@@ -1,4 +1,10 @@
 # SpringBootCMS
+![image](https://img.shields.io/badge/SpringBoot-%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%98%85-blue.svg)
+![image](https://img.shields.io/badge/MybatisPlus-%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%98%85-blue.svg)
+![image](https://img.shields.io/badge/Freemarker-%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%98%85-blue.svg)
+[![Build Status](https://travis-ci.org/moshowgame/SpringBootCMS.svg?branch=master)](https://travis-ci.org/moshowgame/SpringBootCMS)
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+
 - 做个简单易用的SpringBootCMS
 - BackEnd后台:SpringBoot2 + MybatisPlus3 + Freemarker
 - AdminUI管理页面:LayMini2(based on LayUI)
