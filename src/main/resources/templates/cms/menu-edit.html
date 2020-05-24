@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="menuId" value="${(menu.menuId)!!}" class="layui-input">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">名字</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" lay-verify="required" lay-reqtext="名字不能为空" placeholder="请输入名字" value="${(menu.title)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">链接</label>
+        <div class="layui-input-block">
+            <input type="text" name="href" lay-verify="required" lay-reqtext="地址不能为空" placeholder="请输入地址" value="${(menu.href)!'/cms/xxx/list'}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">图标</label>
+        <div class="layui-input-block">
+            <input type="text" name="icon" lay-verify="required" lay-reqtext="图标不能为空" placeholder="请输入图标" value="${(menu.icon)!'fa fa-tachometer'}" class="layui-input">
+            <tip>图标参考 https://www.layui.com/doc/element/icon.html</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">目标</label>
+        <div class="layui-input-block">
+            <input type="text" name="target" lay-verify="required" lay-reqtext="目标不能为空" placeholder="请输入目标" value="${(menu.target)!'_self'}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">父菜单id</label>
+        <div class="layui-input-block">
+                <select id="parentMenuId" name="parentMenuId" lay-filter="parentMenuId" lay-verify="required"  class="layui-input">
+                    <option value="0">主菜单</option>
+                </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色</label>
+        <div class="layui-input-block">
+            <input type="checkbox" id="role1" name="roleId" value="1" title="普通用户"   <#if (menu.roleId)??> ${(menu.roleId?contains('1'))?string('checked','')?html} <#else>checked </#if> >
+            <input type="checkbox" id="role9" name="roleId" value="9" title="管理员" <#if (menu.roleId)??> ${(menu.roleId?contains('9'))?string('checked','')?html} <#else>checked </#if> >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            var roleIds = "";
+            $("input[name='roleId']:checked").each(function(i){
+                //把所有被选中的复选框的值存入数组 by zhengkai.blog.csdn.net
+                roleIds = roleIds+$(this).val()+",";
+            });
+            var submitData = data.field;
+            submitData['roleId'] = roleIds;
+            console.log(submitData);
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/menu/save",
+                data:JSON.stringify(submitData),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+        function initMenu(){
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/menu/list",
+                data:{"searchParams":"{'parentMenuId':'0'}","page":"1","limit":"99"},
+                success: function (responseData) {
+                    if (responseData.code === 200 || responseData.code === 0) {
+                        var length = responseData.data.length;
+                        console.log("parentMenuId.length:"+length);
+                        $("#parentMenuId").empty();
+                        $("#parentMenuId").append('<option value="0">主菜单</option>');
+                        for(var i = 0; i < length; i++) {
+                            //添加option元素
+                            $("#parentMenuId").append("<option value='" + responseData.data[i].menuId + "'>" + responseData.data[i].title + "</option>");
+                        }
+                        $("#parentMenuId").val("${(menu.parentMenuId)!'0'}");
+                        form.render('select');
+                    } else {
+                        layer.msg("加载主菜单列表失败:"+responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+        }
+        initMenu();
+    });
+</script>
+</body>
+</html>

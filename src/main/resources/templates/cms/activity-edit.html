@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="activityId" value="${(activity.activityId)!!}" class="layui-input">
+    <input type="hidden" name="createUserId" value="${(loginUser.userId)!'0'}" class="layui-input">
+    <input type="hidden" name="createUserName" value="${(loginUser.userName)!'管理员'}" class="layui-input">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">活动名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="activityName" lay-verify="required" lay-reqtext="活动名称不能为空" placeholder="请输入活动名称" value="${(activity.activityName)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">活动开始时间</label>
+        <div class="layui-input-block">
+            <input type="text" id="startTime" name="startTime" lay-verify="required" lay-reqtext="活动开始时间不能为空" placeholder="请输入活动开始时间" value="${(activity.startTime?string('yyyy-MM-dd HH:mm:ss'))!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">活动结束时间</label>
+        <div class="layui-input-block">
+            <input type="text" id="endTime" name="endTime" lay-verify="required" lay-reqtext="活动结束时间不能为空" placeholder="请输入活动结束时间" value="${(activity.endTime?string('yyyy-MM-dd HH:mm:ss'))!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">活动简介</label>
+        <div class="layui-input-block">
+            <textarea name="activityDesc"  required id="activityDesc" class="layui-input">${(activity.activityDesc)!!}</textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            layedit =layui.layedit,
+            laydate = layui.laydate,
+            $ = layui.$;
+
+        //日期
+        laydate.render({
+            elem: '#startTime',
+            type: 'datetime'
+        });
+        laydate.render({
+            elem: '#endTime',
+            type: 'datetime'
+        });
+
+        //创建一个编辑器
+        var editIndex = layedit.build('activityDesc');
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/activity/save",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

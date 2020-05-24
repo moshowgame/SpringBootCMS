@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">创建者</label>
+                            <div class="layui-input-inline">
+                                <select id="createUserId" name="createUserId" lay-filter="aihao" >
+                                    <option value="">所有活动</option>
+                                    <#if loginUser??><option value="${(loginUser.userId)!!}">我创建的活动</option></#if>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">状态</label>
+                            <div class="layui-input-inline">
+                                <select id="status" name="status" lay-filter="aihao" >
+                                    <#if roleId gt 1 >
+                                    <option value="">-所有-</option>
+                                    <option value="0">未发布</option>
+                                    </#if>
+                                    <option value="1">已发布</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">活动名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="activityName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button id="searchBtn" type="submit" class="layui-btn layui-btn-primary" lay-submit  lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <#if roleId gt 1 >
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add">  <i class="layui-icon layui-icon-addition"></i>添加活动 </button>
+                </#if>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            {{#  if(d.status =='0' && d.createUserId=='${(loginUserId)!!}' ) { }}
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="publish"><i class="layui-icon layui-icon-ok"></i>发布</a>
+            {{#  } }}
+            {{#  if(d.status =='1' && d.createUserId=='${(loginUserId)!!}' ) { }}
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="qrcode"><i class="layui-icon layui-icon-login-wechat"></i>二维码</a>
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="unpublish"><i class="layui-icon layui-icon-pause"></i>停止</a>
+            {{#  } }}
+
+            {{#  if(d.status =='0') { }}
+                <#if roleId gt 1 >
+                    <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                    <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </#if>
+            {{#  } else { }}
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="sign"><i class="layui-icon layui-icon-release"></i>签到</a>
+                <#if roleId gt 1 >
+                    <a class="layui-btn layui-btn-xs data-count-edit" lay-event="signList"><i class="layui-icon layui-icon-form"></i>签到列表</a>
+                    <a class="layui-btn layui-btn-xs data-count-edit" lay-event="signDashboard"><i class="layui-icon layui-icon-engine"></i>签到分析</a>
+                </#if>
+            {{#  } }}
+        </script>
+        <script type="text/html" id="statusTemplate">
+            {{#  if(d.status == '1' ){ }}
+            <i class="layui-icon layui-icon-ok"></i>已发布
+            {{#  } else { }}
+            - 未发布
+            {{#  } }}
+        </script>
+        <script type="text/html" id="createTimeTemplate">
+            {{ dateFormat(d.createTime) }}
+        </script>
+        <script type="text/html" id="startTimeTemplate">
+            {{ dateFormat(d.startTime) }}
+        </script>
+        <script type="text/html" id="endTimeTemplate">
+            {{ dateFormat(d.endTime) }}
+        </script>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+        table.render({
+            elem: '#currentTableId',
+            method: 'post',
+            url: '${request.contextPath}/activity/list',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [[
+                /*{type: "checkbox", width: 50, fixed: "left"},*/
+                {field: 'activityId', title: '活动序号', sort: true},
+                {field: 'activityName', title: '名称', sort: true},
+                {templet: '#statusTemplate',title: '状态', sort: true},
+                {field: 'startTime', title: '开始时间', sort: true, templet: "<div>{{layui.util.toDateString(d.startTime, 'yyyy-MM-dd HH:mm:ss')}}</div>"},
+                {field: 'endTime',  title: '结束时间', sort: true, templet: "<div>{{layui.util.toDateString(d.endTime, 'yyyy-MM-dd HH:mm:ss')}}</div>"},
+                {field: 'createUserName', title: '创建者', sort: true},
+                {title: '操作', width: 500, templet: '#currentTableBar', align: "center"}
+            ]],
+            limits: [20, 50 , 100],
+            limit: 20,
+            page: true
+        });
+
+        var result;
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            result = JSON.stringify(data.field);
+            // layer.alert(result, {
+            //     title: '最终的搜索信息'
+            // });
+
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    searchParams: result
+                }
+            }, 'data');
+
+            return false;
+        });
+        var searchBtn = $("#searchBtn");
+        searchBtn.click();
+        /**
+         * toolbar监听事件:表格添加按钮
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {
+                var index = layer.open({
+                    title: '添加',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['1000px', '700px'],
+                    content: '${request.contextPath}/activity/edit?id=0',
+                });
+                return false;
+            }
+        });
+        /**
+         * tool监听事件:表格编辑删除等功能按钮
+         */
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                var index = layer.open({
+                    title: '编辑活动',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '500px'],
+                    content: '${request.contextPath}/activity/edit?id='+obj.data.activityId,
+                });
+
+                return false;
+            } else if (obj.event === 'required') {
+                var index = layer.open({
+                    title: '签到规则',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['1200px', '500px'],
+                    content: '${request.contextPath}/activityRequired/list?activityId='+obj.data.activityId,
+                });
+
+                return false;
+            }else if (obj.event === 'signList') {
+                var index = layer.open({
+                    title: '签到列表',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['1200px', '500px'],
+                    content: '${request.contextPath}/activitySign/list?activityId='+obj.data.activityId,
+                });
+
+                return false;
+            }else if (obj.event === 'sign') {
+                console.log('${request.contextPath}/activitySign/display?activityId='+obj.data.activityId);
+                var index = layer.open({
+                    title: '签到',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '600px'],
+                    content: '${request.contextPath}/activitySign/display?activityId='+obj.data.activityId,
+                });
+                return false;
+            }else if (obj.event === 'signDashboard') {
+                var index = layer.open({
+                    title: '签到分析',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['1200px', '500px'],
+                    content: '${request.contextPath}/activitySign/dashboard?activityId='+obj.data.activityId,
+                });
+
+                return false;
+            }else if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/activity/delete",
+                        data:{"id":obj.data.activityId},
+                        success: function (responseData) {
+                            if (responseData.code === 200) {
+                                layer.msg(responseData.msg, function () {
+                                    obj.del();
+                                });
+                            } else {
+                                layer.msg(responseData.msg, function () {
+                                    //window.location = '/index.html';
+                                });
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if (obj.event === 'publish') {
+                layer.confirm('确定要发布活动吗？', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/activity/publish",
+                        data:{"id":obj.data.activityId,"status":"1"},
+                        success: function (responseData) {
+                            searchBtn.click();
+                            layer.msg(responseData.msg, function () {
+                                });
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if (obj.event === 'unpublish') {
+                layer.confirm('确定要停止活动吗？', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/activity/publish",
+                        data:{"id":obj.data.activityId,"status":"0"},
+                        success: function (responseData) {
+                            searchBtn.click();
+                            layer.msg(responseData.msg, function () {
+                                });
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if (obj.event === 'qrcode') {
+                //layer.msg("请保存二维码", function () {
+                //});
+                var index = layer.open({
+                    title: '签到二维码',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['500px', '500px'],
+                    content: '${request.contextPath}/activitySign/qrcode?activityId='+obj.data.activityId,
+                });
+            }
+        });
+    });
+</script>
+<script>
+
+</script>
+
+</body>
+</html>

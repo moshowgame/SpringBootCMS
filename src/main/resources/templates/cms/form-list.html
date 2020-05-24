@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">创建者</label>
+                            <div class="layui-input-inline">
+                                <select id="createUserId" name="createUserId" lay-filter="aihao" >
+                                    <option value="">-所有-</option>
+                                    <#if loginUser??><option value="${(loginUser.userId)!!}">我</option></#if>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">状态</label>
+                            <div class="layui-input-inline">
+                                <select id="status" name="status" lay-filter="aihao" >
+                                    <#if roleId gt 1 >
+                                    <option value="">-所有-</option>
+                                    <option value="0">未发布</option>
+                                    </#if>
+                                    <option value="1">已发布</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">表单名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="formName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button id="searchBtn" type="submit" class="layui-btn layui-btn-primary" lay-submit  lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <#if roleId gt 1 >
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add">  <i class="layui-icon layui-icon-addition"></i>添加表单</button>
+                </#if>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            {{#  if(d.status =='0' && d.createUserId=='${(loginUserId)!!}' ) { }}
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="publish"><i class="layui-icon layui-icon-ok"></i>发布</a>
+
+                <#if roleId gt 1 >
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="formItemList"><i class="layui-icon layui-icon-form"></i>表单设置</a>
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </#if>
+
+            {{#  } }}
+            {{#  if(d.status =='1' && d.createUserId=='${(loginUserId)!!}' ) { }}
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="unpublish"><i class="layui-icon layui-icon-pause"></i>停止</a>
+                <#if roleId gt 1 >
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="excelExport"><i class="layui-icon layui-icon-download-circle"></i>excel导出</a>
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="formSubmitValueList"><i class="layui-icon layui-icon-form"></i>提交列表</a>
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="signDashboard"><i class="layui-icon layui-icon-engine"></i>提交分析</a>
+                </#if>
+            {{#  } }}
+            {{#  if(d.status =='0') { }}
+
+            {{#  } else { }}
+                <a class="layui-btn layui-btn-xs data-count-edit" lay-event="formItemDisplay"><i class="layui-icon layui-icon-release"></i>提交</a>
+
+            {{#  } }}
+
+        </script>
+
+        <script type="text/html" id="formTypeTemplate">
+            {{#  if(d.formType == '1'){ }}
+            常规表单
+            {{#  } else if(d.formType =='2') { }}
+            专项表单
+            {{#  } else { }}
+            表单
+            {{#  } }}
+        </script>
+        <script type="text/html" id="statusTemplate">
+            {{#  if(d.status == '1' ){ }}
+            <i class="layui-icon layui-icon-ok"></i>已发布
+            {{#  } else { }}
+            - 未发布
+            {{#  } }}
+        </script>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            method: 'post',
+            url: '${request.contextPath}/form/list',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [[
+                /*{type: "checkbox", width: 50, fixed: "left"},*/
+                {field: 'formId', title: '表单ID', sort: true},
+                {field: 'formName',  title: '表单名称', sort: true},
+                {templet: "#formTypeTemplate", title: '类型', sort: true},
+                {templet: "#statusTemplate",  title: '状态', sort: true},
+                {field: 'createUserName', title: '创建用户', sort: true},
+                {title: '修改时间', sort: true,templet: "<div>{{layui.util.toDateString(d.updateTime, 'yyyy-MM-dd')}}</div>"},
+                {title: '操作', width: 500, templet: '#currentTableBar', align: "center"}
+            ]],
+            limits: [20, 50 , 100],
+            limit: 20,
+            page: true
+        });
+
+        var result;
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            result = JSON.stringify(data.field);
+            // layer.alert(result, {
+            //     title: '最终的搜索信息'
+            // });
+
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    searchParams: result
+                }
+            }, 'data');
+
+            return false;
+        });
+        var searchBtn = $("#searchBtn");
+        searchBtn.click();
+        /**
+         * toolbar监听事件:表格添加按钮
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {
+                var index = layer.open({
+                    title: '添加',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['1000px', '700px'],
+                    content: '${request.contextPath}/form/edit?id=0',
+                });
+                return false;
+            }
+        });
+
+        // 监听删除操作
+        $(".data-delete-btn").on("click", function () {
+            var checkStatus = table.checkStatus('currentTableId')
+                , data = checkStatus.data;
+            layer.alert(JSON.stringify(data));
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        /**
+         * tool监听事件:表格编辑删除等功能按钮
+         */
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                var index = layer.open({
+                    title: '编辑',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '700px'],
+                    content: '${request.contextPath}/form/edit?userId=${(loginUser.userId)!!}&id='+obj.data.formId,
+                });
+                return false;
+            } else if (obj.event === 'formItemList') {
+                var index = layer.open({
+                    title: '查看表单',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '600px'],
+                    content: '${request.contextPath}/formItem/list?userId=${(loginUser.userId)!!}&formId='+obj.data.formId,
+                });
+                return false;
+            } else if (obj.event === 'formSubmitValueList') {
+                var index = layer.open({
+                    title: '表单列表',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['1000px', '600px'],
+                    content: '${request.contextPath}/formSubmit/list?userId=${(loginUser.userId)!!}&formId='+obj.data.formId,
+                });
+
+                return false;
+            } else if (obj.event === 'formItemDashboard') {
+                var index = layer.open({
+                    title: 'Dashboard',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '600px'],
+                    content: '${request.contextPath}/formSubmitValue/dashboard?userId={(loginUser.userId)!!}&formId='+obj.data.formId,
+                });
+
+                return false;
+            } else if (obj.event === 'formItemDisplay') {
+                var index = layer.open({
+                    title: '填写表单',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '600px'],
+                    content: '${request.contextPath}/formSubmitValue/display?userId=${(loginUser.userId)!!}&formId='+obj.data.formId,
+                });
+                return false;
+            } else if (obj.event === 'excelExport') {
+                var index = layer.open({
+                    title: 'excel导出',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '400px'],
+                    content: '${request.contextPath}/formSubmitValue/excel/page?userId=${(loginUser.userId)!!}&formId='+obj.data.formId,
+                });
+                return false;
+            }else if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/form/delete",
+                        data:{"id":obj.data.formId},
+                        success: function (responseData) {
+                            if (responseData.code === 200) {
+                                layer.msg(responseData.msg, function () {
+                                    obj.del();
+                                });
+                            } else {
+                                layer.msg(responseData.msg, function () {
+                                    //window.location = '/index.html';
+                                });
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if (obj.event === 'publish') {
+                layer.confirm('确定要发布表单吗？', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/form/publish",
+                        data:{"id":obj.data.formId,"status":"1"},
+                        success: function (responseData) {
+                            layer.msg(responseData.msg, function () {
+                                });
+                        }
+                    });
+                    layer.close(index);searchBtn.click();
+                });
+            }else if (obj.event === 'unpublish') {
+                layer.confirm('确定要停止表单吗？', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/form/publish",
+                        data:{"id":obj.data.formId,"status":"0"},
+                        success: function (responseData) {
+                            layer.msg(responseData.msg, function () {
+                                });
+                        }
+                    });
+                    layer.close(index);searchBtn.click();
+                });
+            }else if (obj.event === 'required') {
+                var index = layer.open({
+                    title: '提交规则',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['1200px', '500px'],
+                    content: '${request.contextPath}/formRequired/list?formId='+obj.data.formId,
+                });
+
+                return false;
+            }else if (obj.event === 'signDashboard') {
+                var index = layer.open({
+                    title: '签到分析',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['1200px', '500px'],
+                    content: '${request.contextPath}/formRequired/dashboard?formId='+obj.data.formId,
+                });
+
+                return false;
+            }
+        });
+    });
+</script>
+<script>
+
+</script>
+
+</body>
+</html>

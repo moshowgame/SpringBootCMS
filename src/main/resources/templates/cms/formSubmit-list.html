@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <input type="hidden" name="formId" autocomplete="off" class="layui-input" value="${(formId)!!}">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">状态</label>
+                            <div class="layui-input-inline">
+                                <select name="status" lay-filter="classesId">
+                                    <option value="">-全部-</option>
+                                    <option value="0">未通过</option>
+                                    <option value="1">提交</option>
+                                    <option value="2">已审核</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">创建者</label>
+                            <div class="layui-input-inline">
+                                <select name="userId" lay-filter="classesId">
+                                    <option value="">-全部-</option>
+                                    <option value="${(loginUser.userId)!!}">我</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">角色</label>
+                            <div class="layui-input-inline">
+                                <select id="roleId" name="roleId" lay-filter="departmentId">
+                                    <option value="">-全部-</option>
+                                    <option value="1">普通用户</option>
+                                    <option value="9">管理员</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">账号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="userName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ushowName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button id="searchBtn" type="submit" class="layui-btn layui-btn-primary" lay-submit  lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <#if roleId gt 1 >
+                    <button class="layui-btn layui-btn-sm data-audit-btn1"> <i class="layui-icon layui-icon-ok"></i>审核 </button>
+                </#if>
+                <#if roleId gt 1 >
+                    <button class="layui-btn layui-btn-sm layui-btn-danger data-unaudit-btn"> <i class="layui-icon layui-icon-close"></i>拒绝 </button>
+                </#if>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit"><i class="layui-icon layui-icon-read"></i>查看</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        </script>
+
+        <script type="text/html" id="statusTemplate">
+            {{#  if(d.status == 0){ }}
+            未通过
+            {{#  }else if(d.status == 1){ }}
+            提交
+            {{#  }else if(d.status == 2){ }}
+            审核通过
+            {{#  } else { }}
+            未知
+            {{#  } }}
+        </script>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            method: 'post',
+            url: '${request.contextPath}/formSubmit/list',
+            where : {"searchParams":"{'formId':'${(formId)!!}'}"},
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [[
+                {type: "checkbox", width: 50, fixed: "left"},
+                {field: 'submitId', width: 100, title: '表单序号', sort: true},
+                {field: 'formName', width: 200, title: '表单名称', sort: true},
+                {templet:'#statusTemplate', width: 150, title: '状态', sort: true},
+                {field: 'userName', width: 150, title: '申请者', sort: true},
+                {field: 'auditUserName', width: 150, title: '审核人', sort: true},
+                {title: '提交时间', sort: true ,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},
+                {title: '审核时间', sort: true ,templet: "<div>{{layui.util.toDateString(d.auditTime, 'yyyy-MM-dd')}}</div>"},
+                {title: '操作', minWidth: 50, templet: '#currentTableBar', fixed: "right", align: "center"}
+            ]],
+            limits: [5, 20, 50 , 100],
+            limit: 5,
+            page: true
+        });
+
+        var result;
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            result = JSON.stringify(data.field);
+            // layer.alert(result, {
+            //     title: '最终的搜索信息'
+            // });
+
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    searchParams: result
+                }
+            }, 'data');
+
+            return false;
+        });
+        var searchBtn = $("#searchBtn");
+        // 监听添加操作
+        $(".data-add-btn").on("click", function () {
+            var index = layer.open({
+                title: '添加',
+                type: 2,
+                shade: 0.2,
+                maxmin:true,
+                shadeClose: true,
+                area: ['800px', '500px'],
+                content: '${request.contextPath}/formSubmit/edit?id=0',
+            });
+            return false;
+        });
+
+        // 监听审核通过操作
+        $(".data-audit-btn1").on("click", function () {
+            var checkStatus = table.checkStatus('currentTableId')
+                , data = checkStatus.data;
+            //layer.alert(JSON.stringify(data));
+            layer.confirm('是否标记为审核状态', function (index) {
+                $.ajax({
+                            type: 'POST',
+                            url: "${request.contextPath}/formSubmit/audit?status=2&userId=${(loginUser.userId)!!}&userName=${(loginUser.userName)!!}",
+                            data:JSON.stringify(data),
+                            contentType: "application/json", //必须有
+                            dataType: "json", //表示返回值类型，不必须
+                            success: function (responseData) {
+                                layer.alert(responseData.msg);
+                            }
+                 });
+            });
+            return false;
+        });
+        $(".data-audit-btn2").on("click", function () {
+            var checkStatus = table.checkStatus('currentTableId')
+                , data = checkStatus.data;
+            //layer.alert(JSON.stringify(data));
+            layer.confirm('是否标记为审核状态', function (index) {
+                $.ajax({
+                    type: 'POST',
+                    url: "${request.contextPath}/formSubmit/audit?status=3&userId=${(loginUser.userId)!!}&userName=${(loginUser.userName)!!}",
+                    data:JSON.stringify(data),
+                    contentType: "application/json", //必须有
+                    dataType: "json", //表示返回值类型，不必须
+                    success: function (responseData) {
+                        layer.alert(responseData.msg);
+                    }
+                });
+            });
+            return false;
+        });
+        // 监听审核不通过操作
+        $(".data-unaudit-btn").on("click", function () {
+            var checkStatus = table.checkStatus('currentTableId')
+                , data = checkStatus.data;
+            //layer.alert(JSON.stringify(data));
+            layer.confirm('是否标记为审核不通过状态', function (index) {
+                        $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/formSubmit/audit?status=0&userId=${(loginUser.userId)!!}&userName=${(loginUser.userName)!!}",
+                        data:JSON.stringify(data),
+                        contentType: "application/json", //必须有
+                        dataType: "json", //表示返回值类型，不必须
+                        success: function (responseData) {
+                            layer.alert(responseData.msg);
+                        }
+                });
+            });
+            return false;
+        });
+
+        //监听表格复选框选择
+        //table.on('checkbox(currentTableFilter)', function (obj) {
+        //    console.log(obj)
+        //});
+
+        /**
+         * tool监听事件:表格编辑删除等功能按钮
+         */
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                var index = layer.open({
+                    title: '查看表单',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '500px'],
+                    content: '${request.contextPath}/formSubmitValue/display?formId='+obj.data.formId+'&submitId='+obj.data.submitId,
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/formSubmit/delete",
+                        data:{"id":obj.data.formSubmitId},
+                        success: function (responseData) {
+                            if (responseData.code === 200) {
+                                layer.msg(responseData.msg, function () {
+                                    obj.del();
+                                });
+                            } else {
+                                layer.msg(responseData.msg, function () {
+                                    //window.location = '/index.html';
+                                });
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+    });
+</script>
+
+
+</body>
+</html>

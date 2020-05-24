@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="activitySignId" value="" class="layui-input">
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">签到id</label>
+        <div class="layui-input-block">
+            <input type="text" name="signId" lay-verify="required" lay-reqtext="签到id不能为空" placeholder="请输入签到id" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">活动id</label>
+        <div class="layui-input-block">
+            <input type="text" name="activityId" lay-verify="required" lay-reqtext="活动id不能为空" placeholder="请输入活动id" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户id</label>
+        <div class="layui-input-block">
+            <input type="text" name="userId" lay-verify="required" lay-reqtext="用户id不能为空" placeholder="请输入用户id" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">签到时间</label>
+        <div class="layui-input-block">
+            <input type="text" name="signTime" lay-verify="required" lay-reqtext="签到时间不能为空" placeholder="请输入签到时间" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="userName" lay-verify="required" lay-reqtext="姓名不能为空" placeholder="请输入姓名" value="" class="layui-input">
+        </div>
+    </div>
+
+    <!--<div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>-->
+</div>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/activitySign/save",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="userId" value="${(user.userId)!!}" class="layui-input">
+    <div class="layui-form-item">
+        <label class="layui-form-label">账号</label>
+        <div class="layui-input-block">
+            <input type="text" disabled name="userName" lay-verify="required" lay-reqtext="账号不能为空" placeholder="请输入账号" value="${(user.userName)!!}" class="layui-input">
+            <tip>登录系统的账号。</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" disabled name="showName" lay-verify="required" lay-reqtext="姓名不能为空" placeholder="请输入姓名" value="${(user.showName)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">密码</label>
+        <div class="layui-input-block">
+            <input type="text" id="password" name="password" placeholder="修改密码，留空为不修改" value="" class="layui-input">
+            <tip>登录系统的密码，置空为不修改。</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">再次输入密码</label>
+        <div class="layui-input-block">
+            <input type="text" id="password2" name="password2" value="" class="layui-input">
+            <tip>登录系统的密码。</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">电子邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="email" placeholder="请输入电子邮箱" value="${(user.email)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">手机号码</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone" placeholder="请输入手机号码" value="${(user.phone)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">公司名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="companyName" placeholder="请输入公司名称" value="${(user.companyName)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">公司地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="companyAddress" placeholder="请输入公司地址" value="${(user.companyAddress)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            if($("#password").val()!=$("#password1").val()){
+                layer.msg("两次输入的密码必须一致");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/user/save",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+        /*
+        function initDepartment(){
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/department/list",
+                data:{"searchParams":"","page":"1","limit":"99"},
+                success: function (responseData) {
+                    if (responseData.code === 200 || responseData.code === 0) {
+                        var length = responseData.data.length;
+                        console.log("initDepartment.length:"+length);
+                        $("#departmentId").empty();
+                        $("#departmentId").append('<option value=""></option>');
+                        for(var i = 0; i < length; i++) {
+                            //添加option元素
+                            $("#departmentId").append("<option value='" + responseData.data[i].departmentId + "'>" + responseData.data[i].departmentName + "</option>");
+                        }
+                        $("#departmentId").val("${(user.departmentId)!!}");
+                        form.render('select');
+                    } else {
+                        layer.msg("加载学院列表失败:"+responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+        }
+        initDepartment();
+        function initMajor(){
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/major/list",
+                data:{"searchParams":"{'departmentId':'"+$("#departmentId").val()+"'}","page":"1","limit":"99"},
+                success: function (responseData) {
+                    if (responseData.code === 200 || responseData.code === 0) {
+                        var length = responseData.data.length;
+                        console.log("initMajor.length:"+length);
+                        $("#majorId").empty();
+                        $("#majorId").append('<option value=""></option>');
+                        for(var i = 0; i < length; i++) {
+                            //添加option元素
+                            $("#majorId").append("<option value='" + responseData.data[i].majorId + "'>" + responseData.data[i].majorName + "</option>");
+                        }
+                        $("#majorId").val("${(user.majorId)!!}");
+                        form.render('select');
+                    } else {
+                        layer.msg("加载专业列表失败:"+responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+        }
+        initMajor();
+        function initClasses(){
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/classes/list",
+                data:{"searchParams":"{'majorId':'"+$("#majorId").val()+"'}","page":"1","limit":"99"},
+                success: function (responseData) {
+                    if (responseData.code === 200 || responseData.code === 0) {
+                        var length = responseData.data.length;
+                        console.log("initClasses.length:"+length);
+                        $("#classesId").empty();
+                        $("#classesId").append('<option value=""></option>');
+                        for(var i = 0; i < length; i++) {
+                            //添加option元素
+                            $("#classesId").append("<option value='" + responseData.data[i].classesId + "'>" + responseData.data[i].classesName + "</option>");
+                        }
+                        $("#classesId").val("${(user.classesId)!!}");
+                        form.render('select');
+                    } else {
+                        layer.msg("加载班级列表失败:"+responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+        }
+        //initClasses();
+        form.on('select(departmentId)', function(data){
+            //console.log("select(departmentId)");
+            initMajor();
+            initClasses();
+        });
+        form.on('select(majorId)', function(data){
+            //console.log("select(majorId)");
+            initClasses();
+        });*/
+    });
+</script>
+</body>
+</html>

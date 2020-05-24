@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <input type="hidden" name="formId" autocomplete="off" class="layui-input" value="${(formId)!!}">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">状态</label>
+                            <div class="layui-input-inline">
+                                <select name="status" lay-filter="status">
+                                    <option value="">-全部-</option>
+                                    <option value="0">未通过</option>
+                                    <option value="1">提交</option>
+                                    <option value="2">已审核</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">账号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="userName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ushowName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button id="searchBtn" type="submit" class="layui-btn layui-btn-primary" lay-submit  lay-filter="data-search-btn"><i class="layui-icon layui-icon-download-circle"></i> excel导出</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+    </div>
+</div>
+<script src="${request.contextPath}/static/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        var result;
+        var searchBtn = $("#searchBtn");
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            result = JSON.stringify(data.field);
+            //执行搜索重载
+            var encodedData = encodeURI(result);
+            console.log(encodedData);
+            window.location = '${request.contextPath}/formSubmitValue/excel/export?searchParams='+encodedData;
+            return false;
+        });
+    });
+</script>
+
+
+</body>
+</html>

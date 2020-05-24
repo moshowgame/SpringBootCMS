@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="itemId" value="${(formItem.itemId)!!}" class="layui-input">
+    <input type="hidden" name="formId" value="${(formId)!!}" class="layui-input">
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">表单项名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="itemName" lay-verify="required" lay-reqtext="表单项名称不能为空" placeholder="请输入表单项名称" value="${(formItem.itemName)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">类型</label>
+        <div class="layui-input-block">
+            <input type="radio" name="itemType" value="input" title="输人框" <#if (formItem.itemType)??> ${(formItem.itemType == 'input')?string('checked=""','0')?html} </#if>>
+            <input type="radio" name="itemType" value="select" title="单选框" <#if (formItem.itemType)??> ${(formItem.itemType  == 'radio')?string('checked=""','0')?html} </#if>>
+            <input type="radio" name="itemType" disabled value="checkbox" title="复选框" <#if (formItem.itemType)??> ${(formItem.itemType == 'checkbox')?string('checked=""','0')?html} </#if>>
+            <input type="radio" name="itemType" value="date" title="日期" <#if (formItem.itemType)??> ${(formItem.itemType == 'date')?string('checked=""','0')?html} </#if>>
+            <input type="radio" name="itemType" value="textarea" title="文本域" <#if (formItem.itemType)??> ${(formItem.itemType == 'textarea')?string('checked=""','0')?html} </#if>>
+            <input type="radio" name="itemType" value="fileupload" title="文件上传" <#if (formItem.itemType)??> ${(formItem.itemType == 'fileupload')?string('checked=""','0')?html} </#if>>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">可选值</label>
+        <div class="layui-input-block">
+            <input type="text" name="defaultValue" placeholder="请输入默认值" value="${(formItem.defaultValue)!!}" class="layui-input">
+            <tip>当类型为单选框或者复选框时，请设置可选值。例如公司;企业;个人; 以英文分号;分隔</tip>
+        </div>
+    </div>
+    <!--<div class="layui-form-item">
+        <label class="layui-form-label">提示</label>
+        <div class="layui-input-block">
+            <input type="text" name="itemTip" placeholder="请输入提示" value="${(formItem.itemTip)!!}" class="layui-input">
+        </div>
+    </div>-->
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+        form.render('select');
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/formItem/save",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

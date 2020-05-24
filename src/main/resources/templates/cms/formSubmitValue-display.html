@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<@netCommon.uploadImport />
+    <style>
+       <!-- body {
+            background-color: #ffffff;
+        }
+        .layui-input-block {
+            margin-left: 10%;
+            min-height: 42px;
+        }
+        .layui-input-title {
+            font: 12px "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei","Microsoft YaHei UI","微软雅黑", sans-serif;
+            color: #333;
+            font-weight: bold;
+        }
+        .layui-elem-field legend {
+            margin-left: 40%;
+            font-size: 20px;
+            line-height: 32px;
+            font-weight: bold;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            color: #1ea0fa;
+        }-->
+    </style>
+<body>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>${(form.formName)!!}</legend>
+</fieldset>
+<table class="layui-table" lay-size="sm">
+    <colgroup>
+        <col width="50">
+        <col width="200">
+    </colgroup>
+    <thead>
+    </thead>
+    <tbody>
+    <tr>
+        <td>表单描述</td>
+        <td>${(form.formDesc)!!}</td>
+    </tr>
+    <tr>
+        <td>附件下载</td>
+        <td><a id="downloadLink" href="${request.contextPath}/file/files/${(form.attachment)!!}">点击下载附件</a></td>
+    </tr>
+    </tbody>
+</table>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="formId" value="${(formId)!!}" class="layui-input">
+    <input type="hidden" name="submitId" value="${(submitId)!!}" class="layui-input">
+    <input type="hidden" name="userId" value="${(loginUser.userId)!!}" class="layui-input">
+    <input type="hidden" name="userName" value="${(loginUser.userName)!!}" class="layui-input">
+    <div id="itemArea">
+
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">提交</button>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    layui.use(['form','upload'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            upload = layui.upload,
+            $ = layui.$;
+
+        var checkList = [];
+        var checkNameList = {};
+        var fileUploadList = [];
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            console.info(JSON.stringify(data.field));
+            var errorMessage="";
+
+            for(var i=0;i<checkList.length;i++){
+                if(data.field.hasOwnProperty(checkList[i])){
+                }else{
+                    layer.msg("请先回答以下问题:"+checkNameList[checkList[i]], function () {
+                    });
+                    return false;
+                }
+            }
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/formSubmitValue/submit",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            //提交成功后跳转
+                            //window.location = '${request.contextPath}/questionnaire/success';
+                            //var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            //parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+        function fileupload(fileid){
+          var uploadInst = upload.render({
+            elem: '#'+fileid //绑定元素
+            ,url: '${request.contextPath}/file/files' //上传接口
+            ,exts: 'jpg|jpeg|png|txt|doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z|pdf|log' // 上传文件的类型
+            ,done: function(res){
+              //上传完毕回调
+              console.info(res);
+              $("#"+fileid).val(res.data);
+            }
+            ,error: function(){
+              //请求异常回调
+            }
+          });
+        }
+        function getOptionListHtml(typeStr,nameStr,valueStr,titleStr,defaultValueStr){
+            if(valueStr===undefined){valueStr="";}
+            if(typeStr==="input"){
+                //智能补全：如果是姓名，默认从session获取
+                if(titleStr==="姓名"&&valueStr===""){
+                    valueStr="${(loginUser.showName)!!}";
+                }else if(titleStr==="账号"&&valueStr===""){
+                    valueStr="${(loginUser.userName)!!}";
+                }else if((titleStr==="手机"||titleStr==="联系方式")&&valueStr===""){
+                    valueStr="${(loginUser.phone)!!}";
+                }else if(titleStr==="邮箱"&&valueStr===""){
+                    valueStr="${(loginUser.email)!!}";
+                }
+                return '<input type="text" name="'+nameStr+'" lay-verify="required" lay-reqtext="'+titleStr+'不能为空" placeholder="请输入'+titleStr+'" value="'+valueStr+'" class="layui-input">';
+            }else if(typeStr==="textarea"){
+                return '<'+typeStr+' name="'+nameStr+'" lay-verify="required" lay-filter="choiceOne" class="layui-textarea">'+valueStr+'</'+typeStr+'>';
+            }else if(typeStr==="fileupload"){
+                fileUploadList.push(nameStr);
+                var downloadBtn = '';
+                if(valueStr!=undefined && valueStr!=''){
+                   downloadBtn = '<div class="layui-form-mid layui-word-aux"><a href="${request.contextPath}/file/files/'+valueStr+'">点击下载附件</a></div>';
+                }
+                return '<input type="text" readonly="readonly" name="'+nameStr+'" id="'+nameStr+'" lay-reqtext="请上传'+titleStr+'" placeholder="点击上传文件↑" value="'+valueStr+'" class="layui-input">'+downloadBtn;
+            }else if(typeStr==="select"){
+                var valueList = new Array();
+                //拼接select
+                var selectStr='<select name="'+nameStr+'">';
+                var selectStr2='';
+                //已选的放前面
+                valueList=defaultValueStr.split(";");
+                for(i=0; i < valueList.length; i++){
+                    //选中效果
+                    if(valueList[i]===valueStr){
+                        selectStr+=('<option checked="" value="'+valueList[i]+'">'+valueList[i]+'(已选)</option>');
+                    }else{
+                        selectStr2+=('<option value="'+valueList[i]+'">'+valueList[i]+'</option>');
+                    }
+                    //console.log(valueList[i]);
+                    //console.log(valueStr);
+                }
+                selectStr=selectStr+selectStr2+"</select>";
+                return selectStr;
+            }
+        }
+        function getItemListHtml(nameStr,optionStr){
+            return '<div class="layui-form-item layui-form-pane"><label class="layui-form-label required">'+nameStr+'</label><div class="layui-input-block">'+optionStr+'</div></div>';
+        }
+        function init(){
+            var data = ${(itemValueList)!!};
+            var nowItemId = "";
+            var nowItemName = "";
+            var optionListHtml = "";
+            console.log(data);
+            for(var n in data){//遍历json数组时，这么写p为索引，0,1
+                //当前问题一样，则追加option
+                if(nowItemId===data[n].itemId){
+
+                }else if(nowItemId===""){
+                    //第一次
+                    nowItemId=data[n].itemId;
+                    nowItemName=data[n].itemName;
+                    checkList.push(nowItemId);
+                    checkNameList[nowItemId]=nowItemName;
+                }else{
+                    //不等于，先把上一个问题插先
+                    var insertHtml = getItemListHtml(nowItemName,optionListHtml);
+                    $("#itemArea").append(insertHtml);
+                    nowItemId=data[n].itemId;
+                    nowItemName=data[n].itemName;
+                    optionListHtml="";
+                    checkList.push(nowItemId);
+                    checkNameList[nowItemId]=nowItemName;
+                    //.add({"'+nowItemId+'":"'+nowItemName+'"});
+                }
+                optionListHtml=optionListHtml+getOptionListHtml(data[n].itemType,data[n].itemId,data[n].valueText,data[n].itemName,data[n].defaultValue);
+                //console.log(data[n].itemName + ":" + data[n].optionName);
+            }
+            //最后加一次
+            var insertHtml = getItemListHtml(nowItemName,optionListHtml);
+            $("#itemArea").append(insertHtml);
+
+            //form.render('input');
+            //form.render('radio');
+            //form.render('checkbox');
+            for(var i=0;i<fileUploadList.length;i++){
+                fileupload(fileUploadList[i]);
+            }
+            form.render('select');
+        }
+        init();
+    });
+</script>
+</body>
+</html>

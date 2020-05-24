@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="activitySignId" value="" class="layui-input">
+    <div id="qrcode">
+    </div>
+
+</div>
+</div>
+<script src="${request.contextPath}/static/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script src="${request.contextPath}/static/lib/qrcode/qrcode.min.js" charset="utf-8"></script>
+<script>
+var qrcode = new QRCode(document.getElementById("qrcode"), {
+      width : 420,
+      height : 420,
+      useSVG: false,
+      correctLevel: 3
+  });
+
+  function makeCode () {
+      var dataX={"activityId":"${(activity.activityId)!!}"};
+      $.ajax({
+                async:false,
+                type: 'POST',
+                url: "${request.contextPath}/qrcode",
+                data:JSON.stringify(dataX),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        //绑定成功，修改绑定标志
+                        console.log(responseData.data);
+                        qrcode.makeCode(responseData.data);
+                    } else {
+                        alert(responseData.msg);
+                    }
+                }
+          });
+  }
+
+  makeCode();
+</script>
+</body>
+</html>

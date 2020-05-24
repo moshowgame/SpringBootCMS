@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<div class="layui-form layuimini-form">
+
+    <#if form??>
+         <input type="hidden" name="formId" value="${(form.formId)!!}" class="layui-input">
+    <#else>
+        <input type="hidden" name="createUserId" value="${(loginUser.userId)!!}" class="layui-input">
+        <input type="hidden" name="createUserName" value="${(loginUser.userName)!'管理员'}" class="layui-input">
+    </#if>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">表单名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="formName" lay-verify="required" lay-reqtext="表单名称不能为空" placeholder="请输入表单名称" value="${(form.formName)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">表单类型</label>
+        <div class="layui-input-block">
+            <input type="radio" name="formType" value="1" title="常规表单模板" <#if (form.formType)??> ${(form.formType == 1)?string('checked=""','0')?html} <#else>checked=""</#if>>
+            <input type="radio" name="formType" value="2" title="专项表单模板" <#if (form.formType)??> ${(form.formType == 2)?string('checked=""','0')?html} </#if>>
+            <input type="radio" name="formType" value="3" title="实习表单模板" <#if (form.formType)??> ${(form.formType == 3)?string('checked=""','0')?html} </#if>>
+         </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">表单描述</label>
+        <div class="layui-input-block">
+            <textarea name="formDesc" required id="formDesc" class="layui-input">${(form.formDesc)!!}</textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">表单附件</label>
+        <div class="layui-input-block">
+            <input type="text" name="attachment" id="attachment" lay-reqtext="请上传附件" placeholder="点击上传文件↑" value="${(form.attachment)!!}" class="layui-input">
+            <div class="layui-form-mid layui-word-aux"><a id="downloadLink" href="${request.contextPath}/file/files/${(form.attachment)!!}">点击下载附件</a></div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form','layedit','upload'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            layedit =layui.layedit,
+            upload = layui.upload,
+            $ = layui.$;
+        //创建一个编辑器
+        var editIndex = layedit.build('formDesc');
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            //fix 关于layui富文本编辑器和form表单提交的问题
+            data.field.formDesc = layedit.getContent(editIndex);
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/form/save",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+        function fileupload(fileid){
+          var uploadInst = upload.render({
+            elem: '#'+fileid //绑定元素
+            ,url: '${request.contextPath}/file/files' //上传接口
+            ,exts: 'jpg|jpeg|png|txt|doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z|pdf|log' // 上传文件的类型
+            ,done: function(res){
+              //上传完毕回调
+              console.info(res);
+              $("#"+fileid).val(res.data);
+              $("#downloadLink").attr("href","${request.contextPath}/file/files/"+res.data);
+            }
+            ,error: function(){
+              //请求异常回调
+            }
+          });
+        }
+        fileupload("attachment");
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="userId" value="${(user.userId)!!}" class="layui-input">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">账号</label>
+        <div class="layui-input-block">
+            <input type="text" name="userName" lay-verify="required" lay-reqtext="账号不能为空" placeholder="请输入账号" value="${(user.userName)!!}" class="layui-input">
+            <tip>登录系统的账号。</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="showName" lay-verify="required" lay-reqtext="姓名不能为空" placeholder="请输入姓名" value="${(user.showName)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">密码</label>
+        <div class="layui-input-block">
+            <input type="text" name="password" lay-verify="required" lay-reqtext="密码不能为空" placeholder="请输入密码" value="${(user.password)!!}" class="layui-input">
+            <tip>登录系统的密码。</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">电子邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="email" placeholder="请输入电子邮箱" value="${(user.email)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">手机号码</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone" placeholder="请输入手机号码" value="${(user.phone)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">公司名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="companyName" placeholder="请输入公司名称" value="${(user.companyName)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">公司地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="companyAddress" placeholder="请输入公司地址" value="${(user.companyAddress)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="status" value="1" title="启用" <#if (user.status)??> ${(user.status == 1)?string('checked=""','0')?html} <#else>checked=""</#if> >
+            <input type="radio" name="status" value="0" title="停用" <#if (user.status)??> ${(user.status == 0)?string('checked=""','0')?html} </#if>>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色</label>
+        <div class="layui-input-block">
+            <input type="radio" name="roleId" value="1" title="普通用户" <#if (user.roleId)??> ${(user.roleId == 1)?string('checked=""','0')?html} <#else>checked=""</#if>>
+            <input type="radio" name="roleId" value="9" title="管理员" <#if (user.roleId)??> ${(user.roleId == 9)?string('checked=""','0')?html} </#if>>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    layui.use(['form','laydate'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            laydate = layui.laydate,
+            $ = layui.$;
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/user/save",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>
