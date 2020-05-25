@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="hidden" name="articleId" value="${(article.articleId)!!}" class="layui-input">
+    <#if article??>
+    <#else>
+    <input type="hidden" name="createUserId" value="${(loginUser.userId)!!}" class="layui-input">
+    <input type="hidden" name="createUserName" value="${(loginUser.showName)!!}" class="layui-input">
+    </#if>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">文章标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" lay-verify="required" lay-reqtext="文章标题不能为空" placeholder="请输入文章标题" value="${(article.title)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">内容</label>
+        <div class="layui-input-block">
+            <textarea name="content" required id="content" class="layui-input">${(article.content)!!}</textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">频道id</label>
+        <div class="layui-input-block">
+            <input type="text" name="channelId" lay-verify="required" lay-reqtext="频道id不能为空" placeholder="请输入频道id" value="${(article.channelId)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">关键字，逗号分隔</label>
+        <div class="layui-input-block">
+            <input type="text" name="keyword" lay-verify="required" lay-reqtext="关键字，逗号分隔不能为空" placeholder="请输入关键字，逗号分隔" value="${(article.keyword)!!}" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    layui.use(['form','layedit'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            layedit =layui.layedit,
+            $ = layui.$;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('content');
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            //fix 关于layui富文本编辑器和form表单提交的问题
+            data.field.content = layedit.getContent(editIndex);
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/article/save",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

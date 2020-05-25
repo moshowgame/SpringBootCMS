@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">文章Id</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="articleId" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">文章名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="articleName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button id="searchBtn" type="submit" class="layui-btn layui-btn-primary" lay-submit  lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add">  <i class="layui-icon layui-icon-addition"></i>文章 </button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+        </script>
+
+        <script type="text/html" id="typeTemplate">
+            {{#  if(d.type == '1'){ }}
+            常规
+            {{#  } else if(d.type =='2') { }}
+            专项
+            {{#  } else { }}
+            其它
+            {{#  } }}
+        </script>
+        <script type="text/html" id="statusTemplate">
+            {{#  if(d.status == '1' ){ }}
+            <i class="layui-icon layui-icon-ok"></i>已发布
+            {{#  } else { }}
+            - 未发布
+            {{#  } }}
+        </script>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            method: 'post',
+            url: '${request.contextPath}/article/list',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [[
+                /*{type: "checkbox", width: 50, fixed: "left"},*/
+                {field: 'articleId', title: 'ID', sort: true},
+                {field: 'title', title: '标题', sort: true},
+                {field: 'createUserName', title: '创建者', sort: true},
+                {field: 'channelId', title: '频道id', sort: true},
+                {field: 'keyword',  title: '关键字，逗号分隔', sort: true},
+                {title: '创建时间', sort: true,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},
+                {title: '修改时间', sort: true,templet: "<div>{{layui.util.toDateString(d.updateTime, 'yyyy-MM-dd')}}</div>"},
+                /* 需要时间请自行解封
+                {title: '创建时间', sort: true,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},
+                {title: '修改时间', sort: true,templet: "<div>{{layui.util.toDateString(d.updateTime, 'yyyy-MM-dd')}}</div>"},
+                */
+                {title: '操作', minWidth: 400, templet: '#currentTableBar', fixed: "right", align: "center"}
+            ]],
+            limits: [20 , 50 , 100],
+            limit: 20,
+            page: true
+        });
+
+        var result;
+        /**
+         * submit(data-search-btn):监听搜索操作
+         */
+        form.on('submit(data-search-btn)', function (data) {
+            result = JSON.stringify(data.field);
+
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    searchParams: result
+                }
+            }, 'data');
+
+            return false;
+        });
+
+        var searchBtn = $("#searchBtn");
+        /**
+         * toolbar监听事件:表格添加按钮
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {
+                var index = layer.open({
+                    title: '添加',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['1000px', '700px'],
+                    content: '${request.contextPath}/article/edit?id=0',
+                });
+                return false;
+            }else if(obj.event === 'del') {
+                var checkStatus = table.checkStatus('currentTableId')
+                    , data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+            }
+        });
+        /**
+         * checkbox(currentTableFilter):表格复选框选择
+         */
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            //console.log(obj)
+        });
+
+        /**
+         * tool监听事件:表格编辑删除等功能按钮
+         */
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                var index = layer.open({
+                    title: '编辑',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['1000px', '700px'],
+                    content: '${request.contextPath}/article/edit?id='+obj.data.articleId,
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('确认删除该记录吗？', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/article/delete",
+                        data:{"id":obj.data.articleId},
+                        success: function (responseData) {
+                            if (responseData.code === 200) {
+                                layer.msg(responseData.msg, function () {
+                                    obj.del();
+                                });
+                            } else {
+                                layer.msg(responseData.msg, function () {
+                                    //window.location = '/index.html';
+                                });
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+    });
+</script>
+<script>
+
+</script>
+
+</body>
+</html>

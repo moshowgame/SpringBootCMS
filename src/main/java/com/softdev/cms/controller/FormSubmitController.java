@@ -83,8 +83,6 @@ public class FormSubmitController {
                        @RequestParam(required = false, defaultValue = "0") int page,
                        @RequestParam(required = false, defaultValue = "10") int limit) {
         log.info("searchParams:"+ JSON.toJSONString(searchParams));
-        //条件构造器
-        QueryWrapper<FormSubmitValue> queryWrapper = new QueryWrapper<FormSubmitValue>();
         QueryParamDTO queryParamDTO = JSON.parseObject(searchParams, QueryParamDTO.class);
         queryParamDTO.setPage((page - 1)* limit);
         queryParamDTO.setLimit(limit);
