@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.softdev.cms.entity.Article;
 import com.softdev.cms.entity.Channel;
 import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.mapper.ChannelMapper;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -89,6 +91,7 @@ public class ChannelController {
         if(StringUtils.isNotEmpty(searchParams)&&JSON.isValid(searchParams)) {
             Channel channel = JSON.parseObject(searchParams, Channel.class);
             queryWrapper.eq(StringUtils.isNoneEmpty(channel.getChannelName()), "channel_name", channel.getChannelName());
+            queryWrapper.eq(channel.getParentChannelId()!=null,"parent_channel_id",channel.getParentChannelId());
         }
         //执行分页
         IPage<Channel> pageList = channelMapper.selectPage(buildPage, queryWrapper);
@@ -124,6 +127,23 @@ public class ChannelController {
     public ModelAndView editPage(int id){
         Channel channel = channelMapper.selectOne(new QueryWrapper<Channel>().eq("channel_id",id));
         return new ModelAndView("cms/channel-edit","channel",channel);
+    }
+    /**
+     * 发布/暂停
+     */
+    @PostMapping("/publish")
+    public Object publish(int id,Integer status){
+        Channel channel = channelMapper.selectOne(new QueryWrapper<Channel>().eq("channel_id",id));
+        if(channel!=null){
+            //channel.setUpdateTime(new Date());
+            channel.setStatus(status);
+            channelMapper.updateById(channel);
+            return ReturnT.SUCCESS((status==1)?"已发布":"已暂停");
+        }else if(status.equals(channel.getStatus())){
+            return ReturnT.SUCCESS("状态不正确");
+        }else{
+            return ReturnT.ERROR();
+        }
     }
 }
 

@@ -25,16 +25,18 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label required">父类id</label>
+        <label class="layui-form-label required">父类频道</label>
         <div class="layui-input-block">
-            <input type="text" name="parentChannelId" lay-verify="required" lay-reqtext="父类id不能为空" placeholder="请输入父类id" value="${(channel.parentChannelId)!!}" class="layui-input">
+            <select id="parentChannelId" name="parentChannelId" lay-filter="parentChannelId" lay-verify="required"  class="layui-input">
+                <option value="0">主频道</option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">频道图标</label>
         <div class="layui-input-block">
             <input type="text" name="icon" lay-verify="required" lay-reqtext="频道图标不能为空" placeholder="请输入频道图标" value="${(channel.icon)!!}" class="layui-input">
-            <tip>图标参考 https://www.layui.com/doc/element/icon.html</tip>
+            <tip>图标请参考 <a href="https://www.layui.com/doc/element/icon.html">https://www.layui.com/doc/element/icon.html</a> </tip>
         </div>
     </div>
 
@@ -78,6 +80,33 @@
             });
             return false;
         });
+
+        function initChannel(){
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/channel/list",
+                data:{"searchParams":"{'parentChannelId':'0'}","page":"1","limit":"99"},
+                success: function (responseData) {
+                    if (responseData.code === 200 || responseData.code === 0) {
+                        var length = responseData.data.length;
+                        console.log("parentChannelId.length:"+length);
+                        $("#parentChannelId").empty();
+                        $("#parentChannelId").append('<option value="0">主频道</option>');
+                        for(var i = 0; i < length; i++) {
+                            //添加option元素
+                            $("#parentChannelId").append("<option value='" + responseData.data[i].channelId + "'>" + responseData.data[i].channelName + "</option>");
+                        }
+                        $("#parentChannelId").val("${(channel.parentChannelId)!'0'}");
+                        form.render('select');
+                    } else {
+                        layer.msg("加载主菜单列表失败:"+responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+        }
+        initChannel();
 
     });
 </script>

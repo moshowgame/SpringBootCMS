@@ -19,9 +19,11 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">频道Id</label>
+                            <label class="layui-form-label">频道分类</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="channelId" autocomplete="off" class="layui-input">
+                                <select id="parentChannelId" name="parentChannelId" lay-filter="parentChannelId" lay-verify="required"  class="layui-input">
+                                    <option value="0">主频道</option>
+                                </select>
                             </div>
                         </div>
                         <div class="layui-inline">
@@ -87,10 +89,11 @@
                 icon: 'layui-icon-tips'
             }],
             cols: [[
-                {field: 'channelId', title: '频道ID', sort: true},
+                {field: 'channelId', title: '频道分类', sort: true},
                 {field: 'channelName', title: '频道名称', sort: true},
                 {field: 'parentChannelId', title: '父类ID', sort: true},
                 {field: 'icon', title: '频道图标', sort: true},
+                {templet: '#statusTemplate',title: '状态', sort: true},
                 /* 需要时间请自行解封
                 {title: '创建时间', sort: true,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},
                 {title: '修改时间', sort: true,templet: "<div>{{layui.util.toDateString(d.updateTime, 'yyyy-MM-dd')}}</div>"},
@@ -187,9 +190,62 @@
                     });
                     layer.close(index);
                 });
+            }else if (obj.event === 'publish') {
+                layer.confirm('确定要发布吗？', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/channel/publish",
+                        data:{"id":obj.data.articleId,"status":"1"},
+                        success: function (responseData) {
+                            searchBtn.click();
+                            layer.msg(responseData.msg, function () {
+                            });
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else if (obj.event === 'unpublish') {
+                layer.confirm('确定要停止吗？', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/channel/publish",
+                        data:{"id":obj.data.articleId,"status":"0"},
+                        success: function (responseData) {
+                            searchBtn.click();
+                            layer.msg(responseData.msg, function () {
+                            });
+                        }
+                    });
+                    layer.close(index);
+                });
             }
         });
-
+        function initChannel(){
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/channel/list",
+                data:{"searchParams":"{'parentChannelId':'0'}","page":"1","limit":"99"},
+                success: function (responseData) {
+                    if (responseData.code === 200 || responseData.code === 0) {
+                        var length = responseData.data.length;
+                        console.log("parentChannelId.length:"+length);
+                        $("#parentChannelId").empty();
+                        $("#parentChannelId").append('<option value="0">主频道</option>');
+                        for(var i = 0; i < length; i++) {
+                            //添加option元素
+                            $("#parentChannelId").append("<option value='" + responseData.data[i].channelId + "'>" + responseData.data[i].channelName + "</option>");
+                        }
+                        $("#parentChannelId").val("${(channel.parentChannelId)!'0'}");
+                        form.render('select');
+                    } else {
+                        layer.msg("加载主菜单列表失败:"+responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+        }
+        initChannel();
     });
 </script>
 <script>

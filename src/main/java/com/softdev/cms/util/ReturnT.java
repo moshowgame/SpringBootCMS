@@ -43,6 +43,9 @@ public class ReturnT implements Serializable {
 	public static ReturnT PAGE( Object data , int count){
 		return new ReturnT(data,count);
 	}
+	public static ReturnT DEFINE( int code, String msg , Object data){
+		return new ReturnT(code,msg,data);
+	}
 	public static ReturnT PAGE( Object data , long count){
 		return new ReturnT(data,Integer.parseInt(count+""));
 	}

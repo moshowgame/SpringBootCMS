@@ -1,6 +1,7 @@
 package com.softdev.cms.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.softdev.cms.entity.Activity;
 import com.softdev.cms.entity.Article;
 import com.softdev.cms.mapper.ArticleMapper;
 import com.softdev.cms.util.ReturnT;
@@ -108,6 +109,23 @@ public class ArticleController {
     public ModelAndView editPage(int id){
         Article article = articleMapper.selectOne(new QueryWrapper<Article>().eq("article_id",id));
         return new ModelAndView("cms/article-edit","article",article);
+    }
+    /**
+     * 发布/暂停
+     */
+    @PostMapping("/publish")
+    public Object publish(int id,Integer status){
+        Article article = articleMapper.selectOne(new QueryWrapper<Article>().eq("article_id",id));
+        if(article!=null){
+            article.setUpdateTime(new Date());
+            article.setStatus(status);
+            articleMapper.updateById(article);
+            return ReturnT.SUCCESS((status==1)?"已发布":"已暂停");
+        }else if(status.equals(article.getStatus())){
+            return ReturnT.SUCCESS("状态不正确");
+        }else{
+            return ReturnT.ERROR();
+        }
     }
 }
 

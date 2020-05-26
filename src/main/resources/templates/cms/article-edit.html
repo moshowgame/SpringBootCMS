@@ -23,9 +23,11 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label required">频道id</label>
+        <label class="layui-form-label required">频道分类</label>
         <div class="layui-input-block">
-            <input type="text" name="channelId" lay-verify="required" lay-reqtext="频道id不能为空" placeholder="请输入频道id" value="${(article.channelId)!!}" class="layui-input">
+            <select id="channelId" name="channelId" lay-filter="channelId" lay-verify="required"  class="layui-input">
+                <option value="0">主频道</option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
@@ -48,6 +50,13 @@
             layer = layui.layer,
             layedit =layui.layedit,
             $ = layui.$;
+
+        layedit.set({
+            uploadImage: {
+                url: '${request.contextPath}/file/layuiUpload' //接口url
+                ,type: 'post' //默认post
+            }
+        });
 
         //创建一个编辑器
         var editIndex = layedit.build('content');
@@ -80,6 +89,33 @@
             });
             return false;
         });
+
+        function initChannel(){
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/channel/list",
+                data:{"searchParams":"{'parentChannelId':'0'}","page":"1","limit":"99"},
+                success: function (responseData) {
+                    if (responseData.code === 200 || responseData.code === 0) {
+                        var length = responseData.data.length;
+                        console.log("parentChannelId.length:"+length);
+                        $("#channelId").empty();
+                        $("#channelId").append('<option value="0">主频道</option>');
+                        for(var i = 0; i < length; i++) {
+                            //添加option元素
+                            $("#channelId").append("<option value='" + responseData.data[i].channelId + "'>" + responseData.data[i].channelName + "</option>");
+                        }
+                        $("#channelId").val("${(article.channelId)!'0'}");
+                        form.render('select');
+                    } else {
+                        layer.msg("加载主菜单列表失败:"+responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+        }
+        initChannel();
 
     });
 </script>

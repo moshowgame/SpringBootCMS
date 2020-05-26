@@ -3,8 +3,11 @@ package com.softdev.cms.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.softdev.cms.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -79,15 +82,24 @@ public class FileController {
         //返回成功消息
         return ReturnT.SUCCESS(fileName);
     }
-	// public ModelAndView handleFileUpload(@RequestParam("file") MultipartFile file,
-	// 		RedirectAttributes redirectAttributes) {
-	// 	//存储文件
-	// 	storageService.store(file);
-	// 	//返回成功消息
-	// 	redirectAttributes.addFlashAttribute("message",
-	// 			"恭喜你,文件" + file.getOriginalFilename() + "上传成功!");
-	// 	return new ModelAndView("redirect:/cms/files");
-	// }
+
+	/**
+	 * FileUpload文件上传 For LayEdit
+	 * @author zhengkai.blog.csdn.net
+	 * */
+	@PostMapping("/layuiUpload")
+	public ReturnT layuiUpload(@RequestParam("file") MultipartFile file) {
+    	//自定义文件名
+		String fileName=System.currentTimeMillis()+file.getOriginalFilename();
+		//存储文件
+		storageService.store(file,fileName);
+		//封装返回显示的url和文件名
+		Map returnMap = new HashMap();
+		returnMap.put("src", StringUtils.SYSTEM_PATH+"/file/files/"+fileName);
+		returnMap.put("title",fileName);
+		//返回成功消息
+		return ReturnT.DEFINE(ReturnT.PAGE_CODE,"上传成功",returnMap);
+	}
 
 	@ExceptionHandler(StorageFileNotFoundException.class)
 	public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {

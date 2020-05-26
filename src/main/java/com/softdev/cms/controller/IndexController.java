@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * spring boot code generator
- * @author HZ
+ * @author zhengkai.blog.csdn.net
  */
 @RestController
 @Slf4j
@@ -41,7 +41,6 @@ public class IndexController {
     public ModelAndView welcome(){
         return new ModelAndView("cms/welcome");
     }
-
 
     @GetMapping("/index")
     public ModelAndView indexPage(){

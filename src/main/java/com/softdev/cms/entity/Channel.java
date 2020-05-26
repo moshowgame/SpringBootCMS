@@ -37,6 +37,8 @@ public class Channel implements Serializable {
      */
     private String icon;
 
+    private Integer status;
+
     public Channel() {
     }
 

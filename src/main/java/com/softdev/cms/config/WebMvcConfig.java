@@ -40,6 +40,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/static/**")
                 //排除小程序api
                 .excludePathPatterns("/api/**")
+                //排除FrontEnd页面
+                .excludePathPatterns("/page/**")
                 //.excludePathPatterns("/index")
                 //排除登录页面和登录方法
                 .excludePathPatterns("/login")
