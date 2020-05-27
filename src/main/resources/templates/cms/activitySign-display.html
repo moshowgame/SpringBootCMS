@@ -1,19 +1,7 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>CMS活动签到</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta http-equiv="Access-Control-Allow-Origin" content="*">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="format-detection" content="telephone=no">
-    <link rel="stylesheet" href="${request.contextPath}/static/lib/layui-v2.5.5/css/layui.css" media="all">
-    <!--[if lt IE 9]>
-    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
     <style>
         body {background-image:url("${request.contextPath}/static/images/bg.jpg");height:100%;width:100%;}
         #container{height:100%;width:100%;}
@@ -33,7 +21,6 @@
         i {position:absolute;}
         .admin-captcha {position:absolute;margin-left:205px;margin-top:-40px;}
     </style>
-</head>
 <body>
 <div id="container">
     <div></div>
@@ -63,7 +50,7 @@
                                 <input type="hidden" name="userName" value="${(loginUser.userName)!!}">
                                 <div>
                                     <i class="layui-icon layui-icon-username admin-icon"></i>
-                                    <input type="text" name="userName" placeholder="请输入姓名" autocomplete="off" class="layui-input admin-input" value="${(loginUser.showName)!!}">
+                                    <input type="text" name="showName" placeholder="请输入姓名" autocomplete="off" class="layui-input admin-input" value="${(loginUser.showName)!!}">
                                 </div>
                                 <div>
                                     <select name="signType" class="layui-input admin-input">

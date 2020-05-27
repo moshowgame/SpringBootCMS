@@ -142,7 +142,7 @@
                     $.ajax({
                         type: 'POST',
                         url: "${request.contextPath}/activitySign/delete",
-                        data:{"id":obj.data.activitySign},
+                        data:{"id":obj.data.signId},
                         success: function (responseData) {
                             if (responseData.code === 200) {
                                 layer.msg(responseData.msg, function () {

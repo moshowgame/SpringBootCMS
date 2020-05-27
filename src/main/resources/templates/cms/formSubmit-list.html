@@ -174,7 +174,7 @@
                             contentType: "application/json", //必须有
                             dataType: "json", //表示返回值类型，不必须
                             success: function (responseData) {
-                                layer.alert(responseData.msg);
+                                layer.alert(responseData.msg);searchBtn.click();
                             }
                  });
             });
@@ -187,12 +187,12 @@
             layer.confirm('是否标记为审核状态', function (index) {
                 $.ajax({
                     type: 'POST',
-                    url: "${request.contextPath}/formSubmit/audit?status=3&userId=${(loginUser.userId)!!}&userName=${(loginUser.userName)!!}",
+                    url: "${request.contextPath}/formSubmit/audit?status=3&userId=${(loginUser.userId)!!}&userName=${(loginUser.showName)!!}",
                     data:JSON.stringify(data),
                     contentType: "application/json", //必须有
                     dataType: "json", //表示返回值类型，不必须
                     success: function (responseData) {
-                        layer.alert(responseData.msg);
+                        layer.alert(responseData.msg);searchBtn.click();
                     }
                 });
             });
@@ -206,12 +206,12 @@
             layer.confirm('是否标记为审核不通过状态', function (index) {
                         $.ajax({
                         type: 'POST',
-                        url: "${request.contextPath}/formSubmit/audit?status=0&userId=${(loginUser.userId)!!}&userName=${(loginUser.userName)!!}",
+                        url: "${request.contextPath}/formSubmit/audit?status=0&userId=${(loginUser.userId)!!}&userName=${(loginUser.showName)!!}",
                         data:JSON.stringify(data),
                         contentType: "application/json", //必须有
                         dataType: "json", //表示返回值类型，不必须
                         success: function (responseData) {
-                            layer.alert(responseData.msg);
+                            layer.alert(responseData.msg);searchBtn.click();
                         }
                 });
             });

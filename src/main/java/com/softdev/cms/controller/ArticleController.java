@@ -8,6 +8,8 @@ import com.softdev.cms.util.ReturnT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -31,10 +33,16 @@ public class ArticleController {
     @Autowired
     private ArticleMapper articleMapper;
 
+
+    private final String CACHE_NAME="cache-article";
+    private final String CACHE_KEY="#article.id";
+    private final String CACHE_KEY2="#id";
+
     /**
      * 新增或编辑
      */
     @PostMapping("/save")
+    @CacheEvict(value = CACHE_NAME, key = CACHE_KEY)
     public Object save(@RequestBody Article article){
         log.info("article:"+JSON.toJSONString(article));
         Article oldArticle = articleMapper.selectOne(new QueryWrapper<Article>().eq("article_id",article.getArticleId()));
@@ -54,6 +62,7 @@ public class ArticleController {
     /**
      * 删除
      */
+    @CacheEvict(value = CACHE_NAME, key = CACHE_KEY2)
     @PostMapping("/delete")
     public Object delete(int id){
         Article article = articleMapper.selectOne(new QueryWrapper<Article>().eq("article_id",id));
@@ -68,6 +77,7 @@ public class ArticleController {
     /**
      * 查询
      */
+    @Cacheable(value = CACHE_NAME, key = CACHE_KEY2)
     @PostMapping("/find")
     public Object find(int id){
         Article article = articleMapper.selectOne(new QueryWrapper<Article>().eq("article_id",id));

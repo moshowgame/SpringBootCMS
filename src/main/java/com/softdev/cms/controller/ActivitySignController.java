@@ -71,7 +71,7 @@ public class ActivitySignController {
      */
     @PostMapping("/delete")
     public Object delete(int id){
-        ActivitySign activitySign = activitySignMapper.selectOne(new QueryWrapper<ActivitySign>().eq("activitySign_id",id));
+        ActivitySign activitySign = activitySignMapper.selectOne(new QueryWrapper<ActivitySign>().eq("sign_id",id));
         if(activitySign!=null){
             activitySignMapper.deleteById(id);
             return ReturnT.SUCCESS("删除成功");

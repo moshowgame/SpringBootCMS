@@ -74,7 +74,7 @@
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="sign"><i class="layui-icon layui-icon-release"></i>签到</a>
                 <#if roleId gt 1 >
                     <a class="layui-btn layui-btn-xs data-count-edit" lay-event="signList"><i class="layui-icon layui-icon-form"></i>签到列表</a>
-                    <a class="layui-btn layui-btn-xs data-count-edit" lay-event="signDashboard"><i class="layui-icon layui-icon-engine"></i>签到分析</a>
+                    <!--<a class="layui-btn layui-btn-xs data-count-edit" lay-event="signDashboard"><i class="layui-icon layui-icon-engine"></i>签到分析</a>-->
                 </#if>
             {{#  } }}
         </script>
@@ -177,7 +177,7 @@
                     shade: 0.2,
                     maxmin:true,
                     shadeClose: true,
-                    area: ['800px', '500px'],
+                    area: ['1000px', '700px'],
                     content: '${request.contextPath}/activity/edit?id='+obj.data.activityId,
                 });
 
