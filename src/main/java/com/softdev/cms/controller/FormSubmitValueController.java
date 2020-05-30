@@ -10,13 +10,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.softdev.cms.entity.Form;
 import com.softdev.cms.entity.FormSubmit;
 import com.softdev.cms.entity.FormSubmitValue;
+import com.softdev.cms.entity.User;
 import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.entity.dto.FormSubmitValueDTO;
 import com.softdev.cms.entity.dto.FormSubmitValueExcelDTO;
 import com.softdev.cms.mapper.FormSubmitMapper;
 import com.softdev.cms.mapper.FormSubmitValueMapper;
 import com.softdev.cms.mapper.FormMapper;
+import com.softdev.cms.mapper.UserMapper;
 import com.softdev.cms.service.StorageService;
+import com.softdev.cms.util.JwtTokenUtil;
 import com.softdev.cms.util.ReturnT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,15 +47,16 @@ public class FormSubmitValueController {
 
     @Autowired
     private FormSubmitValueMapper formSubmitValueMapper;
-
     @Autowired
     private FormSubmitMapper formSubmitMapper;
-
     @Autowired
     private FormMapper formMapper;
-
     @Autowired
     private StorageService storageService;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 新增或编辑
@@ -125,18 +129,20 @@ public class FormSubmitValueController {
         return new ModelAndView("cms/formSubmitValue-list","formId",formId);
     }
     @GetMapping("/display")
-    public ModelAndView display(Integer formId,Integer userId,Integer submitId){
+    public ModelAndView display(Integer formId,Integer submitId,String token){
         Form form = formMapper.selectById(formId);
         if(submitId==null){
             submitId=0;
         }
+        String userName = jwtTokenUtil.getUsernameFromToken(token);
+        User user= userMapper.selectOne(new QueryWrapper<User>().eq("user_name",userName));
         //从FormSubmit点进来，有submitId，直接显示
         //从用户formList点进来，是填写新的，还要判断类型是否为2专项，如果为2，还需要判断是否填写过。
-        if(submitId==0&&userId!=null&&form!=null&&form.getFormType()==2){
+        if(submitId==0&&user!=null&&form!=null&&form.getFormType()==2){
             //状态: 0未通过 1提交 2审核 3完成
             //未通过还可以再提交
             //每学期只能提交一次
-            Integer infoCount = formSubmitMapper.selectCount(new QueryWrapper<FormSubmit>().eq("user_id",userId).eq("form_id",formId));
+            Integer infoCount = formSubmitMapper.selectCount(new QueryWrapper<FormSubmit>().eq("user_id",user.getUserId()).eq("form_id",formId));
             if(infoCount>0){
                 return new ModelAndView("cms/error","msg","专项表单只能提交一次");
             }
@@ -146,6 +152,7 @@ public class FormSubmitValueController {
                 .addObject("itemValueList",JSON.toJSONString(itemValueList))
                 .addObject("form",form)
                 .addObject("submitId",submitId)
+                .addObject("loginUser",user)
                 ;
     }
     /**
@@ -153,13 +160,13 @@ public class FormSubmitValueController {
      */
     @PostMapping("/submit")
     @Transactional(rollbackFor = Exception.class)
-    public Object submit(@RequestBody String submitData){
+    public Object submit(@RequestBody String submitData,String token){
         log.info("formSubmitValue:"+submitData);
         JSONObject jsonObject = JSONObject.parseObject(submitData);
         Integer formId = jsonObject.getInteger("formId");
         Integer submitId = jsonObject.getInteger("submitId");
-        Integer userId = jsonObject.getInteger("userId");if(userId==null){userId=1;}
-        String userName = jsonObject.getString("userName");if(userName==null){userName="学生";}
+        String userName = jwtTokenUtil.getUsernameFromToken(token);
+        User user= userMapper.selectOne(new QueryWrapper<User>().eq("user_name",userName));
         Form form = formMapper.selectById(formId);
 
         //有submitId，直接更新，否则新增
@@ -181,13 +188,13 @@ public class FormSubmitValueController {
                         formSubmitValue.setValueText(itemValue);
                         formSubmitValueMapper.updateById(formSubmitValue);
                     } else{
-                        formSubmitValue = new FormSubmitValue(formId,formSubmit.getSubmitId(),itemId,itemValue,userId);
+                        formSubmitValue = new FormSubmitValue(formId,formSubmit.getSubmitId(),itemId,itemValue,user.getUserId());
                         formSubmitValueMapper.insert(formSubmitValue);
                     }
                 }
             }
         }else{
-            FormSubmit formSubmit = new FormSubmit(formId,userId,userName);
+            FormSubmit formSubmit = new FormSubmit(formId,user.getUserId(),user.getShowName());
             formSubmitMapper.insert(formSubmit);
             for(String key:jsonObject.keySet()){
                 if("formId".equals(key)|| "userId".equals(key)|| "userName".equals(key)|| "showName".equals(key) || "file".equals(key)|| "submitId".equals(key)){
@@ -195,7 +202,7 @@ public class FormSubmitValueController {
                 }else{
                     Integer itemId = Integer.valueOf(key);
                     String itemValue = jsonObject.getString(key);
-                    FormSubmitValue formSubmitValue = new FormSubmitValue(formId,formSubmit.getSubmitId(),itemId,itemValue,userId);
+                    FormSubmitValue formSubmitValue = new FormSubmitValue(formId,formSubmit.getSubmitId(),itemId,itemValue,user.getUserId());
                     formSubmitValueMapper.insert(formSubmitValue);
                 }
             }

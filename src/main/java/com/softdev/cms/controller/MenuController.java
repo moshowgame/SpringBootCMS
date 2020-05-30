@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.softdev.cms.entity.Menu;
 import com.softdev.cms.mapper.MenuMapper;
+import com.softdev.cms.util.JwtTokenUtil;
 import com.softdev.cms.util.ReturnT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,8 @@ public class MenuController {
     @Autowired
     private MenuMapper menuMapper;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
     /**
      * 新增或编辑
      */
@@ -108,12 +111,16 @@ public class MenuController {
     }
 
     @GetMapping("/init")
-    public Object initMenu(HttpSession session){
+    public Object initMenu(String token){
         //获取当前用户权限
-        Integer roleId = Integer.parseInt(session.getAttribute("roleId")+"");
+        //Integer roleId = Integer.parseInt(session.getAttribute("roleId")+"");
+        //jwt
+        Integer roleId = jwtTokenUtil.getRoleIdFromToken(token);
         //根据角色查询可用菜单
         QueryWrapper<Menu> queryWrapper = new QueryWrapper<Menu>().like("role_id",roleId);
         List<Menu> pageList = menuMapper.selectList(queryWrapper);
+        //jwt
+        pageList.forEach(m->m.setHref(m.getHref()+"?token="+token));
         //最终返回的jsonMap
         Map<String,Object> parentMap = new HashMap<>();
         //clear信息
@@ -124,7 +131,7 @@ public class MenuController {
         Map<String,String> homeInfo = new HashMap<>();
         homeInfo.put("title","首页");
         homeInfo.put("icon","fa fa-home");
-        homeInfo.put("href","/cms/welcome");
+        homeInfo.put("href","/cms/welcome?token="+token);
         parentMap.put("homeInfo",homeInfo);
         //info系统左边logo文字信息
         Map<String,String> logoInfo = new HashMap<>();

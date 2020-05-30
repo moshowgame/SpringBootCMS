@@ -76,6 +76,7 @@
             layer = layui.layer,
             laydate = layui.laydate,
             $ = layui.$;
+        <@netCommon.jwtHandle />
         //监听提交
         form.on('submit(saveBtn)', function (data) {
             $.ajax({

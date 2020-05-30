@@ -32,7 +32,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="layui-inline">
+                        <!--<div class="layui-inline">
                             <label class="layui-form-label">角色</label>
                             <div class="layui-input-inline">
                                 <select id="roleId" name="roleId" lay-filter="departmentId">
@@ -41,7 +41,7 @@
                                     <option value="9">管理员</option>
                                 </select>
                             </div>
-                        </div>
+                        </div>-->
                         <div class="layui-inline">
                             <label class="layui-form-label">账号</label>
                             <div class="layui-input-inline">
@@ -64,12 +64,8 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                <#if roleId gt 1 >
                     <button class="layui-btn layui-btn-sm data-audit-btn1"> <i class="layui-icon layui-icon-ok"></i>审核 </button>
-                </#if>
-                <#if roleId gt 1 >
                     <button class="layui-btn layui-btn-sm layui-btn-danger data-unaudit-btn"> <i class="layui-icon layui-icon-close"></i>拒绝 </button>
-                </#if>
             </div>
         </script>
 
@@ -98,7 +94,7 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-
+    <@netCommon.jwtHandle />
         table.render({
             elem: '#currentTableId',
             method: 'post',
@@ -156,7 +152,7 @@
                 maxmin:true,
                 shadeClose: true,
                 area: ['800px', '500px'],
-                content: '${request.contextPath}/formSubmit/edit?id=0',
+                content: '${request.contextPath}/formSubmit/edit?id=0'+"&token="+layui.data('token').token,
             });
             return false;
         });
@@ -236,7 +232,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['800px', '500px'],
-                    content: '${request.contextPath}/formSubmitValue/display?formId='+obj.data.formId+'&submitId='+obj.data.submitId,
+                    content: '${request.contextPath}/formSubmitValue/display?formId='+obj.data.formId+'&submitId='+obj.data.submitId+"&token="+layui.data('token').token,
                 });
                 return false;
             } else if (obj.event === 'delete') {

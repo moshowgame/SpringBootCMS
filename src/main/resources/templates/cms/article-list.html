@@ -12,10 +12,10 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">文章Id</label>
+                            <label class="layui-form-label">所属频道</label>
                             <div class="layui-input-inline">
-                                <select id="channelId" name="channelId" lay-filter="channelId" lay-verify="required"  class="layui-input">
-                                    <option value="0">主频道</option>
+                                <select id="channelId" name="channelId" lay-filter="channelId" class="layui-input">
+                                    <option value="">全部</option>
                                 </select>
                             </div>
                         </div>
@@ -68,6 +68,13 @@
             - 未发布
             {{#  } }}
         </script>
+        <script type="text/html" id="topTemplate">
+            {{#  if(d.status == '1' ){ }}
+            <i class="layui-icon layui-icon-top"></i>置顶
+            {{#  } else { }}
+            -
+            {{#  } }}
+        </script>
     </div>
 </div>
 <script>
@@ -75,7 +82,7 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-
+    <@netCommon.jwtHandle />
         table.render({
             elem: '#currentTableId',
             method: 'post',
@@ -91,10 +98,11 @@
                 {field: 'articleId', title: 'ID', sort: true},
                 {field: 'title', title: '标题', sort: true},
                 {field: 'createUserName', title: '创建者', sort: true},
-                {field: 'channelId', title: '频道分类', sort: true},
+                {field: 'channelName', title: '频道', sort: true},
                 {field: 'keyword',  title: '关键字，逗号分隔', sort: true},
+                {templet: '#topTemplate',title: '是否置顶', sort: true},
                 {templet: '#statusTemplate',title: '状态', sort: true},
-                {title: '创建时间', sort: true,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},
+                /*{title: '创建时间', sort: true,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},*/
                 {title: '修改时间', sort: true,templet: "<div>{{layui.util.toDateString(d.updateTime, 'yyyy-MM-dd')}}</div>"},
                 /* 需要时间请自行解封
                 {title: '创建时间', sort: true,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},
@@ -140,7 +148,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['1000px', '700px'],
-                    content: '${request.contextPath}/article/edit?id=0',
+                    content: '${request.contextPath}/article/edit?id=0'+"&token="+layui.data('token').token,
                 });
                 return false;
             }else if(obj.event === 'del') {
@@ -169,7 +177,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['1000px', '700px'],
-                    content: '${request.contextPath}/article/edit?id='+obj.data.articleId,
+                    content: '${request.contextPath}/article/edit?id='+obj.data.articleId+"&token="+layui.data('token').token,
                 });
                 return false;
             } else if (obj.event === 'delete') {
@@ -230,6 +238,7 @@
                     if (responseData.code === 200 || responseData.code === 0) {
                         var length = responseData.data.length;
                         $("#channelId").empty();
+                        $("#channelId").append('<option value="">全部</option>');
                         $("#channelId").append('<option value="0">主频道</option>');
                         for(var i = 0; i < length; i++) {
                             //添加option元素

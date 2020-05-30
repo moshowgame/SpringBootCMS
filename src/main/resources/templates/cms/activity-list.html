@@ -24,10 +24,8 @@
                             <label class="layui-form-label">状态</label>
                             <div class="layui-input-inline">
                                 <select id="status" name="status" lay-filter="aihao" >
-                                    <#if roleId gt 1 >
                                     <option value="">-所有-</option>
                                     <option value="0">未发布</option>
-                                    </#if>
                                     <option value="1">已发布</option>
                                 </select>
                             </div>
@@ -48,9 +46,7 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                <#if roleId gt 1 >
                 <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add">  <i class="layui-icon layui-icon-addition"></i>添加活动 </button>
-                </#if>
             </div>
         </script>
 
@@ -66,16 +62,12 @@
             {{#  } }}
 
             {{#  if(d.status =='0') { }}
-                <#if roleId gt 1 >
                     <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
                     <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
-                </#if>
             {{#  } else { }}
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="sign"><i class="layui-icon layui-icon-release"></i>签到</a>
-                <#if roleId gt 1 >
                     <a class="layui-btn layui-btn-xs data-count-edit" lay-event="signList"><i class="layui-icon layui-icon-form"></i>签到列表</a>
                     <!--<a class="layui-btn layui-btn-xs data-count-edit" lay-event="signDashboard"><i class="layui-icon layui-icon-engine"></i>签到分析</a>-->
-                </#if>
             {{#  } }}
         </script>
         <script type="text/html" id="statusTemplate">
@@ -101,6 +93,7 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
+    <@netCommon.jwtHandle />
         table.render({
             elem: '#currentTableId',
             method: 'post',
@@ -160,7 +153,7 @@
                     maxmin: true,
                     shadeClose: true,
                     area: ['1000px', '700px'],
-                    content: '${request.contextPath}/activity/edit?id=0',
+                    content: '${request.contextPath}/activity/edit?id=0'+"&token="+layui.data('token').token,
                 });
                 return false;
             }
@@ -178,7 +171,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['1000px', '700px'],
-                    content: '${request.contextPath}/activity/edit?id='+obj.data.activityId,
+                    content: '${request.contextPath}/activity/edit?id='+obj.data.activityId+"&token="+layui.data('token').token,
                 });
 
                 return false;
@@ -190,7 +183,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['1200px', '500px'],
-                    content: '${request.contextPath}/activityRequired/list?activityId='+obj.data.activityId,
+                    content: '${request.contextPath}/activityRequired/list?activityId='+obj.data.activityId+"&token="+layui.data('token').token,
                 });
 
                 return false;
@@ -202,12 +195,11 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['1200px', '500px'],
-                    content: '${request.contextPath}/activitySign/list?activityId='+obj.data.activityId,
+                    content: '${request.contextPath}/activitySign/list?activityId='+obj.data.activityId+"&token="+layui.data('token').token,
                 });
 
                 return false;
             }else if (obj.event === 'sign') {
-                console.log('${request.contextPath}/activitySign/display?activityId='+obj.data.activityId);
                 var index = layer.open({
                     title: '签到',
                     type: 2,
@@ -215,7 +207,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['800px', '600px'],
-                    content: '${request.contextPath}/activitySign/display?activityId='+obj.data.activityId,
+                    content: '${request.contextPath}/activitySign/display?activityId='+obj.data.activityId+"&token="+layui.data('token').token,
                 });
                 return false;
             }else if (obj.event === 'signDashboard') {
@@ -226,7 +218,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['1200px', '500px'],
-                    content: '${request.contextPath}/activitySign/dashboard?activityId='+obj.data.activityId,
+                    content: '${request.contextPath}/activitySign/dashboard?activityId='+obj.data.activityId+"&token="+layui.data('token').token,
                 });
 
                 return false;

@@ -24,6 +24,7 @@ public interface FormSubmitMapper extends BaseMapper<FormSubmit> {
             "where 1=1" +
             "<when test='formId!=null and formId!=&apos;&apos; '> and t0.form_Id=#{formId}</when> " +
             "<when test='userId!=null and userId!=&apos;&apos; '> and t0.user_Id=#{userId}</when> " +
+            "<when test='status!=null and status!=&apos;&apos; '> and t0.status=#{status}</when> " +
             "<when test='userName!=null and userName!=&apos;&apos; '> and t1.user_name=#{userName} </when> " +
             "<when test='showName!=null and showName!=&apos;&apos; ' > and t1.show_Name like '%${showName}%' </when> " +
             " limit ${page},${limit} </script>")
@@ -35,6 +36,7 @@ public interface FormSubmitMapper extends BaseMapper<FormSubmit> {
             "where 1=1" +
             "<when test='formId!=null and formId!=&apos;&apos; '> and t0.form_Id=#{formId}</when> " +
             "<when test='userId!=null and userId!=&apos;&apos; '> and t0.user_Id=#{userId}</when> " +
+            "<when test='status!=null and status!=&apos;&apos; '> and t0.status=#{status}</when> " +
             "<when test='userName!=null and userName!=&apos;&apos; '> and t1.user_name=#{userName} </when> " +
             "<when test='showName!=null and showName!=&apos;&apos; ' > and t1.show_Name like '%${showName}%' </when> " +
             " </script>")

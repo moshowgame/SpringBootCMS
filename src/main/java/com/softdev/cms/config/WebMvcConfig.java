@@ -28,7 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }*/
 
-    @Autowired
+/*    @Autowired
     private UserLoginInterceptor userLoginInterceptor;
 
     @Override
@@ -54,7 +54,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/captcha")
                 //排除注销方法
                 .excludePathPatterns("/logout");
-    }
+    }*/
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {

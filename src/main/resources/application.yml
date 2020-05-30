@@ -73,6 +73,19 @@ spring:
     file:
       winPath: D:\temp\java\
       linuxPath: /dev/fileupload/
+    cache:
+      cache-names:
+        - cache-article
+        - cache-activity
+        - cache-form
 #mybatis-plus:
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#here is the importance configs of JWT
+jwt:
+  route:
+    authentication:
+      path: /auth
+  header: Authorization
+  expiration: 604800
+  secret: zhengkai.blog.csdn.net

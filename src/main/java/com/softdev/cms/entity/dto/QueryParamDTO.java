@@ -8,17 +8,20 @@ import java.io.Serializable;
 public class QueryParamDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    Integer userId;
+    Integer createUserId;
     String userName;
     String showName;
+    Integer articleId;
+    Integer parentChannelId;
+    String title;
     Integer formId;
-    Integer year;
-    Integer departmentId;
-    Integer majorId;
+    Integer submitId;
+    Integer channelId;
     Integer classesId;
+    Integer status;
     Integer page;
     Integer limit;
-    Integer userId;
-    Integer status;
 
     public void setPageLimit(Integer page,Integer limit) {
         this.page = (page-1)*limit;

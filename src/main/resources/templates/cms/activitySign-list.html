@@ -67,7 +67,7 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-
+    <@netCommon.jwtHandle />
         table.render({
             elem: '#currentTableId',
             method: 'post',
@@ -127,7 +127,7 @@
                     maxmin: true,
                     shadeClose: true,
                     area: ['1000px', '700px'],
-                    content: '${request.contextPath}/activitySign/edit?id=0',
+                    content: '${request.contextPath}/activitySign/edit?id=0'+"&token="+layui.data('token').token,
                 });
                 return false;
             }

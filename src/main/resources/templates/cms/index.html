@@ -113,9 +113,8 @@
         var $ = layui.jquery,
             layer = layui.layer,
             miniAdmin = layui.miniAdmin;
-
         var options = {
-            iniUrl: "${request.contextPath}/menu/init",    // 初始化接口
+            iniUrl: "${request.contextPath}/menu/init?token="+layui.data('token').token,    // 初始化接口
             clearUrl: "${request.contextPath}/clear", // 缓存清理接口
             urlHashLocation: true,      // 是否打开hash定位
             bgColorDefault: false,      // 主题默认配置
@@ -129,6 +128,7 @@
 
         $('.login-out').on("click", function () {
             $.ajax({
+                headers: {'Authorization':'Bearer '+layui.data('token').token},
                 type: 'POST',
                 data: {"userId":"${(loginUser.userId)!!}"},
                 url: "${request.contextPath}/logout",

@@ -3,6 +3,7 @@ package com.softdev.cms.controller;
 import com.alibaba.fastjson.JSON;
 import com.softdev.cms.entity.Activity;
 import com.softdev.cms.entity.Article;
+import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.mapper.ArticleMapper;
 import com.softdev.cms.util.ReturnT;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +36,8 @@ public class ArticleController {
 
 
     private final String CACHE_NAME="cache-article";
-    private final String CACHE_KEY="#article.id";
-    private final String CACHE_KEY2="#id";
+    private final String CACHE_KEY="#article.articleId";
+    private final String CACHE_KEY2="#articleId";
 
     /**
      * 新增或编辑
@@ -91,8 +92,8 @@ public class ArticleController {
     /**
      * 分页查询
      */
-    @PostMapping("/list")
-    public Object list(String searchParams,
+    @PostMapping("/list2")
+    public Object list2(String searchParams,
                        @RequestParam(required = false, defaultValue = "0") int page,
                        @RequestParam(required = false, defaultValue = "10") int limit) {
         log.info("page:"+page+"-limit:"+limit+"-json:"+ JSON.toJSONString(searchParams));
@@ -109,7 +110,20 @@ public class ArticleController {
         //返回结果
         return ReturnT.PAGE(pageList.getRecords(),pageList.getTotal());
     }
-
+    @PostMapping("/list")
+    public Object list(String searchParams,
+                       @RequestParam(required = false, defaultValue = "0") int page,
+                       @RequestParam(required = false, defaultValue = "10") int limit) {
+        log.info("page:"+page+"-limit:"+limit+"-json:"+ JSON.toJSONString(searchParams));
+        QueryParamDTO queryParamDTO = JSON.parseObject(searchParams, QueryParamDTO.class);
+        if(queryParamDTO==null){queryParamDTO= new QueryParamDTO();}
+        queryParamDTO.setPageLimit(page,limit);
+        //分页构造器
+        List<Article> itemList=articleMapper.pageAll(queryParamDTO);
+        int itemTotal=articleMapper.countAll(queryParamDTO);
+        //返回结果
+        return ReturnT.PAGE(itemList,itemTotal);
+    }
     @GetMapping("/list")
     public ModelAndView listPage(){
         return new ModelAndView("cms/article-list");

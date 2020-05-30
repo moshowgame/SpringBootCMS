@@ -54,3 +54,22 @@
     <script src="${request.contextPath}/static/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
     <script src="${request.contextPath}/static/lib/jq-module/zyupload/zyupload-1.0.0.min.js" charset="utf-8"></script>
 </#macro>
+
+<#macro jwtHandle>
+$.ajaxSetup({
+    headers: {
+        "Author": "zhengkai.blog.csdn.net" ,
+        "Authorization": "Bearer "+layui.data('token').token
+    }
+ });
+ if(typeof(table)!="undefined"){
+     table.set({
+         headers: { //通过 request 头传递
+             Authorization: "Bearer "+layui.data('token').token
+         }
+         ,where: { //通过参数传递
+             token: layui.data('token').token
+         }
+     });
+ }
+</#macro>

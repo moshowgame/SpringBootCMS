@@ -64,7 +64,7 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-
+    <@netCommon.jwtHandle />
         table.render({
             elem: '#currentTableId',
             method: 'post',
@@ -122,7 +122,7 @@
                     maxmin: true,
                     shadeClose: true,
                     area: ['1000px', '700px'],
-                    content: '${request.contextPath}/formItem/edit?id=0&formId=${(formId)!!}',
+                    content: '${request.contextPath}/formItem/edit?id=0&formId=${(formId)!!}'+"&token="+layui.data('token').token,
                 });
                 return false;
             }
@@ -153,7 +153,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['800px', '500px'],
-                    content: '${request.contextPath}/formItem/edit?formId=${(formId)!!}&id='+obj.data.itemId,
+                    content: '${request.contextPath}/formItem/edit?formId=${(formId)!!}&id='+obj.data.itemId+"&token="+layui.data('token').token,
                 });
                 return false;
             } else if (obj.event === 'delete') {

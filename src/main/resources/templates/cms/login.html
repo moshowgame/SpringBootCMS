@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>${(systemName)!!}</title>
+    <title>SpringBootCMS</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -37,7 +37,7 @@
         <div class="layui-form login-form">
             <form class="layui-form" action="">
                 <div class="layui-form-item logo-title">
-                    <h1>${(systemName)!!}</h1>
+                    <h1>SpringBootCMS</h1>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-username" for="username"></label>
@@ -68,8 +68,10 @@
 <script src="${request.contextPath}/static/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
 <script src="${request.contextPath}/static/lib/jq-module/jquery.particleground.min.js" charset="utf-8"></script>
 <script>
-    layui.use(['form'], function () {
-        var form = layui.form,
+    layui.use(['form', 'table','jquery'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table,
             layer = layui.layer;
 
         // 登录过期的时候，跳出ifram框架
@@ -111,8 +113,13 @@
                 //contentType: "application/json",
                 success: function (responseData) {
                     if (responseData.code === 200) {
-                        layer.msg(responseData.msg, function () {
-                            window.location = '${request.contextPath}/index';
+                        //使用layui存储
+                        layui.data('token', {
+                            key: "token",
+                            value: responseData.msg
+                        });
+                        layer.msg("登录成功", function () {
+                            window.location = '${request.contextPath}/index?token='+responseData.msg;
                         });
                     } else {
                         layer.msg(responseData.msg, function () {

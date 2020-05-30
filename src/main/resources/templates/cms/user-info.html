@@ -65,9 +65,11 @@
 </div>
 <script>
     layui.use(['form'], function () {
+        <@netCommon.jwtHandle />
         var form = layui.form,
             layer = layui.layer,
             $ = layui.$;
+        <@netCommon.jwtHandle />
         //监听提交
         form.on('submit(saveBtn)', function (data) {
             if($("#password").val()!=$("#password1").val()){

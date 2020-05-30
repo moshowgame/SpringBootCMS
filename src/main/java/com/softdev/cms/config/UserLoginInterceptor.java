@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
 @Component
 public class UserLoginInterceptor implements HandlerInterceptor {
 
-    @Override
+/*    @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object handler)throws Exception {
         HttpSession session = request.getSession(true);
@@ -28,6 +28,6 @@ public class UserLoginInterceptor implements HandlerInterceptor {
             response.sendRedirect(request.getContextPath()+"/login");
             return false;
         }
-    }
+    }*/
 
 }

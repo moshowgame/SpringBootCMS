@@ -24,10 +24,8 @@
                             <label class="layui-form-label">状态</label>
                             <div class="layui-input-inline">
                                 <select id="status" name="status" lay-filter="aihao" >
-                                    <#if roleId gt 1 >
                                     <option value="">-所有-</option>
                                     <option value="0">未发布</option>
-                                    </#if>
                                     <option value="1">已发布</option>
                                 </select>
                             </div>
@@ -48,9 +46,7 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                <#if roleId gt 1 >
                 <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add">  <i class="layui-icon layui-icon-addition"></i>添加表单</button>
-                </#if>
             </div>
         </script>
 
@@ -60,20 +56,16 @@
             {{#  if(d.status =='0' && d.createUserId=='${(loginUserId)!!}' ) { }}
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="publish"><i class="layui-icon layui-icon-ok"></i>发布</a>
 
-                <#if roleId gt 1 >
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="formItemList"><i class="layui-icon layui-icon-form"></i>表单设置</a>
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
                 <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
-                </#if>
 
             {{#  } }}
             {{#  if(d.status =='1' && d.createUserId=='${(loginUserId)!!}' ) { }}
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="unpublish"><i class="layui-icon layui-icon-pause"></i>停止</a>
-                <#if roleId gt 1 >
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="excelExport"><i class="layui-icon layui-icon-download-circle"></i>excel导出</a>
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="formSubmitValueList"><i class="layui-icon layui-icon-form"></i>提交列表</a>
                 <a class="layui-btn layui-btn-xs data-count-edit" lay-event="signDashboard"><i class="layui-icon layui-icon-engine"></i>提交分析</a>
-                </#if>
             {{#  } }}
             {{#  if(d.status =='0') { }}
 
@@ -107,7 +99,7 @@
         var $ = layui.jquery,
             form = layui.form,
             table = layui.table;
-
+    <@netCommon.jwtHandle />
         table.render({
             elem: '#currentTableId',
             method: 'post',
@@ -167,7 +159,7 @@
                     maxmin: true,
                     shadeClose: true,
                     area: ['1000px', '700px'],
-                    content: '${request.contextPath}/form/edit?id=0',
+                    content: '${request.contextPath}/form/edit?id=0'+"&token="+layui.data('token').token,
                 });
                 return false;
             }
@@ -209,7 +201,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['800px', '600px'],
-                    content: '${request.contextPath}/formItem/list?userId=${(loginUser.userId)!!}&formId='+obj.data.formId,
+                    content: '${request.contextPath}/formItem/list?userId=${(loginUser.userId)!!}&formId='+obj.data.formId+"&token="+layui.data('token').token,
                 });
                 return false;
             } else if (obj.event === 'formSubmitValueList') {
@@ -220,7 +212,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['1000px', '600px'],
-                    content: '${request.contextPath}/formSubmit/list?userId=${(loginUser.userId)!!}&formId='+obj.data.formId,
+                    content: '${request.contextPath}/formSubmit/list?userId=${(loginUser.userId)!!}&formId='+obj.data.formId+"&token="+layui.data('token').token,
                 });
 
                 return false;
@@ -232,7 +224,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['800px', '600px'],
-                    content: '${request.contextPath}/formSubmitValue/dashboard?userId={(loginUser.userId)!!}&formId='+obj.data.formId,
+                    content: '${request.contextPath}/formSubmitValue/dashboard?userId={(loginUser.userId)!!}&formId='+obj.data.formId+"&token="+layui.data('token').token,
                 });
 
                 return false;
@@ -244,7 +236,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['800px', '600px'],
-                    content: '${request.contextPath}/formSubmitValue/display?userId=${(loginUser.userId)!!}&formId='+obj.data.formId,
+                    content: '${request.contextPath}/formSubmitValue/display?userId=${(loginUser.userId)!!}&formId='+obj.data.formId+"&token="+layui.data('token').token,
                 });
                 return false;
             } else if (obj.event === 'excelExport') {
@@ -255,7 +247,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['800px', '400px'],
-                    content: '${request.contextPath}/formSubmitValue/excel/page?userId=${(loginUser.userId)!!}&formId='+obj.data.formId,
+                    content: '${request.contextPath}/formSubmitValue/excel/page?userId=${(loginUser.userId)!!}&formId='+obj.data.formId+"&token="+layui.data('token').token,
                 });
                 return false;
             }else if (obj.event === 'delete') {
@@ -304,30 +296,6 @@
                     });
                     layer.close(index);searchBtn.click();
                 });
-            }else if (obj.event === 'required') {
-                var index = layer.open({
-                    title: '提交规则',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin:true,
-                    shadeClose: true,
-                    area: ['1200px', '500px'],
-                    content: '${request.contextPath}/formRequired/list?formId='+obj.data.formId,
-                });
-
-                return false;
-            }else if (obj.event === 'signDashboard') {
-                var index = layer.open({
-                    title: '签到分析',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin:true,
-                    shadeClose: true,
-                    area: ['1200px', '500px'],
-                    content: '${request.contextPath}/formRequired/dashboard?formId='+obj.data.formId,
-                });
-
-                return false;
             }
         });
     });

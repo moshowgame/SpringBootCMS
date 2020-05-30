@@ -36,7 +36,13 @@
             <input type="text" name="keyword" lay-verify="required" lay-reqtext="关键字，逗号分隔不能为空" placeholder="请输入关键字，逗号分隔" value="${(article.keyword)!!}" class="layui-input">
         </div>
     </div>
-
+    <div class="layui-form-item">
+        <label class="layui-form-label required">是否置顶</label>
+        <div class="layui-input-block">
+            <input type="radio" name="isTop" value="1" title="是" <#if (article.status)??> ${(article.status == 1)?string('checked=""','0')?html}  </#if> >
+            <input type="radio" name="isTop" value="0" title="否" <#if (article.status)??> ${(article.status == 0)?string('checked=""','0')?html}  <#else>checked=""</#if> >
+        </div>
+    </div>
     <div class="layui-form-item">
         <div class="layui-input-block">
             <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
@@ -50,7 +56,7 @@
             layer = layui.layer,
             layedit =layui.layedit,
             $ = layui.$;
-
+    <@netCommon.jwtHandle />
         layedit.set({
             uploadImage: {
                 url: '${request.contextPath}/file/layuiUpload' //接口url

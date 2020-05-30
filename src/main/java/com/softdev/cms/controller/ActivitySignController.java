@@ -8,9 +8,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.softdev.cms.entity.Activity;
 import com.softdev.cms.entity.ActivitySign;
 import com.softdev.cms.entity.FormSubmitValue;
+import com.softdev.cms.entity.User;
 import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.mapper.ActivityMapper;
 import com.softdev.cms.mapper.ActivitySignMapper;
+import com.softdev.cms.mapper.UserMapper;
+import com.softdev.cms.util.JwtTokenUtil;
 import com.softdev.cms.util.ReturnT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +38,10 @@ public class ActivitySignController {
     private ActivitySignMapper activitySignMapper;
     @Autowired
     private ActivityMapper activityMapper;
-
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private UserMapper userMapper;
     /**
      * 新增或编辑
      */
@@ -151,9 +157,11 @@ public class ActivitySignController {
         return new ModelAndView("cms/activitySign-edit","activitySign",activitySign).addObject("activityId",activityId);
     }
     @GetMapping("/display")
-    public ModelAndView display(Integer activityId){
+    public ModelAndView display(Integer activityId,String token){
+        String userName = jwtTokenUtil.getUsernameFromToken(token);
+        User user= userMapper.selectOne(new QueryWrapper<User>().eq("user_name",userName));
         Activity activity = activityMapper.selectOne(new QueryWrapper<Activity>().eq("activity_id",activityId));
-        return new ModelAndView("cms/activitySign-display","activity",activity).addObject("activityId",activityId);
+        return new ModelAndView("cms/activitySign-display","activity",activity).addObject("activityId",activityId).addObject("loginUser",user);
     }
     @GetMapping("/signResult")
     public ModelAndView signResult(boolean isSuccess,String msg){

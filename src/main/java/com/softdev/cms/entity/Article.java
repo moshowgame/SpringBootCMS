@@ -1,6 +1,7 @@
 package com.softdev.cms.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
@@ -57,13 +58,19 @@ public class Article implements Serializable {
      * 创建时间
      */
     private Date createTime;
-
+    /**
+     * 是否置顶
+     */
+    private Integer isTop;
     /**
      * 更新时间
      */
     private Date updateTime;
 
     private Integer status;
+
+    @TableField(exist = false)
+    private String channelName;
 
     public Article() {
     }

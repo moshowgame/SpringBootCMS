@@ -5,10 +5,13 @@ import cn.hutool.captcha.ShearCaptcha;
 import com.alibaba.fastjson.JSON;
 import com.softdev.cms.entity.User;
 import com.softdev.cms.mapper.UserMapper;
+import com.softdev.cms.service.JwtUserDetailsService;
+import com.softdev.cms.util.JwtTokenUtil;
 import com.softdev.cms.util.ReturnT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +55,10 @@ public class IndexController {
         return new ModelAndView("cms/login");
     }
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private JwtUserDetailsService userDetailsService;
 
     @PostMapping("/login")
     public ReturnT login(String username, String password, String captcha, HttpServletRequest request){
@@ -74,7 +81,11 @@ public class IndexController {
             request.getSession().setMaxInactiveInterval(1800);
         }
         if(loginSuccess){
-            return ReturnT.SUCCESS("登录成功");
+            //final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            //String token = jwtTokenUtil.generateToken(userDetails);
+            //自定义token生成规则
+            String token = jwtTokenUtil.generateToken(user);
+            return ReturnT.SUCCESS(token);
         }else{
             return ReturnT.ERROR("登录失败，账号密码不正确");
         }
