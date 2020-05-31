@@ -11,7 +11,7 @@
  Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 30/05/2020 21:34:03
+ Date: 31/05/2020 23:32:23
 */
 
 SET NAMES utf8mb4;
@@ -224,6 +224,7 @@ INSERT INTO `menu` VALUES (12, '/cms/menu/list', 'fa fa-home', '_self', '菜单�
 INSERT INTO `menu` VALUES (32, '/cms/xxx/list', 'fa fa-tachometer', '_self', '文章管理', 0, '9,');
 INSERT INTO `menu` VALUES (33, '/cms/channel/list', 'fa fa-tachometer', '_self', '频道列表', 32, '9,');
 INSERT INTO `menu` VALUES (34, '/cms/article/list', 'fa fa-tachometer', '_self', '文章列表', 32, '9,');
+INSERT INTO `menu` VALUES (38, '/cms/template/list', 'fa fa-tachometer', '_self', '模板值管理', 10, '9,');
 INSERT INTO `menu` VALUES (22, '/cms/activity', 'fa fa-tachometer', '_self', '活动管理', 0, '1,9,');
 INSERT INTO `menu` VALUES (23, '/cms/activity/list', 'fa fa-tachometer', '_self', '活动列表', 22, '1,9,');
 INSERT INTO `menu` VALUES (25, '/cms/xxx/list', 'fa fa-tachometer', '_self', '表单管理', 0, '1,9,');
@@ -246,6 +247,50 @@ CREATE TABLE `role`  (
 -- ----------------------------
 INSERT INTO `role` VALUES (9, '管理员', '管理员权限');
 INSERT INTO `role` VALUES (1, '普通用户', '普通用户权限');
+
+-- ----------------------------
+-- Table structure for template
+-- ----------------------------
+DROP TABLE IF EXISTS `template`;
+CREATE TABLE `template`  (
+  `template_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '模板ID',
+  `template_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'div id',
+  `template_value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '值',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '描述',
+  `page` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '页面',
+  PRIMARY KEY (`template_id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of template
+-- ----------------------------
+INSERT INTO `template` VALUES (1, 'companyName', '广州*信息咨询有限公司', '公司名称', 'home');
+INSERT INTO `template` VALUES (2, 'bannerTitle', '政务信息系统云化迁移探讨', '首页大展示框大字', 'home');
+INSERT INTO `template` VALUES (3, 'bannerDescription', '进行中', '首页大展示框小字', 'home');
+INSERT INTO `template` VALUES (4, 'bannerButton', '点击参与', '大展示框按钮', 'home');
+INSERT INTO `template` VALUES (5, 'bannerUrl', 'http://www.egag.org.cn/', '大展示框按钮跳转页面', 'home');
+INSERT INTO `template` VALUES (6, 'bannerImage', '/img/intro/banner-1.png', '大展示框背景图', 'home');
+INSERT INTO `template` VALUES (7, 'serviceTitle', '我们的服务', '服务标题', 'home');
+INSERT INTO `template` VALUES (8, 'serviceDescription', '商务文印服务;商品信息咨询服务;企业管理咨询服务;市场调研服务;市场营销策划服务;群众参与的文艺类演出、比赛等公益性文化活动的策划;会议及展览服务;计算机网络系统工程服务;计算机技术开发、技术服务;软件开发;', '服务描述', 'home');
+INSERT INTO `template` VALUES (9, 'location', '广州市越秀区*', '地址', 'home');
+INSERT INTO `template` VALUES (10, 'phone', '020-******', '联系电话', 'home');
+INSERT INTO `template` VALUES (11, 'email', '******@qq.com', '电子邮箱', 'home');
+INSERT INTO `template` VALUES (12, 'service1icon', '/img/services/1.svg', '服务1图标', 'home');
+INSERT INTO `template` VALUES (13, 'service2icon', '/img/services/2.svg', '服务2图标', 'home');
+INSERT INTO `template` VALUES (14, 'service3icon', '/img/services/3.svg', '服务3图标', 'home');
+INSERT INTO `template` VALUES (15, 'service1title', '咨询', '服务1标题', 'home');
+INSERT INTO `template` VALUES (16, 'service2title', '金融', '服务2标题', 'home');
+INSERT INTO `template` VALUES (17, 'service3title', '支持', '服务3标题', 'home');
+INSERT INTO `template` VALUES (18, 'service1description', '咨询', '服务1链接', 'home');
+INSERT INTO `template` VALUES (19, 'service2description', '咨询', '服务2描述', 'home');
+INSERT INTO `template` VALUES (20, 'service3description', '咨询', '服务3描述', 'home');
+INSERT INTO `template` VALUES (22, 'service2url', 'www.egag.org.cn', '服务2链接', 'home');
+INSERT INTO `template` VALUES (23, 'service3url', 'www.egag.org.cn', '服务3链接', 'home');
+INSERT INTO `template` VALUES (21, 'service1url', 'www.egag.org.cn', '服务1链接', 'home');
+INSERT INTO `template` VALUES (24, 'solutionTitle', '终极解决方案', '解决方案标题', 'home');
+INSERT INTO `template` VALUES (25, 'solutionDescription', '解决方案内容有：xxxxxxxxxxxxxxxxxxxxxxx', '解决方案内容', 'home');
+INSERT INTO `template` VALUES (213, 'solutionUrl', 'www.egag.org.cn', '解决方案链接', 'home');
+INSERT INTO `template` VALUES (214, 'readMore', '了解更多', 'ReadMore', 'home');
 
 -- ----------------------------
 -- Table structure for user

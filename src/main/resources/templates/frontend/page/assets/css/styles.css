@@ -1,0 +1,264 @@
+/*  
+Author: WebThemez.com
+License: https://webthemez.com/license 
+*/
+/*------------------- 
+# General
+---------------------*/
+
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap'); 
+@import url('https://fonts.googleapis.com/css?family=Archivo+Black&display=swap'); 
+
+h1, h2{
+	font-family: 'Archivo Black', sans-serif;
+	font-weight:bolder;
+	color: #014073;
+}
+
+html {
+  font-size: 1rem;
+}
+
+body {
+  font-weight: 400;
+  font-size: 1rem;
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.6;
+  color: #1b1e24;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -moz-font-feature-settings: "liga", "kern";
+  text-rendering: optimizelegibility;
+}
+
+a {
+  color: #ff9d34;
+}
+
+a:hover {
+  color: #ff9d34;
+}
+
+a:focus {
+  outline: none;
+}
+
+p {
+  line-height: 1.8;
+}
+
+figure {
+  margin-bottom: 0;
+}
+
+hr {
+  border-color: #e6e7e9;
+}
+
+[role=button] {
+  cursor: pointer;
+}
+
+/*------------------------------------
+  Headings
+------------------------------------*/
+.h1, .h2, .h3, .h4, .h5, .h6, .h7,
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.6;
+  font-weight:600;
+} 
+/*------------------------------------
+  Highlight Color
+------------------------------------*/
+::-moz-selection {
+  color: #fff;
+  background-color: #ff9d34;
+}
+
+::selection {
+  color: #fff;
+  background-color: #ff9d34;
+}
+
+.bg-primary ::-moz-selection {
+  color: #ff9d34;
+  background-color: #fff;
+}
+
+.bg-primary ::selection {
+  color: #ff9d34;
+  background-color: #fff;
+}
+.nav-top a, .nav-top li{
+	color:#fff;
+}
+.hero-img {
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: cover;
+}
+
+.inner-page{
+    background: #006bdf;
+}
+footer{
+	color:#bdbdbd;
+}
+footer a{
+	color: #fff;
+}
+.btn-outline-dark {
+    color: #6f7173;
+    border-color: #b8b8b8;
+}
+a.active span{
+	color: #ff9d34 !important;
+}
+.logo{
+  color: #222;
+      margin: 19px 0 0;
+}
+.logo a{
+text-decoration:none;
+}
+.logo h2 span{
+  padding: 5px 7px;
+  color: #ff9d34;
+}   
+.menu-area{
+    position:relative;
+    background: #fff;
+}
+.logo h2 {
+    font-size: 30px;
+    color: #fff;
+} 
+.bg-primary {
+  color: #fff;
+  border-color: #014073 !important;
+  background-color: #014073 !important;
+}
+.nav-top {
+    background-color: #000 !important;
+}
+.inner-page-header p {
+    color: #333;
+}
+.btn-primary {
+  color: #fff;
+  border-color: #ff9d34 !important;
+  background-color: #ff9d34 !important;
+}
+.btn-outline-primary{
+    color: #ff9d34;
+    background-color: transparent !important;
+    border-color: #ff9d34 !important;
+}	
+.btn-outline-primary:hover{
+    color: #fff;
+    background-color:#ff9d34 !important; 
+}
+.bg-overlay, .hero-img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+.nav-top i {
+    color: #ffffffd1;
+}
+section.wt-section.hero-large {
+    background: #dee2e6;
+    margin-top: 0px !important;
+    /* background: #0f5386; */
+    padding: 100px 0;
+}
+section.wt-section.hero-large p {
+    /* color: #fff; */
+}
+section.wt-section.hero-large h1 {
+    /* color: #fff; */
+    font-size: 46px;
+}
+.page-item.active .page-link {
+    z-index: 1;
+    color: #fff !important;
+    background-color: #ff9d34;
+    border-color: #ff9d34;
+}
+.text-primary, .page-link{
+	color: #ff9d34 !important;
+}
+.hero-img {
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: cover;
+}
+.hero-content{
+	
+}
+.inner-page{
+    background: #006bdf;
+}  
+
+.price-card .card-body ul li{
+	line-height:38px;
+}
+.contact-info i{
+	font-size:24px;
+}
+.team-dp ul{
+	display:bock;
+	margin:0 auto;
+	padding:0;
+}
+.team-dp{
+	text-align:center;
+	display:bock;
+}
+
+.portfolio-menu ul li {
+    margin: 0px 22px 8px;
+    border: none;
+    border-bottom: 4px solid;
+    border-radius: 0;
+    padding: 10px 4px;
+}
+.portfolio-menu ul li.active, .portfolio-menu ul li:hover {
+    margin: 0px 22px 8px;
+    border: none;
+    border-bottom: 4px solid;
+    border-color: #ff9d34 !important;
+    border-radius: 0;
+    padding: 10px 4px;
+}
+ .main-footer li{
+	line-height:32px;
+	color: #fff;
+}
+.inner-page-header {
+    background: #dee2e6;
+    padding: 0;
+}
+.sub-text{
+	font-size:16px;
+}
+.nav-top-contact li{
+	font-size:13px;
+} 
+.contactIcons .fa {
+    font-size: 34px;
+    padding: 32px;
+    background: #ebebeb;
+    border-radius: 50%;
+	margin-bottom:15px;
+}
+.copyrights{
+	font-size:13px !important;
+}
+@media (max-width: 991px) {
+.hero-img { 
+    background-position: 74%; 
+}
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body>
+<div class="layui-form layuimini-form">
+    <input type="" name="templateId" value="${(template.templateId)!!}" class="layui-input">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">页面</label>
+        <div class="layui-input-block">
+            <input type="text" name="page" lay-verify="required" lay-reqtext="页面不能为空" placeholder="请输入页面" value="${(template.page)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">模板名(DIV ID)</label>
+        <div class="layui-input-block">
+            <input type="text" name="templateName" lay-verify="required" lay-reqtext="div id不能为空" placeholder="请输入div id" value="${(template.templateName)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">值</label>
+        <div class="layui-input-block">
+            <input type="text" name="templateValue" lay-verify="required" lay-reqtext="值不能为空" placeholder="请输入值" value="${(template.templateValue)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">描述</label>
+        <div class="layui-input-block">
+            <input type="text" name="description" lay-reqtext="描述不能为空" placeholder="请输入描述" value="${(template.description)!!}" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+
+</div>
+</div>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+        <@netCommon.jwtHandle />
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                type: 'POST',
+                url: "${request.contextPath}/template/save",
+                data:JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.code === 200) {
+                        layer.msg(responseData.msg, function () {
+                            // 关闭弹出层
+                            //layer.close(index);
+                            var iframeIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(iframeIndex);
+                            parent.searchBtn.click();
+                        });
+                    } else {
+                        layer.msg(responseData.msg, function () {
+                            //window.location = '/index.html';
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>
