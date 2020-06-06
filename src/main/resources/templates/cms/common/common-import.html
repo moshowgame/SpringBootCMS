@@ -73,3 +73,46 @@ $.ajaxSetup({
      });
  }
 </#macro>
+
+
+<#macro frontEndPageImport>
+  <head>
+    <!-- Meta -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="keywords" content="${(templateMap.companyName)!!}">
+    <meta name="description" content="${(templateMap.companyName)!!}">
+    <meta name="author" content="zhengkai.blog.csdn.net">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${request.contextPath}/static/frontend/img/favicon.png" type="image/x-icon">
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/font-awesome/css/fontawesome-all.min.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.css">
+	<link href="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.css" rel="stylesheet" type="text/css" />
+	<link href="${request.contextPath}/static/frontend/vendors/aos/aos.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/theme.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/styles.css">
+
+    <!-- JS Script Files -->
+    <!-- Global Vendor -->
+    <script src="${request.contextPath}/static/frontend/vendors/jquery.min.js"></script>
+    <script src="${request.contextPath}/static/frontend/vendors/jquery.migrate.min.js"></script>
+    <script src="${request.contextPath}/static/frontend/vendors/popper.min.js"></script>
+    <script src="${request.contextPath}/static/frontend/vendors/bootstrap/js/bootstrap.min.js"></script>
+    <script src="${request.contextPath}/static/frontend/vendors/aos/aos.js"></script>
+
+    <!-- Components Vendor  -->
+    <script src="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.min.js"></script>
+    <script src="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.js"></script>
+
+    <!--Plugin Initialize-->
+    <script src="${request.contextPath}/static/frontend/js/global.js"></script>
+    <script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
+
+    <!-- END JAVASCRIPTS -->
+  </head>
+</#macro>

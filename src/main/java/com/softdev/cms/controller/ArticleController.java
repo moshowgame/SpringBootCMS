@@ -1,10 +1,13 @@
 package com.softdev.cms.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.softdev.cms.entity.Activity;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.softdev.cms.entity.Article;
 import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.mapper.ArticleMapper;
+import com.softdev.cms.util.EhCacheUtil;
 import com.softdev.cms.util.ReturnT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -12,14 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @description 文章
@@ -35,15 +34,11 @@ public class ArticleController {
     private ArticleMapper articleMapper;
 
 
-    private final String CACHE_NAME="cache-article";
-    private final String CACHE_KEY="#article.articleId";
-    private final String CACHE_KEY2="#articleId";
-
     /**
      * 新增或编辑
      */
     @PostMapping("/save")
-    @CacheEvict(value = CACHE_NAME, key = CACHE_KEY)
+    @CacheEvict(value = EhCacheUtil.CACHE_NAME_ARTICLE, key = EhCacheUtil.CACHE_OBJ_KEY_ARTICLE)
     public Object save(@RequestBody Article article){
         log.info("article:"+JSON.toJSONString(article));
         Article oldArticle = articleMapper.selectOne(new QueryWrapper<Article>().eq("article_id",article.getArticleId()));
@@ -63,7 +58,7 @@ public class ArticleController {
     /**
      * 删除
      */
-    @CacheEvict(value = CACHE_NAME, key = CACHE_KEY2)
+    @CacheEvict(value = EhCacheUtil.CACHE_NAME_ARTICLE, key = EhCacheUtil.CACHE_KEY_ARTICLE)
     @PostMapping("/delete")
     public Object delete(int id){
         Article article = articleMapper.selectOne(new QueryWrapper<Article>().eq("article_id",id));
@@ -78,7 +73,7 @@ public class ArticleController {
     /**
      * 查询
      */
-    @Cacheable(value = CACHE_NAME, key = CACHE_KEY2)
+    @Cacheable(value = EhCacheUtil.CACHE_NAME_ARTICLE, key = EhCacheUtil.CACHE_KEY_ARTICLE)
     @PostMapping("/find")
     public Object find(int id){
         Article article = articleMapper.selectOne(new QueryWrapper<Article>().eq("article_id",id));

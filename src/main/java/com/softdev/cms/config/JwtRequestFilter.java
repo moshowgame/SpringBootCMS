@@ -20,6 +20,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
+/**
+ * JwtRequestFilter
+ * JWT请求过滤器：同时支持Authorization头+token参数处理模式
+ * @author zhengkai.blog.csdn.net
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired

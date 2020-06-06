@@ -39,6 +39,8 @@ public class Channel implements Serializable {
 
     private Integer status;
 
+    private Integer seq;
+
     public Channel() {
     }
 

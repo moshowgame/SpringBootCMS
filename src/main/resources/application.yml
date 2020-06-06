@@ -78,6 +78,8 @@ spring:
         - cache-article
         - cache-activity
         - cache-form
+        - cache-page
+        - cache-channel
 #mybatis-plus:
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

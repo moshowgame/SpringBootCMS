@@ -11,7 +11,7 @@
  Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 31/05/2020 23:32:23
+ Date: 06/06/2020 13:35:18
 */
 
 SET NAMES utf8mb4;
@@ -213,23 +213,25 @@ CREATE TABLE `menu`  (
   `parent_menu_id` int(11) NULL DEFAULT 0 COMMENT '父菜单id',
   `role_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '1,5,9' COMMENT '权限',
   PRIMARY KEY (`menu_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 38 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 41 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of menu
 -- ----------------------------
-INSERT INTO `menu` VALUES (10, '/cms/index', 'fa fa-home', '_self', '基础信息管理', 0, '1,9,');
+INSERT INTO `menu` VALUES (10, '/cms/index', 'fa fa-home', '_self', '基础管理', 0, '1,9,');
 INSERT INTO `menu` VALUES (11, '/cms/user/list', 'fa fa-tachometer', '_self', '用户管理', 10, '1,9,');
 INSERT INTO `menu` VALUES (12, '/cms/menu/list', 'fa fa-home', '_self', '菜单管理', 10, '1,9,');
 INSERT INTO `menu` VALUES (32, '/cms/xxx/list', 'fa fa-tachometer', '_self', '文章管理', 0, '9,');
 INSERT INTO `menu` VALUES (33, '/cms/channel/list', 'fa fa-tachometer', '_self', '频道列表', 32, '9,');
 INSERT INTO `menu` VALUES (34, '/cms/article/list', 'fa fa-tachometer', '_self', '文章列表', 32, '9,');
-INSERT INTO `menu` VALUES (38, '/cms/template/list', 'fa fa-tachometer', '_self', '模板值管理', 10, '9,');
+INSERT INTO `menu` VALUES (38, '/cms/template/list', 'fa fa-tachometer', '_self', '模板值管理', 39, '9,');
 INSERT INTO `menu` VALUES (22, '/cms/activity', 'fa fa-tachometer', '_self', '活动管理', 0, '1,9,');
 INSERT INTO `menu` VALUES (23, '/cms/activity/list', 'fa fa-tachometer', '_self', '活动列表', 22, '1,9,');
 INSERT INTO `menu` VALUES (25, '/cms/xxx/list', 'fa fa-tachometer', '_self', '表单管理', 0, '1,9,');
 INSERT INTO `menu` VALUES (26, '/cms/form/list', 'fa fa-tachometer', '_self', '表单模板', 25, '1,9,');
 INSERT INTO `menu` VALUES (27, '/cms/formSubmit/list', 'fa fa-tachometer', '_self', '提交列表', 25, '9,');
+INSERT INTO `menu` VALUES (39, '/cms/xxx/list', 'fa fa-tachometer', '_self', '页面管理', 0, '1,9,');
+INSERT INTO `menu` VALUES (40, '/cms/page/index', 'fa fa-tachometer', '_self', '首页预览', 39, '9,');
 
 -- ----------------------------
 -- Table structure for role
@@ -259,12 +261,12 @@ CREATE TABLE `template`  (
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '描述',
   `page` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '页面',
   PRIMARY KEY (`template_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 215 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of template
 -- ----------------------------
-INSERT INTO `template` VALUES (1, 'companyName', '广州*信息咨询有限公司', '公司名称', 'home');
+INSERT INTO `template` VALUES (1, 'companyName', '广州智纵慧联信息咨询有限公司', '公司名称', 'home');
 INSERT INTO `template` VALUES (2, 'bannerTitle', '政务信息系统云化迁移探讨', '首页大展示框大字', 'home');
 INSERT INTO `template` VALUES (3, 'bannerDescription', '进行中', '首页大展示框小字', 'home');
 INSERT INTO `template` VALUES (4, 'bannerButton', '点击参与', '大展示框按钮', 'home');
@@ -272,9 +274,9 @@ INSERT INTO `template` VALUES (5, 'bannerUrl', 'http://www.egag.org.cn/', '大�
 INSERT INTO `template` VALUES (6, 'bannerImage', '/img/intro/banner-1.png', '大展示框背景图', 'home');
 INSERT INTO `template` VALUES (7, 'serviceTitle', '我们的服务', '服务标题', 'home');
 INSERT INTO `template` VALUES (8, 'serviceDescription', '商务文印服务;商品信息咨询服务;企业管理咨询服务;市场调研服务;市场营销策划服务;群众参与的文艺类演出、比赛等公益性文化活动的策划;会议及展览服务;计算机网络系统工程服务;计算机技术开发、技术服务;软件开发;', '服务描述', 'home');
-INSERT INTO `template` VALUES (9, 'location', '广州市越秀区*', '地址', 'home');
-INSERT INTO `template` VALUES (10, 'phone', '020-******', '联系电话', 'home');
-INSERT INTO `template` VALUES (11, 'email', '******@qq.com', '电子邮箱', 'home');
+INSERT INTO `template` VALUES (9, 'location', '广州市越秀区盘福路医国后街1号大院自编1号1503房', '地址', 'home');
+INSERT INTO `template` VALUES (10, 'phone', '020-87599883', '联系电话', 'home');
+INSERT INTO `template` VALUES (11, 'email', '279554612@qq.com', '电子邮箱', 'home');
 INSERT INTO `template` VALUES (12, 'service1icon', '/img/services/1.svg', '服务1图标', 'home');
 INSERT INTO `template` VALUES (13, 'service2icon', '/img/services/2.svg', '服务2图标', 'home');
 INSERT INTO `template` VALUES (14, 'service3icon', '/img/services/3.svg', '服务3图标', 'home');

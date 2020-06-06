@@ -43,6 +43,10 @@ public class Article implements Serializable {
      * 内容
      */
     private String content;
+    /**
+     * 描述
+     */
+    private String description;
 
     /**
      * 频道id

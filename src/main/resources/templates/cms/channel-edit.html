@@ -1,22 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>layuimini</title>
-    <meta name="renderer" content="webkit">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="${request.contextPath}/static/lib/layui-v2.5.5/css/layui.css" media="all">
-    <link rel="stylesheet" href="${request.contextPath}/static/css/public.css" media="all">
-    <style>
-        body {
-            background-color: #ffffff;
-        }
-    </style>
-</head>
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
 <body>
 <div class="layui-form layuimini-form">
-    <input type="hidden" name="channelId" value="" class="layui-input">
+    <input type="hidden" name="channelId" value="${(channel.channelId)!!}" class="layui-input">
 
     <div class="layui-form-item">
         <label class="layui-form-label required">频道名称</label>
@@ -37,6 +25,13 @@
         <div class="layui-input-block">
             <input type="text" name="icon" lay-verify="required" lay-reqtext="频道图标不能为空" placeholder="请输入频道图标" value="${(channel.icon)!!}" class="layui-input">
             <tip>图标请参考 <a href="https://www.layui.com/doc/element/icon.html">https://www.layui.com/doc/element/icon.html</a> </tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">排序</label>
+        <div class="layui-input-block">
+            <input type="text" name="seq" lay-verify="required" lay-reqtext="排序不能为空" placeholder="请输入排序" value="${(channel.seq)!!}" class="layui-input">
+            <tip>默认0，越高越靠前</tip>
         </div>
     </div>
 

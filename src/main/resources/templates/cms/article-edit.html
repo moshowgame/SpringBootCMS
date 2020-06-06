@@ -17,6 +17,12 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label required">摘要</label>
+        <div class="layui-input-block">
+            <input row="2" type="text" name="description" lay-verify="required" lay-reqtext="摘要不能为空，250字以内" placeholder="请输入摘要，250字以内" value="${(article.description)!!}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label required">内容</label>
         <div class="layui-input-block">
             <textarea name="content" required id="content" class="layui-input">${(article.content)!!}</textarea>
@@ -39,8 +45,8 @@
     <div class="layui-form-item">
         <label class="layui-form-label required">是否置顶</label>
         <div class="layui-input-block">
-            <input type="radio" name="isTop" value="1" title="是" <#if (article.status)??> ${(article.status == 1)?string('checked=""','0')?html}  </#if> >
-            <input type="radio" name="isTop" value="0" title="否" <#if (article.status)??> ${(article.status == 0)?string('checked=""','0')?html}  <#else>checked=""</#if> >
+            <input type="radio" name="isTop" value="1" title="是" <#if (article.isTop)??> ${(article.isTop == 1)?string('checked=""','0')?html}  </#if> >
+            <input type="radio" name="isTop" value="0" title="否" <#if (article.isTop)??> ${(article.isTop == 0)?string('checked=""','0')?html}  <#else>checked=""</#if> >
         </div>
     </div>
     <div class="layui-form-item">
