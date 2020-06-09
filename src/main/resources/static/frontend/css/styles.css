@@ -116,7 +116,7 @@ a.active span{
 }
 .logo{
   color: #222;
-      margin: 19px 0 0;
+      margin: 1rem 0 0;
 }
 .logo a{
 text-decoration:none;
@@ -124,15 +124,12 @@ text-decoration:none;
 .logo h2 span{
   padding: 5px 7px;
   color: #ff9d34;
+  font-size: 1.2rem;
 }   
 .menu-area{
     position:relative;
     background: #fff;
 }
-.logo h2 {
-    font-size: 30px;
-    color: #fff;
-} 
 .bg-primary {
   color: #fff;
   border-color: #014073 !important;

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.softdev.cms.entity.Article;
 import com.softdev.cms.entity.Template;
+import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.mapper.ArticleMapper;
 import com.softdev.cms.mapper.TemplateMapper;
 import com.softdev.cms.service.FrontEndService;
@@ -37,7 +38,9 @@ public class FrontEndController {
 
     @Autowired
     FrontEndService frontEndService;
-
+    /**
+     * 首页
+     */
     @GetMapping("index")
     public ModelAndView indexPage(){
 
@@ -47,6 +50,9 @@ public class FrontEndController {
                 //获取模板值
                 .addObject("templateMap",frontEndService.getTemplateMap("index"));
     }
+    /**
+     * 频道页面
+     */
     @GetMapping("/channel/{channelId}")
     public ModelAndView channelPage(@PathVariable Integer channelId){
         return new ModelAndView("/frontend/channel")
@@ -57,6 +63,9 @@ public class FrontEndController {
                 //获取模板值
                 .addObject("templateMap",frontEndService.getTemplateMap("channel"));
     }
+    /**
+     * 文章页面
+     */
     @GetMapping("article/{articleId}")
     public ModelAndView articlePage(@PathVariable String articleId){
         //判断文章是否启用
@@ -69,17 +78,19 @@ public class FrontEndController {
                 //文章内容
                 .addObject("article",frontEndService.getArticle(articleId));
     }
+    /**
+     * 文章列表接口
+     */
     @PostMapping("article/list")
-    public ReturnT getArticleList(String searchParams,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int limit) {
+    public ReturnT getArticleList(@RequestBody QueryParamDTO queryParamDTO) {
+        log.info(JSON.toJSONString(queryParamDTO));
+        queryParamDTO.setPageLimit();
         //分页构造器
-        Page<Article> buildPage = new Page<Article>(page,limit);
+        Page<Article> buildPage = new Page<Article>(queryParamDTO.getPage(),queryParamDTO.getLimit());
         //条件构造器
         QueryWrapper<Article> queryWrapper = new QueryWrapper<Article>();
-        Article article = JSON.parseObject(searchParams, Article.class);
-        queryWrapper.select("article_id","title","description","create_user_name")
-                .eq(article.getChannelId()!=null,"channel_id",article.getChannelId())
+        queryWrapper.select("article_id","title","description","create_user_name","create_time")
+                .eq(queryParamDTO.getChannelId()!=null,"channel_id",queryParamDTO.getChannelId())
                 .orderByAsc("is_top","create_time")
             ;
         //执行分页

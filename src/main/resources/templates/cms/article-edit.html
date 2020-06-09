@@ -52,6 +52,7 @@
     <div class="layui-form-item">
         <div class="layui-input-block">
             <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
+            <button class="layui-btn" lay-submit lay-filter="uploadBtn">WORD图片上传</button>
         </div>
     </div>
 </div>
@@ -72,7 +73,32 @@
 
         //创建一个编辑器
         var editIndex = layedit.build('content');
-
+        //监听uploadBtn提交
+        form.on('submit(uploadBtn)', function (data) {
+            let imgDataArr = [];
+            let i=0;
+            $("#LAY_layedit_1").contents().find("img").each(function () {
+                console.log("遍历img元素");
+                let imgData = {};
+                let id = 'id_' + new Date().getTime();
+                let imgUrl = $(this).attr("src");
+                if (imgUrl.indexOf("data:image/png;base64,") != -1) {
+                    imgData.id = id;
+                    imgData.imgUrl = imgUrl.replace("data:image/png;base64,", "");
+                    imgDataArr[i]=imgData;
+                    i++;
+                    $(this).attr('id', id);
+                }
+            });
+            if(i>0){
+                $.each(imgDataArr, function(i,item){
+                    console.log("这里有一个图片");
+                    //上传并回写图片
+                    //$("#content").contents().find("#"+item.id).attr("src",uploadimgUrl);
+                });
+            }
+            layer.msg('提交成功');
+        });
         //监听提交
         form.on('submit(saveBtn)', function (data) {
             //fix 关于layui富文本编辑器和form表单提交的问题

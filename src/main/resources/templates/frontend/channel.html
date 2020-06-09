@@ -5,7 +5,7 @@
 
     <!-- Meta -->
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no,user-scalable=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="keywords" content="${(templateMap.companyName)!!}">
     <meta name="description" content="${(templateMap.companyName)!!}">
@@ -76,56 +76,16 @@
             <div class="container">
                 <div class="row justify-content-between">
                     <div id="articleListDiv" class="col-lg-12">
-                        <div class="blog-post">
+                        <!--<div class="blog-post">
                             <h3><a href="#">Latest Fullstack Technologies for Year 2020</a></h3>
                             <div class="meta font-lora mb-3">
                                 <a href="#">Front-end</a>
                                 <a href="#">29th August 2019</a>
                             </div>
                             <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius eligendi fugiat labore libero molestias provident quae </p>
-                        </div>
-                        <div class="blog-post">
-                            <h3><a href="#">Latest Fullstack Technologies for Year 2020</a></h3>
-                            <div class="meta font-lora mb-3">
-                                <a href="#">Front-end</a>
-                                <a href="#">29th August 2019</a>
-                            </div>
-                            <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius eligendi fugiat labore libero molestias provident quae </p>
-                        </div>
+                        </div>-->
                         <!--pagination-->
-                        <div class="row justify-content-between align-items-center mb-4">
-                            <div class="col-lg">
-                                <nav aria-label="Bootstrap Pagination Example">
-                                    <ul class="pagination mb-0">
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">Previous</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">1</a>
-                                        </li>
-                                        <li class="page-item active">
-                                            <a class="page-link" href="#">2</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">3</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">4</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">5</a>
-                                        </li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">Next</a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
 
-                           <!-- <div class="col-lg text-lg-right mt-1 mt-lg-0">
-                                <span class="wt-font-size-90 text-muted">Page 2 of 5</span>
-                            </div>-->
-                        </div>
                     </div>
                 </div>
             </div>
@@ -170,15 +130,27 @@
    <script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
 
     <script>
+        function insertArticle(id,title,tab,date,description){
+            return "<div class=\"blog-post\" id=\""+id+"\"><h3><a href=\"${request.contextPath}/page/article/"+id+"\">"+title+"</a></h3>" +
+                "<div class=\"meta font-lora mb-3\"><a>"+tab+"</a>" +
+                "<a>"+date+"</a></div><p><a href=\"${request.contextPath}/page/article/"+id+"\">"+description+"</a></p></div><br>";
+        }
         function getArticleList () {
             $.ajax({
                 type: 'POST',
                 url: "${request.contextPath}/page/article/list",
-                data:{"searchParams":"{'channelId':'$(channel.channelId)!!'}","page":"1","limit":"99"},
+                data:JSON.stringify({"channelId":"${(channel.channelId)!!}","page":"1","limit":"99"}),
                 dataType: "json",
                 contentType: "application/json",
                 success: function (responseData) {
-
+                    let data = responseData.data;
+                    // console.log(data);
+                    if(data.length<1){
+                        $("#articleListDiv").append("该分类下没有文章，请查看其他分类");
+                    }
+                    for(var n in data) {//遍历json数组时，这么写p为索引，0,1
+                        $("#articleListDiv").append(insertArticle(data[n].articleId,data[n].title,data[n].createUserName,data[n].createTime,data[n].description));
+                    }
                 }
             });
         }

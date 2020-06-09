@@ -27,4 +27,7 @@ public class QueryParamDTO implements Serializable {
         this.page = (page-1)*limit;
         this.limit = limit;
     }
+    public void setPageLimit() {
+        this.page = (this.page-1)*this.limit;
+    }
 }

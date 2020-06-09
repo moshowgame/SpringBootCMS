@@ -5,7 +5,7 @@
 
     <!-- Meta -->
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no,user-scalable=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="keywords" content="${(templateMap.companyName)!!}">
     <meta name="description" content="${(templateMap.companyName)!!}">
@@ -22,7 +22,17 @@
     <link href="${request.contextPath}/static/frontend/vendors/aos/aos.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/theme.css">
     <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/styles.css">
-
+    <style>
+        @media (min-width: 576px) {
+            .logo h2 { font-size: 16px; }
+        }
+        @media (min-width: 768px) {
+            .logo h2 { font-size: 20px; }
+        }
+        @media (min-width: 992px) {
+            .logo h2 {font-size: 26px;}
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
