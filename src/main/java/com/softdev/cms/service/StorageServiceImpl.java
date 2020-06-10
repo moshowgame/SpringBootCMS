@@ -48,7 +48,15 @@ public class StorageServiceImpl implements StorageService {
 		}
 		return path;
 	}
-
+	@Override
+	public String getPathString() {
+		//如果在Window下,用dev路径,如果在其他系统,则用生产环境路径linuxPath by zhengkai.blog.csdn.net
+		if(System.getProperty("os.name").toLowerCase().startsWith("win")) {
+			return winPath;
+		}else {
+			return linuxPath;
+		}
+	}
 
 	@Override
 	public void store(MultipartFile file,String filename) {

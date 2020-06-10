@@ -98,7 +98,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/login",
                         "/MP_verify_*.txt",
                         "/captcha",
-                        "/logout"
+                        "/logout",
+                        "/file/files/*"
                 );
     }
 }
