@@ -82,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         HttpMethod.POST,
                         authenticationPath,
-                        "/login",
+                        "/admin/login",
                         "/page/article/list"
                 )
 
@@ -95,10 +95,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/static/**",
                         "/page/**",
                         "/api/**",
-                        "/login",
                         "/MP_verify_*.txt",
-                        "/captcha",
-                        "/logout",
+                        "/admin/login",
+                        "/admin/captcha",
+                        "/admin/logout",
                         "/file/files/*"
                 );
     }

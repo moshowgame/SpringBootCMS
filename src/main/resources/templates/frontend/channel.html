@@ -87,6 +87,20 @@
                         <!--pagination-->
 
                     </div>
+                    <!--pagination-->
+                    <div class="row justify-content-between align-items-center mb-4">
+                        <div class="col-lg">
+                            <nav aria-label="Bootstrap Pagination Example">
+                                <ul class="pagination mb-0" id="pageAreaDiv">
+                                    <!--<li class="page-item"><a class="page-link" ><span aria-hidden="true">&laquo;</span></a></li>-->
+                                    <!--<li id="p1" class="page-item active">
+                                        <a class="page-link" href="#">1</a>
+                                    </li>-->
+                                    <!--<li class="page-item"><a class="page-link" ><span aria-hidden="true">&raquo;</span></a></li>-->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -135,20 +149,71 @@
                 "<div class=\"meta font-lora mb-3\"><a>"+tab+"</a>" +
                 "<a>"+date+"</a></div><p><a href=\"${request.contextPath}/page/article/"+id+"\">"+description+"</a></p></div><br>";
         }
+        //当前页面
+        let currentPage=1;
+        //是否初始化分页
+        let init=0;
+        //总页面（向上取整）
+        let page = 1;
+        //大于多少数量进行分页
+        let limit = 10;
+        //切换页面
+        function switchPage(index){
+            $("#p"+currentPage).attr("class","page-item");
+            $("#p"+index).attr("class","page-item active");
+            currentPage=index;
+            getArticleList ();
+        }
+        //上一页
+        function lastPage(){
+            if(currentPage>1){
+                switchPage(currentPage-1);
+            }
+        }
+        //下一页
+        function nextPage(){
+            if(currentPage<page){
+                switchPage(currentPage+1);
+            }
+        }
+        //获取文章列表
         function getArticleList () {
             $.ajax({
                 type: 'POST',
                 url: "${request.contextPath}/page/article/list",
-                data:JSON.stringify({"channelId":"${(channel.channelId)!!}","page":"1","limit":"99"}),
+                data:JSON.stringify({"channelId":"${(channel.channelId)!!}","page":currentPage,"limit":limit}),
                 dataType: "json",
                 contentType: "application/json",
                 success: function (responseData) {
-                    let data = responseData.data;
                     // console.log(data);
+                    $("#articleListDiv").html("");
+                    //获取分页数据
+                    let data = responseData.data;
+                    //获取分页数量
+                    let count = responseData.count;
+                    //文章大于10，需要进行分页
+                    if(count>limit&&init===0){
+                        page=Math.ceil(count/limit);
+                        //清空dev
+                        $("#pageAreaDiv").html("");
+                        //上一页
+                        $("#pageAreaDiv").append('<li class="page-item"><a class="page-link" onclick="lastPage()"><span aria-hidden="true">&laquo;</span></a></li>');
+                        //动态分页数量
+                        for(let i=1; i<page+1; i++){
+                            $("#pageAreaDiv").append('<li id="p'+i+'" class="page-item" onclick="switchPage(\''+i+'\')"><a class="page-link">'+i+'</a></li>');
+                        }
+                        //下一页
+                        $("#pageAreaDiv").append('<li class="page-item"><a class="page-link" onclick="nextPage()"><span aria-hidden="true">&raquo;</span></a></li>');
+                        currentPage=1;
+                        init=1;
+                        //设置选中Active效果
+                        $("#p"+currentPage).attr("class","page-item active");
+                    }
                     if(data.length<1){
                         $("#articleListDiv").append("该分类下没有文章，请查看其他分类");
                     }
-                    for(var n in data) {//遍历json数组时，这么写p为索引，0,1
+                    //遍历并插入最新数据
+                    for(const n in data) {//遍历json数组时，这么写p为索引，0,1
                         $("#articleListDiv").append(insertArticle(data[n].articleId,data[n].title,data[n].createUserName,data[n].createTime,data[n].description));
                     }
                 }

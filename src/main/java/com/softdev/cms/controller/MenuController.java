@@ -131,7 +131,7 @@ public class MenuController {
         Map<String,String> homeInfo = new HashMap<>();
         homeInfo.put("title","首页");
         homeInfo.put("icon","fa fa-home");
-        homeInfo.put("href","/cms/welcome?token="+token);
+        homeInfo.put("href","/cms/admin/welcome?token="+token);
         parentMap.put("homeInfo",homeInfo);
         //info系统左边logo文字信息
         Map<String,String> logoInfo = new HashMap<>();

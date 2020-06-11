@@ -105,7 +105,7 @@ public class FileController {
 		FileOutputStream fos = null;
 		//自定义文件名
 		String fileName=System.currentTimeMillis()+"_img_upload.png";
-		StringUtils.generateImage(base64String,storageService.getPathString()+fileName);
+		StringUtils.generateImage(base64String.replace("data:image/png;base64,",""),storageService.getPathString()+fileName);
 		Map returnMap = new HashMap();
 		returnMap.put("src", StringUtils.SYSTEM_PATH+"/file/files/"+fileName);
 		returnMap.put("title",fileName);

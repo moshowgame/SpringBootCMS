@@ -22,11 +22,16 @@ public class QueryParamDTO implements Serializable {
     Integer status;
     Integer page;
     Integer limit;
-
+    /**
+     *设置分页参数for手工分页
+     */
     public void setPageLimit(Integer page,Integer limit) {
         this.page = (page-1)*limit;
         this.limit = limit;
     }
+    /**
+     *设置分页参数for手工分页
+     */
     public void setPageLimit() {
         this.page = (this.page-1)*this.limit;
     }

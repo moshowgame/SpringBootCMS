@@ -38,6 +38,7 @@ public class FrontEndController {
 
     @Autowired
     FrontEndService frontEndService;
+
     /**
      * 首页
      */
@@ -84,7 +85,7 @@ public class FrontEndController {
     @PostMapping("article/list")
     public ReturnT getArticleList(@RequestBody QueryParamDTO queryParamDTO) {
         log.info(JSON.toJSONString(queryParamDTO));
-        queryParamDTO.setPageLimit();
+        //queryParamDTO.setPageLimit();
         //分页构造器
         Page<Article> buildPage = new Page<Article>(queryParamDTO.getPage(),queryParamDTO.getLimit());
         //条件构造器
