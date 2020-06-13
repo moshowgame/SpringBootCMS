@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.softdev.cms.entity.Template;
 import com.softdev.cms.mapper.TemplateMapper;
+import com.softdev.cms.service.FrontEndService;
 import com.softdev.cms.util.ReturnT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,9 @@ public class TemplateController {
     @Autowired
     private TemplateMapper templateMapper;
 
+    @Autowired
+    private FrontEndService frontEndService;
+
     /**
      * 新增或编辑
      */
@@ -43,6 +47,7 @@ public class TemplateController {
             }
             templateMapper.insert(template);
         }
+        frontEndService.refreshTemplateMap(template.getPage());
         return ReturnT.SUCCESS("保存成功");
     }
 

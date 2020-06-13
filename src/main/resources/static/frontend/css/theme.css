@@ -178,6 +178,10 @@ header.main-header {
     font-size: 14px;
     padding: 12px 24px;
 }
+.mainNav ul li input{
+    font-size: 14px;
+    padding: 12px 24px;
+}
 .ace-responsive-menu {
     float: left;
     width: 100%;

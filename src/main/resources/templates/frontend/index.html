@@ -55,6 +55,11 @@
                 </li>
                 </#list>
                 </#if>
+                <!--<li>
+                    <a>
+                        <span class="title"><input type="text" placeholder="Search"></span>
+                    </a>
+                </li>-->
             </ul>
         </nav>
     </div>
@@ -138,11 +143,11 @@
         <div class="container">
             <div class="row justify-content-between align-items-center text-center text-md-left" data-aos="fade-in" data-aos-easing="linear" data-aos-delay="50">
                 <div class="col-md-8">
-                    <h5 class="mb-1">The best business consultancy services in world</h5>
-                    <p class="mb-0">There are many variations of passages of Lorem Ipsum available the majority alteration.</p>
+                    <h5 class="mb-1">${(templateMap.quoteTitle)!!}</h5>
+                    <p class="mb-0">${(templateMap.quoteDescription)!!}</p>
                 </div>
                 <div class="col-md-4 text-lg-right mt-md-0 mt-3">
-                    <a href="contact.html" class="btn btn btn-outline-light btn-pill">Request Quote</a>
+                    <a href="${(templateMap.quoteUrl)!!}" class="btn btn btn-outline-light btn-pill">${(templateMap.readMore)!!}</a>
                 </div>
             </div>
         </div>
@@ -152,10 +157,10 @@
             <div class="row justify-content-md-center align-items-center text-center mb-lg-5 mb-4 pb-lg-5" data-aos="fade-left" data-aos-easing="linear" data-aos-delay="50">
                 <div class="col-md-6 px-md-5">
                     <i class="fab fa-connectdevelop display-4 text-primary mb-4"></i>
-                    <h2 class="mb-md-4 mt-3">We are Top Consulting Firm in the World</h2>
-                    <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod Lorem ipsum dolor sit amet</p>
+                    <h2 class="mb-md-4 mt-3">${(templateMap.consultingTitle)!!}</h2>
+                    <p class="text-muted">${(templateMap.consultingDescription)!!}</p>
                     <div class="mb-md-5 mb-4">
-                        <a href="#" class="btn btn-primary btn-pill">${(templateMap.readMore)!!}</a>
+                        <a href="${(templateMap.consultingUrl)!!}" class="btn btn-primary btn-pill">${(templateMap.readMore)!!}</a>
                     </div>
                 </div>
                 <div class="col-md-6">

@@ -9,6 +9,7 @@ import com.softdev.cms.mapper.ChannelMapper;
 import com.softdev.cms.mapper.TemplateMapper;
 import com.softdev.cms.util.EhCacheUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,10 @@ public class FrontEndService {
         templateList.stream().forEach(m->{templateMap.put(m.getTemplateName(),m.getTemplateValue());});
         return templateMap;
     }
+    @CacheEvict(value = EhCacheUtil.CACHE_NAME_PAGE, key = EhCacheUtil.CACHE_KEY_PAGE)
+    public void refreshTemplateMap(String pageName){
 
+    }
     /**
      * 获取文章（缓存）
      * @return
