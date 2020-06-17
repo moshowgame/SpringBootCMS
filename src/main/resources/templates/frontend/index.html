@@ -55,11 +55,14 @@
                 </li>
                 </#list>
                 </#if>
-                <!--<li>
-                    <a>
-                        <span class="title"><input type="text" placeholder="Search"></span>
+                <li>
+                    <a href="${request.contextPath}/page/search" >
+                        <span class="title">搜索</span>
                     </a>
-                </li>-->
+                        <!--<span class="glyphicon glyphicon-star" aria-hidden="true"></span>-->
+                        <!--<span class="badge badge-secondary"><input id="searchParam" type="text" placeholder="Search"><button class="btn btn-link" onclick="searchAction()">搜索</button></span>-->
+                        <!--<span class="title"><input type="text" placeholder="Search"></span>-->
+                </li>
             </ul>
         </nav>
     </div>
@@ -257,6 +260,13 @@
 <script src="${request.contextPath}/static/frontend/js/global.js"></script>
 <script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
 
+<script>
+    function searchAction() {
+        const searchUrl = "searchParam=" + $("#searchParam").val();
+        console.log(searchUrl);
+    }
+    
+</script>
 <!-- END JAVASCRIPTS -->
 </body>
 </html>

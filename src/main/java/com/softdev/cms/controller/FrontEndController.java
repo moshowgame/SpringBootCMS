@@ -90,13 +90,28 @@ public class FrontEndController {
         Page<Article> buildPage = new Page<Article>(queryParamDTO.getPage(),queryParamDTO.getLimit());
         //条件构造器
         QueryWrapper<Article> queryWrapper = new QueryWrapper<Article>();
+        //支持channelId和标题/关键字/内容多重维度搜索
         queryWrapper.select("article_id","title","description","create_user_name","create_time")
                 .eq(queryParamDTO.getChannelId()!=null,"channel_id",queryParamDTO.getChannelId())
+                .like(StringUtils.isNotEmpty(queryParamDTO.getSearchParam()),"title",queryParamDTO.getSearchParam())
+                .or()
+                .like(StringUtils.isNotEmpty(queryParamDTO.getSearchParam()),"keyword",queryParamDTO.getSearchParam())
+                .or()
+                .like(StringUtils.isNotEmpty(queryParamDTO.getSearchParam()),"content",queryParamDTO.getSearchParam())
                 .orderByAsc("is_top","create_time")
             ;
         //执行分页
         IPage<Article> pageList = articleMapper.selectPage(buildPage, queryWrapper);
         //返回结果
         return ReturnT.PAGE(pageList.getRecords(),pageList.getTotal());
+    }
+    /**
+     * 搜索页面
+     */
+    @GetMapping("/search")
+    public ModelAndView searchPage(){
+        return new ModelAndView("/frontend/search")
+                //获取模板值
+                .addObject("templateMap",frontEndService.getTemplateMap("channel"));
     }
 }

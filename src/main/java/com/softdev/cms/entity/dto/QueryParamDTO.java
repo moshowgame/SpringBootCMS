@@ -22,6 +22,7 @@ public class QueryParamDTO implements Serializable {
     Integer status;
     Integer page;
     Integer limit;
+    String searchParam;
     /**
      *设置分页参数for手工分页
      */
