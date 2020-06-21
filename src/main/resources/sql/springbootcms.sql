@@ -11,7 +11,7 @@
  Target Server Version : 80012
  File Encoding         : 65001
 
- Date: 17/06/2020 22:36:32
+ Date: 21/06/2020 16:32:34
 */
 
 SET NAMES utf8mb4;
@@ -33,12 +33,13 @@ CREATE TABLE `activity`  (
   `create_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建用户姓名',
   `status` tinyint(1) NULL DEFAULT 0 COMMENT '活动状态:0未发布 1已发布',
   PRIMARY KEY (`activity_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of activity
 -- ----------------------------
-INSERT INTO `activity` VALUES (3, '共同抗击疫情，健康中华IT讲座', '病毒无情，人有情。防护病毒，防护IT系统，人人有责。', '2020-05-09 16:50:13', '2020-05-27 23:51:17', '2020-05-13 09:00:00', '2020-07-13 12:00:00', 1, 'admin', 1);
+INSERT INTO `activity` VALUES (3, '共同抗击疫情，健康中华IT讲座', '病毒无情，人有情。防护病毒，防护IT系统，人人有责。', '2020-05-09 16:50:13', '2020-05-27 23:51:17', '2020-05-13 09:00:00', '2020-07-13 12:00:00', 1, '系统管理员', 1);
+INSERT INTO `activity` VALUES (4, '新版系统上线庆典', 'new version arrived! update it please!', '2020-06-21 10:25:48', '2020-06-21 10:25:51', '2020-06-20 10:00:00', '2020-10-01 10:00:00', 1, '系统管理员', 1);
 
 -- ----------------------------
 -- Table structure for activity_sign
@@ -53,13 +54,16 @@ CREATE TABLE `activity_sign`  (
   `show_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '姓名',
   `sign_type` int(255) NULL DEFAULT 1 COMMENT '签到类型:1签到 2请假',
   `leave_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '请假理由',
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '手机',
+  `company` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '公司名',
   PRIMARY KEY (`sign_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of activity_sign
 -- ----------------------------
-INSERT INTO `activity_sign` VALUES (7, 3, 1, '2020-05-27 23:56:44', 'admin', '超级管理员', 1, '签到');
+INSERT INTO `activity_sign` VALUES (7, 3, 1, '2020-05-27 23:56:44', 'admin', '超级管理员', 1, '签到', NULL, NULL);
+INSERT INTO `activity_sign` VALUES (9, 4, NULL, '2020-06-21 11:08:36', NULL, 'Moshow K ZHENG', 1, '', '18502072277', 'WOMS');
 
 -- ----------------------------
 -- Table structure for article
@@ -81,7 +85,7 @@ CREATE TABLE `article`  (
   PRIMARY KEY (`article_id`) USING BTREE,
   FULLTEXT INDEX `idx_full_keyword`(`keyword`),
   FULLTEXT INDEX `idx_full_content`(`content`)
-) ENGINE = MyISAM AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of article
@@ -104,7 +108,7 @@ CREATE TABLE `channel`  (
   `status` tinyint(255) NULL DEFAULT 1 COMMENT '发布状态:1发布0未发布',
   `seq` int(6) NULL DEFAULT 0 COMMENT '排序',
   PRIMARY KEY (`channel_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of channel
@@ -129,7 +133,7 @@ CREATE TABLE `form`  (
   `status` tinyint(1) NULL DEFAULT 0 COMMENT '状态:0未发布 1已发布',
   `attachment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '附件',
   PRIMARY KEY (`form_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of form
@@ -148,15 +152,15 @@ CREATE TABLE `form_item`  (
   `default_value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '默认值',
   `item_tip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '提示',
   PRIMARY KEY (`item_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 51 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 51 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of form_item
 -- ----------------------------
 INSERT INTO `form_item` VALUES (50, 10, '附件上传', 'fileupload', '', NULL);
-INSERT INTO `form_item` VALUES (49, 10, '描述', 'textarea', '', NULL);
-INSERT INTO `form_item` VALUES (48, 10, '联系方式', 'input', '', NULL);
-INSERT INTO `form_item` VALUES (47, 10, '姓名', 'input', '', NULL);
+INSERT INTO `form_item` VALUES (49, 10, '问题描述', 'textarea', '', NULL);
+INSERT INTO `form_item` VALUES (48, 10, '公司地址', 'input', '', NULL);
+INSERT INTO `form_item` VALUES (47, 10, '咨询方向', 'input', '', NULL);
 
 -- ----------------------------
 -- Table structure for form_submit
@@ -174,14 +178,17 @@ CREATE TABLE `form_submit`  (
   `audit_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '审核人',
   `audit_time` timestamp(0) NULL DEFAULT NULL COMMENT '审核时间',
   `audit_user_id` int(11) NULL DEFAULT NULL COMMENT '审核用户ID',
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `company` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`submit_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of form_submit
 -- ----------------------------
-INSERT INTO `form_submit` VALUES (9, 10, 1, '2020-05-26 23:36:17', '2020-05-26 23:36:17', 'admin', 2, 'admin', 'admin', '2020-05-26 23:37:19', 1);
-INSERT INTO `form_submit` VALUES (10, 10, 1, '2020-05-26 23:36:55', '2020-05-26 23:36:55', 'admin', 0, 'admin', 'admin', '2020-05-27 23:57:18', 1);
+INSERT INTO `form_submit` VALUES (9, 10, 1, '2020-05-26 23:36:17', '2020-05-26 23:36:17', 'admin', 2, 'admin', 'admin', '2020-05-26 23:37:19', 1, NULL, NULL);
+INSERT INTO `form_submit` VALUES (10, 10, 1, '2020-05-26 23:36:55', '2020-05-26 23:36:55', 'admin', 0, 'admin', 'admin', '2020-05-27 23:57:18', 1, NULL, NULL);
+INSERT INTO `form_submit` VALUES (11, 10, NULL, '2020-06-21 15:31:27', '2020-06-21 15:57:13', 'Moshow K ZHENG', 1, 'Moshow K ZHENG', NULL, NULL, NULL, '18502072277', 'WOMS');
 
 -- ----------------------------
 -- Table structure for form_submit_value
@@ -195,7 +202,7 @@ CREATE TABLE `form_submit_value`  (
   `user_id` int(11) NULL DEFAULT NULL COMMENT '用户id',
   `submit_id` int(11) NULL DEFAULT NULL COMMENT '提交id',
   PRIMARY KEY (`value_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 46 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 46 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of form_submit_value
@@ -208,6 +215,10 @@ INSERT INTO `form_submit_value` VALUES (42, 47, 10, '超级管理员', 1, 10);
 INSERT INTO `form_submit_value` VALUES (43, 48, 10, '18588888888', 1, 10);
 INSERT INTO `form_submit_value` VALUES (44, 49, 10, '2414214444', 1, 10);
 INSERT INTO `form_submit_value` VALUES (45, 50, 10, '', 1, 10);
+INSERT INTO `form_submit_value` VALUES (46, 47, 10, '', NULL, 11);
+INSERT INTO `form_submit_value` VALUES (47, 48, 10, '', NULL, 11);
+INSERT INTO `form_submit_value` VALUES (48, 49, 10, '', NULL, 11);
+INSERT INTO `form_submit_value` VALUES (49, 50, 10, '', NULL, 11);
 
 -- ----------------------------
 -- Table structure for menu
@@ -222,7 +233,7 @@ CREATE TABLE `menu`  (
   `parent_menu_id` int(11) NULL DEFAULT 0 COMMENT '父菜单id',
   `role_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '1,5,9' COMMENT '权限',
   PRIMARY KEY (`menu_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 42 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 42 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of menu
@@ -252,7 +263,7 @@ CREATE TABLE `role`  (
   `role_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '角色名称',
   `role_desc` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '角色描述',
   PRIMARY KEY (`role_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of role
@@ -330,7 +341,7 @@ CREATE TABLE `user`  (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '邮箱',
   PRIMARY KEY (`user_id`) USING BTREE,
   UNIQUE INDEX `open_id_unique`(`open_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 2088 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 2088 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user
