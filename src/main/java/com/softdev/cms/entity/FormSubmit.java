@@ -3,6 +3,7 @@ package com.softdev.cms.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -35,19 +36,25 @@ public class FormSubmit implements Serializable {
     private Integer userId;
 
     private String userName;
+    private String showName;
+    private String phone;
+    private String company;
 
     /**
      * create_time
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * modify_time
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
     /**
      * 状态与审核相关
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date auditTime;
     private Integer status;
     private String auditUserName;
@@ -61,6 +68,14 @@ public class FormSubmit implements Serializable {
     public FormSubmit(Integer formId, Integer userId, String userName) {
         this.formId = formId;
         this.userId = userId;
+        this.userName = userName;
+        this.createTime = new Date();
+        this.updateTime = new Date();
+    }
+    public FormSubmit(Integer formId, String userName,String phone ,String company) {
+        this.formId = formId;
+        this.phone = phone;
+        this.company = company;
         this.userName = userName;
         this.createTime = new Date();
         this.updateTime = new Date();

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <title>${(templateMap.companyName)!!}</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no,user-scalable=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="keywords" content="${(templateMap.companyName)!!}">
+    <meta name="description" content="${(templateMap.companyName)!!}">
+    <meta name="author" content="zhengkai.blog.csdn.net">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${request.contextPath}/static/frontend/img/favicon.png" type="image/x-icon">
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/font-awesome/css/fontawesome-all.min.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.css">
+    <link href="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.css" rel="stylesheet" type="text/css" />
+    <link href="${request.contextPath}/static/frontend/vendors/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/theme.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/styles.css">
+
+</head>
+<body>
+<!-- Header -->
+<header class="main-header">
+    <div class="container">
+        <div class="logo">
+            <a href="${request.contextPath}/page/index">
+                <h2><span>${(templateMap.companyName)!!}</span></h2>
+            </a>
+        </div>
+        <!-- Navbar -->
+        <nav class="mainNav">
+            <!-- Menu Toggle btn-->
+            <div class="menu-toggle">
+                <h3>Menu</h3>
+                <button type="button" id="menu-btn">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <!-- Responsive Menu Structure-->
+            <!--Note: declare the Menu style in the data-menu-style="horizontal" (options: horizontal, vertical, accordion) -->
+            <ul id="respMenu" class="ace-responsive-menu" data-menu-style="horizontal">
+                <#if channelList??>
+                <#list channelList as item>
+                <li>
+                    <a href="${request.contextPath}/page/channel/${item.channelId}" >
+                        <span class="title">${item.channelName}</span>
+                    </a>
+                </li>
+            </#list>
+        </#if>
+        <li>
+            <a href="${request.contextPath}/page/activity/search" >
+                <span class="title">活动签到</span>
+            </a>
+        </li>
+        <li>
+            <a href="${request.contextPath}/page/form/search" >
+                <span class="title">表单提交</span>
+            </a>
+        </li>
+        <li>
+            <a href="${request.contextPath}/page/search" >
+                <span class="title">搜索</span>
+            </a>
+        </li>
+        </ul>
+        </nav>
+    </div>
+</header>
+<section class="wt-section bg-gray text-center inner-page-header">
+    <div class="container">
+        <div class="row justify-content-md-center align-items-center text-white py-4 py-lg-5">
+            <div class="col-md-5">
+                <div class="text-center">
+                    <input id="searchParam" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-left">
+                    <h2><a onclick="getArticleList()">表单搜索</a></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<main role="main">
+    <section class="wt-section">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div id="articleListDiv" class="col-lg-12">
+                    <!--<div class="blog-post">
+                        <h3><a href="#">Latest Fullstack Technologies for Year 2020</a></h3>
+                        <div class="meta font-lora mb-3">
+                            <a href="#">Front-end</a>
+                            <a href="#">29th August 2019</a>
+                        </div>
+                        <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius eligendi fugiat labore libero molestias provident quae </p>
+                    </div>-->
+                    <!--pagination-->
+
+                </div>
+                <!--pagination-->
+                <div class="row justify-content-between align-items-center mb-4">
+                    <div class="col-lg">
+                        <nav aria-label="Bootstrap Pagination Example">
+                            <ul class="pagination mb-0" id="pageAreaDiv">
+                                <!--<li class="page-item"><a class="page-link" ><span aria-hidden="true">&laquo;</span></a></li>-->
+                                <!--<li id="p1" class="page-item active">
+                                    <a class="page-link" href="#">1</a>
+                                </li>-->
+                                <!--<li class="page-item"><a class="page-link" ><span aria-hidden="true">&raquo;</span></a></li>-->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+<!-- Footer -->
+<footer class="wt-section bg-dark main-footer">
+    <div class="container">
+        <div class="row">
+            <div class=" col-sm-4 col-md col-sm-4 col-12 col mb-4">
+                <h5 class="mb-4">联系我们</h5>
+
+                <p><i class="fa fa-location-arrow mr-2"></i> ${(templateMap.location)!!} </p>
+                <p><i class="fa fa-phone mr-2"></i>  ${(templateMap.phone)!!}  </p>
+                <p><i class="fa fa fa-envelope mr-2"></i> ${(templateMap.email)!!}  </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 pt-4">
+                <p class="text-center copyrights"> © ${(templateMap.companyName)!!} All Rights Reserved</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- JS Script Files -->
+<!-- Global Vendor -->
+<script src="${request.contextPath}/static/frontend/vendors/jquery.min.js"></script>
+<script src="${request.contextPath}/static/frontend/vendors/jquery.migrate.min.js"></script>
+<script src="${request.contextPath}/static/frontend/vendors/popper.min.js"></script>
+<script src="${request.contextPath}/static/frontend/vendors/bootstrap/js/bootstrap.min.js"></script>
+<script src="${request.contextPath}/static/frontend/vendors/aos/aos.js"></script>
+
+<!-- Components Vendor  -->
+<script src="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.min.js"></script>
+<script src="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.js"></script>
+
+<!--Plugin Initialize-->
+<script src="${request.contextPath}/static/frontend/js/global.js"></script>
+<script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
+
+<script>
+    function insertActivity(id,title,tab,date,description){
+        return "<div class=\"blog-post\" id=\""+id+"\"><h3><a href=\"${request.contextPath}/page/formSubmit/"+id+"\">"+title+"</a></h3>" +
+            "<div class=\"meta font-lora mb-3\"><a>"+tab+"</a>" +
+            "<a>"+date+"</a></div><p><a href=\"${request.contextPath}/page/activitySign/"+id+"\">"+description+"</a></p></div><br>";
+    }
+    //当前页面
+    let currentPage=1;
+    //是否初始化分页
+    let init=0;
+    //总页面（向上取整）
+    let page = 1;
+    //大于多少数量进行分页
+    let limit = 10;
+    //切换页面
+    function switchPage(index){
+        $("#p"+currentPage).attr("class","page-item");
+        $("#p"+index).attr("class","page-item active");
+        currentPage=index;
+        getArticleList ();
+    }
+    //上一页
+    function lastPage(){
+        if(currentPage>1){
+            switchPage(currentPage-1);
+        }
+    }
+    //下一页
+    function nextPage(){
+        if(currentPage<page){
+            switchPage(currentPage+1);
+        }
+    }
+    //获取文章列表
+    function getArticleList () {
+        $.ajax({
+            type: 'POST',
+            url: "${request.contextPath}/page/form/list",
+            data:JSON.stringify({"searchParam":$("#searchParam").val(),"page":currentPage,"limit":limit}),
+            dataType: "json",
+            contentType: "application/json",
+            success: function (responseData) {
+                // console.log(data);
+                $("#articleListDiv").html("");
+                //获取分页数据
+                let data = responseData.data;
+                //获取分页数量
+                let count = responseData.count;
+                //文章大于10，需要进行分页
+                if(count>limit&&init===0){
+                    page=Math.ceil(count/limit);
+                    //清空dev
+                    $("#pageAreaDiv").html("");
+                    //上一页
+                    $("#pageAreaDiv").append('<li class="page-item"><a class="page-link" onclick="lastPage()"><span aria-hidden="true">&laquo;</span></a></li>');
+                    //动态分页数量
+                    for(let i=1; i<page+1; i++){
+                        $("#pageAreaDiv").append('<li id="p'+i+'" class="page-item" onclick="switchPage(\''+i+'\')"><a class="page-link">'+i+'</a></li>');
+                    }
+                    //下一页
+                    $("#pageAreaDiv").append('<li class="page-item"><a class="page-link" onclick="nextPage()"><span aria-hidden="true">&raquo;</span></a></li>');
+                    currentPage=1;
+                    init=1;
+                    //设置选中Active效果
+                    $("#p"+currentPage).attr("class","page-item active");
+                }
+                if(data.length<1){
+                    $("#articleListDiv").append("目前没有任何活动");
+                }
+                //遍历并插入最新数据
+                for(const n in data) {//遍历json数组时，这么写p为索引，0,1
+                    $("#articleListDiv").append(insertActivity(data[n].formId,data[n].formName,data[n].createUserName,data[n].createTime,data[n].formDesc));
+                }
+            }
+        });
+    }
+    getArticleList();
+</script>
+<!-- END JAVASCRIPTS -->
+</body>
+</html>

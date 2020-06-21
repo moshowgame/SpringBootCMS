@@ -54,6 +54,8 @@ public class ActivitySign implements Serializable {
      * 请假理由
      */
     private String leaveReason;
+    private String phone;
+    private String company;
 
     private Integer userId;
 

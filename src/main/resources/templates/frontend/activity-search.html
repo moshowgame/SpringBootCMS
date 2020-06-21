@@ -56,33 +56,38 @@
                         </li>
                     </#list>
                 </#if>
-        <li>
-            <a href="${request.contextPath}/page/activity/search" >
-                <span class="title">活动签到</span>
-            </a>
-        </li>
-        <li>
-            <a href="${request.contextPath}/page/form/search" >
-                <span class="title">表单提交</span>
-            </a>
-        </li>
-        <li>
-            <a href="${request.contextPath}/page/search" >
-                <span class="title">搜索</span>
-            </a>
-        </li>
-        </ul>
+                    <li>
+                        <a href="${request.contextPath}/page/activity/search" >
+                            <span class="title">活动签到</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${request.contextPath}/page/form/search" >
+                            <span class="title">表单提交</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${request.contextPath}/page/search" >
+                            <span class="title">搜索</span>
+                        </a>
+                    </li>
+                    </ul>
 				</nav>   
 				</div>
     </header> 
 	  <section class="wt-section bg-gray text-center inner-page-header">
 			<div class="container">
 				<div class="row justify-content-md-center align-items-center text-white py-4 py-lg-5">
-					<div class="col-md-7">
+					<div class="col-md-5">
 						<div class="text-center">
-							<h1 class="display-sm-4 display-lg-3">${(channel.channelName)!!}</h1>
+                            <input id="searchParam" class="form-control">
 					  </div>
 					</div>
+                    <div class="col-md-3">
+                        <div class="text-left">
+                            <h2><a onclick="getArticleList()">活动搜索</a></h2>
+                        </div>
+                    </div>
 				</div>
 			</div>
 		</section>
@@ -159,10 +164,10 @@
    <script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
 
     <script>
-        function insertArticle(id,title,tab,date,description){
-            return "<div class=\"blog-post\" id=\""+id+"\"><h3><a href=\"${request.contextPath}/page/article/"+id+"\">"+title+"</a></h3>" +
+        function insertActivity(id,title,tab,sdate,edate,description){
+            return "<div class=\"blog-post\" id=\""+id+"\"><h3><a href=\"${request.contextPath}/page/activitySign/"+id+"\">"+title+"</a></h3>" +
                 "<div class=\"meta font-lora mb-3\"><a>"+tab+"</a>" +
-                "<a>"+date+"</a></div><p><a href=\"${request.contextPath}/page/article/"+id+"\">"+description+"</a></p></div><br>";
+                "<a>"+sdate+"-"+edate+"</a></div><p><a href=\"${request.contextPath}/page/activitySign/"+id+"\">"+description+"</a></p></div><br>";
         }
         //当前页面
         let currentPage=1;
@@ -195,8 +200,8 @@
         function getArticleList () {
             $.ajax({
                 type: 'POST',
-                url: "${request.contextPath}/page/article/list",
-                data:JSON.stringify({"channelId":"${(channel.channelId)!!}","page":currentPage,"limit":limit}),
+                url: "${request.contextPath}/page/activity/list",
+                data:JSON.stringify({"searchParam":$("#searchParam").val(),"page":currentPage,"limit":limit}),
                 dataType: "json",
                 contentType: "application/json",
                 success: function (responseData) {
@@ -225,11 +230,11 @@
                         $("#p"+currentPage).attr("class","page-item active");
                     }
                     if(data.length<1){
-                        $("#articleListDiv").append("该分类下没有文章，请查看其他分类");
+                        $("#articleListDiv").append("目前没有任何活动");
                     }
                     //遍历并插入最新数据
                     for(const n in data) {//遍历json数组时，这么写p为索引，0,1
-                        $("#articleListDiv").append(insertArticle(data[n].articleId,data[n].title,data[n].createUserName,data[n].createTime,data[n].description));
+                        $("#articleListDiv").append(insertActivity(data[n].activityId,data[n].activityName,data[n].createUserName,data[n].startTime,data[n].endTime,data[n].activityDesc));
                     }
                 }
             });

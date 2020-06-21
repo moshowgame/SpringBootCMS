@@ -66,7 +66,22 @@
                         </li>
                     </#list>
                 </#if>
-                </ul>
+        <li>
+            <a href="${request.contextPath}/page/activity/search" >
+                <span class="title">活动签到</span>
+            </a>
+        </li>
+        <li>
+            <a href="${request.contextPath}/page/form/search" >
+                <span class="title">表单提交</span>
+            </a>
+        </li>
+        <li>
+            <a href="${request.contextPath}/page/search" >
+                <span class="title">搜索</span>
+            </a>
+        </li>
+        </ul>
 				</nav>   
 				</div>
     </header> 
@@ -97,7 +112,7 @@
                     </p>
                 </div>
                <h6 class="mb-0">Tags:
-               <#if article.keyword??>
+               <#if (article.keyword)??>
                    <#list article.keyword?split(",") as name>
                    <a class="badge badge-pill">${name}</a>
                    </#list>

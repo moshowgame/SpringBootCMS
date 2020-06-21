@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <title>${(templateMap.companyName)!!}</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no,user-scalable=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="keywords" content="${(templateMap.companyName)!!}">
+    <meta name="description" content="${(templateMap.companyName)!!}">
+    <meta name="author" content="zhengkai.blog.csdn.net">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="${request.contextPath}/static/frontend/img/favicon.png" type="image/x-icon">
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/font-awesome/css/fontawesome-all.min.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.css">
+    <link href="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.css" rel="stylesheet" type="text/css" />
+    <link href="${request.contextPath}/static/frontend/vendors/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/theme.css">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/styles.css">
+    <style>
+        @media (min-width: 576px) {
+            .logo h2 { font-size: 16px; }
+        }
+        @media (min-width: 768px) {
+            .logo h2 { font-size: 20px; }
+        }
+        @media (min-width: 992px) {
+            .logo h2 {font-size: 26px;}
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header"> 
+	<div class="container">
+			<div class="logo">
+                <a href="${request.contextPath}/page/index">
+                    <h2><span>${(templateMap.companyName)!!}</span></h2>
+                </a>
+				</div> 
+			 <!-- Navbar --> 
+				<nav class="mainNav">
+				<!-- Menu Toggle btn-->
+				<div class="menu-toggle">
+					<h3>Menu</h3>
+					<button type="button" id="menu-btn">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+				</div>
+				<!-- Responsive Menu Structure-->
+				<!--Note: declare the Menu style in the data-menu-style="horizontal" (options: horizontal, vertical, accordion) -->
+                    <ul id="respMenu" class="ace-responsive-menu" data-menu-style="horizontal">
+                        <#if channelList??>
+                        <#list channelList as item>
+                        <li>
+                            <a href="${request.contextPath}/page/channel/${item.channelId}" >
+                                <span class="title">${item.channelName}</span>
+                            </a>
+                        </li>
+                    </#list>
+                </#if>
+        <li>
+            <a href="${request.contextPath}/page/activity/search" >
+                <span class="title">活动签到</span>
+            </a>
+        </li>
+        <li>
+            <a href="${request.contextPath}/page/form/search" >
+                <span class="title">表单提交</span>
+            </a>
+        </li>
+        <li>
+            <a href="${request.contextPath}/page/search" >
+                <span class="title">搜索</span>
+            </a>
+        </li>
+        </ul>
+				</nav>   
+				</div>
+    </header> 
+	  <section class="wt-section bg-gray text-center inner-page-header"> 
+			<div class="container">
+				<div class="row justify-content-md-center align-items-center text-white py-4 py-lg-5">
+					<div class="col-md-7">
+						<div class="text-center">
+							<h1 class="display-sm-4 display-lg-3">${(form.formName)!!}</h1>
+                            <p class="display-sm-4 sub-text">发布者：${(form.createUserName)!!} , 发布时间： ${(form.createTime?string('yyyy年MM月dd日'))!!}</p>
+					  </div>
+					</div>
+				</div>
+			</div>
+		</section>
+    <main role="main">
+<section class="wt-section">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-12">
+                <div class="blog-post">
+                    <#if (form.formDesc)??>
+                    <h6 class="mb-0">附件:
+                        <a class="badge badge-pill">${(form.attachment)!!}</a>
+                    </h6>
+                    </#if>
+                    <p>
+                        ${(form.formDesc)!!}
+                    </p>
+                </div>
+                <section class="wt-section mb-0 pb-0">
+                <!--comments area start-->
+				<div class="comment-respond mb-lg-5 mb-4">
+                    <h3 class="comment-reply-title mb-lg-5 mb-4">
+                        表单提交
+                    </h3>
+                    <form id="form" role="form" class="comment-form">
+                        <input type="hidden" id="formId" name="formId" value="${(form.formId)!!}" class="layui-input">
+                        <div class="row">
+                            <div class=" col-md-4">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="phone" name="phone" placeholder="手机" required="">
+                                </div>
+                            </div>
+                            <div class=" col-md-4">
+                                <div class="form-group ">
+                                    <input type="text" class="form-control" id="showName" name="showName" placeholder="姓名" required="">
+                                </div>
+                            </div>
+                            <div class=" col-md-4">
+                                <div class="form-group ">
+                                    <input type="text" class="form-control" id="company" name="company" placeholder="公司" required="">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="itemArea">
+
+                        </div>
+                        <!--
+                        <div class="row">
+                            <div class=" col-md-12">
+                                <div class="form-group">
+                                    <select class="form-control" required="" id="signType" name="signType">
+                                        <option value="1">签到</option>
+                                        <option value="2">请假</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="controls">
+                                <textarea id="leaveReason" name="leaveReason" rows="2" placeholder="如需请假请填写请假理由" class="form-control"></textarea>
+                            </div>
+                        </div>-->
+                        <p class="text-muted">请如实填写信息，所有信息将被严格保密 *</p>
+                        <div class="text-center mt-md-5">
+                            <a onclick="sign()" class="btn btn-pill btn-primary">提交</a>
+                        </div>
+                    </form>
+                    <div id="confirm"></div>
+                    <div id="alert"></div>
+                </div>
+				</section>
+
+            </div>
+        </div>
+    </div>
+</section>
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="wt-section bg-dark main-footer">
+        <div class="container">
+            <div class="row">
+                <div class=" col-sm-4 col-md col-sm-4 col-12 col mb-4">
+                    <h5 class="mb-4">联系我们</h5>
+
+                    <p><i class="fa fa-location-arrow mr-2"></i> ${(templateMap.location)!!} </p>
+                    <p><i class="fa fa-phone mr-2"></i>  ${(templateMap.phone)!!}  </p>
+                    <p><i class="fa fa fa-envelope mr-2"></i> ${(templateMap.email)!!}  </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 pt-4">
+                    <p class="text-center copyrights"> © ${(templateMap.companyName)!!} All Rights Reserved</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+   <!-- JS Script Files -->
+   <!-- Global Vendor -->
+   <script src="${request.contextPath}/static/frontend/vendors/jquery.min.js"></script>
+   <script src="${request.contextPath}/static/frontend/vendors/jquery.migrate.min.js"></script>
+   <script src="${request.contextPath}/static/frontend/vendors/popper.min.js"></script>
+   <script src="${request.contextPath}/static/frontend/vendors/bootstrap/js/bootstrap.min.js"></script>
+   <script src="${request.contextPath}/static/frontend/vendors/aos/aos.js"></script>
+
+   <!-- Components Vendor  -->
+   <script src="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.min.js"></script>
+   <script src="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.js"></script>
+
+   <!--Plugin Initialize-->
+   <script src="${request.contextPath}/static/frontend/js/global.js"></script>
+   <script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
+
+   <!-- END JAVASCRIPTS -->
+    <script>
+        //签到标识，防止重复签到
+        let submit=0;
+        let checkList = [];
+        let checkNameList = {};
+        let fileUploadList = [];
+        function sign(){
+            if($("#phone").val().length<1||$("#showName").val().length<1||$("#company").val().length<1){
+                alert("姓名/手机/公司不能为空");
+                return false;
+            }
+            if(submit===0){
+                $.ajax({
+                    type: 'POST',
+                    url: "${request.contextPath}/page/formSubmit/save",
+                    /*data:JSON.stringify({
+                        "showName":$("#showName").val(),"phone":$("#phone").val(),"company":$("#company").val(),
+                        "signType":$("#signType").val(),"leaveReason":$("#leaveReason").val(),"activityId":"${(activity.activityId)!!}"
+                    }),*/
+                    data:JSON.stringify($("#form").serializeArray()),
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (responseData) {
+                        alert(responseData.msg);
+                        if(responseData.code===200){
+                            submit=1;
+                            $("#alert").html("");
+                            $("#confirm").html('<div class="alert alert-success" role="alert">'+responseData.msg+'</div>');
+                        }else{
+                            $("#alert").html('<div class="alert alert-danger" role="alert">'+responseData.msg+'</div>');
+                        }
+                    }
+                });
+            }else{
+                alert("已提交成功，请勿重复提交");
+                $("#alert").html('<div class="alert alert-primary" role="alert">已提交成功，请勿重复提交</div>');
+            }
+
+        }
+        function fileupload(fileid){
+            /*var uploadInst = upload.render({
+                elem: '#'+fileid //绑定元素
+                ,url: '${request.contextPath}/file/files' //上传接口
+                ,exts: 'jpg|jpeg|png|txt|doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z|pdf|log' // 上传文件的类型
+                ,done: function(res){
+                    //上传完毕回调
+                    console.info(res);
+                    $("#"+fileid).val(res.data);
+                }
+                ,error: function(){
+                    //请求异常回调
+                }
+            });*/
+        }
+        function getOptionListHtml(typeStr,nameStr,valueStr,titleStr,defaultValueStr){
+            if(valueStr===undefined){valueStr="";}
+            if(typeStr==="input"){
+                //智能补全：如果是姓名，默认从session获取
+                /*if(titleStr==="姓名"&&valueStr===""){
+                    valueStr="${(loginUser.showName)!!}";
+                }else if(titleStr==="账号"&&valueStr===""){
+                    valueStr="${(loginUser.userName)!!}";
+                }else if((titleStr==="手机"||titleStr==="联系方式")&&valueStr===""){
+                    valueStr="${(loginUser.phone)!!}";
+                }else if(titleStr==="邮箱"&&valueStr===""){
+                    valueStr="${(loginUser.email)!!}";
+                }*/
+                return '<input type="text" name="'+nameStr+'" lay-verify="required" lay-reqtext="'+titleStr+'不能为空" placeholder="请输入'+titleStr+'" value="'+valueStr+'" class="form-control">';
+            }else if(typeStr==="textarea"){
+                return '<textarea name="'+nameStr+'" lay-verify="required" lay-filter="choiceOne" class="form-control">'+valueStr+'</textarea>';
+            }else if(typeStr==="fileupload"){
+                fileUploadList.push(nameStr);
+                var downloadBtn = '';
+                if(valueStr!=undefined && valueStr!=''){
+                    downloadBtn = '<div class="form-control"><a href="${request.contextPath}/file/files/'+valueStr+'">点击下载附件</a></div>';
+                }
+                return '<input type="text" readonly="readonly" name="'+nameStr+'" id="'+nameStr+'" lay-reqtext="请上传'+titleStr+'" placeholder="点击上传文件↑" value="'+valueStr+'" class="form-control">'+downloadBtn;
+            }else if(typeStr==="select"){
+                var valueList = new Array();
+                //拼接select
+                var selectStr='<select name="'+nameStr+'">';
+                var selectStr2='';
+                //已选的放前面
+                valueList=defaultValueStr.split(";");
+                for(let i=0; i < valueList.length; i++){
+                    //选中效果
+                    if(valueList[i]===valueStr){
+                        selectStr+=('<option checked="" value="'+valueList[i]+'">'+valueList[i]+'(已选)</option>');
+                    }else{
+                        selectStr2+=('<option value="'+valueList[i]+'">'+valueList[i]+'</option>');
+                    }
+                    //console.log(valueList[i]);
+                    //console.log(valueStr);
+                }
+                selectStr=selectStr+selectStr2+"</select>";
+                return selectStr;
+            }
+        }
+        function getItemListHtml(nameStr,optionStr){
+            return '<div class="layui-form-item layui-form-pane"><label class="layui-form-label required">'+nameStr+'</label><div class="layui-input-block">'+optionStr+'</div></div>';
+        }
+        function init(){
+            let insertHtml;
+            var data = ${(itemValueList)!!};
+            var nowItemId = "";
+            var nowItemName = "";
+            var optionListHtml = "";
+            console.log(data);
+            for(var n in data){//遍历json数组时，这么写p为索引，0,1
+                //当前问题一样，则追加option
+                if(nowItemId===data[n].itemId){
+
+                }else if(nowItemId===""){
+                    //第一次
+                    nowItemId=data[n].itemId;
+                    nowItemName=data[n].itemName;
+                    checkList.push(nowItemId);
+                    checkNameList[nowItemId]=nowItemName;
+                }else{
+                    //不等于，先把上一个问题插先
+                    insertHtml = getItemListHtml(nowItemName, optionListHtml);
+                    $("#itemArea").append(insertHtml);
+                    nowItemId=data[n].itemId;
+                    nowItemName=data[n].itemName;
+                    optionListHtml="";
+                    checkList.push(nowItemId);
+                    checkNameList[nowItemId]=nowItemName;
+                    //.add({"'+nowItemId+'":"'+nowItemName+'"});
+                }
+                optionListHtml=optionListHtml+getOptionListHtml(data[n].itemType,data[n].itemId,data[n].valueText,data[n].itemName,data[n].defaultValue);
+                //console.log(data[n].itemName + ":" + data[n].optionName);
+            }
+            //最后加一次
+            insertHtml = getItemListHtml(nowItemName,optionListHtml);
+            $("#itemArea").append(insertHtml);
+
+            for(let i=0; i<fileUploadList.length; i++){
+                fileupload(fileUploadList[i]);
+            }
+        }
+        init();
+    </script>
+  </body> 
+</html>

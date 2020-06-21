@@ -57,4 +57,10 @@ public class FormSubmitValue implements Serializable {
         this.userId = userId;
         this.submitId = submitId;
     }
+    public FormSubmitValue(Integer formId, Integer submitId,Integer itemId, String valueText) {
+        this.itemId = itemId;
+        this.formId = formId;
+        this.valueText = valueText;
+        this.submitId = submitId;
+    }
 }

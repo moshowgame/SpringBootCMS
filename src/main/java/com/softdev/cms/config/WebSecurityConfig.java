@@ -83,7 +83,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         HttpMethod.POST,
                         authenticationPath,
                         "/admin/login",
-                        "/page/article/list"
+                        "/page/activity/list",
+                        "/page/activitySign/save",
+                        "/page/article/list",
+                        "/page/form/list",
+                        "/page/formSubmit/save"
                 )
 
                 // allow anonymous resource requests
