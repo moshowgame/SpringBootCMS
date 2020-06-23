@@ -190,7 +190,7 @@
                     maxmin:true,
                     shadeClose: true,
                     area: ['800px', '700px'],
-                    content: '${request.contextPath}/form/edit?userId=${(loginUser.userId)!!}&id='+obj.data.formId,
+                    content: '${request.contextPath}/form/edit?userId=${(loginUser.userId)!!}&id='+obj.data.formId+'&token='+layui.data('token').token,
                 });
                 return false;
             } else if (obj.event === 'formItemList') {

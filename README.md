@@ -10,6 +10,9 @@
 - AdminUI管理页面:LayMini2(based on LayUI)
 - FrontEndUI前端页面:Bootstrap4
 
+# 界面预览
+[查看有道笔记](https://note.youdao.com/ynoteshare1/index.html?id=75b5e251f4c83215dec6428a03142995&type=note)
+
 # Author
 - Moshow郑锴@zhengkai.blog.csdn.net
 
