@@ -50,12 +50,37 @@
     </tr>
     </tbody>
 </table>
+<fieldset class="layui-elem-field layui-field-title"></fieldset>
 <div class="layui-form layuimini-form">
     <input type="hidden" name="formId" value="${(formId)!!}" class="layui-input">
     <input type="hidden" name="submitId" value="${(submitId)!!}" class="layui-input">
-    <input type="hidden" name="userId" value="${(loginUser.userId)!!}" class="layui-input">
-    <input type="hidden" name="userName" value="${(loginUser.userName)!!}" class="layui-input">
-    <input type="hidden" name="showName" value="${(loginUser.showName)!!}" class="layui-input">
+    <#if submitId gt 0>
+        <input type="hidden" name="userId" value="${(loginUser.userId)!!}" class="layui-input">
+        <input type="hidden" name="userName" value="${(loginUser.userName)!!}" class="layui-input">
+    </#if>
+<table class="layui-table" lay-size="sm">
+    <colgroup>
+        <col>
+        <col>
+        <col>
+    </colgroup>
+    <thead>
+    </thead>
+    <tbody>
+    <tr>
+        <td>姓名</td>
+        <td>手机</td>
+        <td>公司</td>
+    </tr>
+    <tr>
+        <td><input type="text" name="showName" value="${(formSubmit.showName)!!}" class="layui-input"></td>
+        <td><input type="text" name="phone" value="${(formSubmit.phone)!!}" class="layui-input"></td>
+        <td><input type="text" name="company" value="${(formSubmit.company)!!}" class="layui-input"></td>
+    </tr>
+    </tbody>
+</table>
+<fieldset class="layui-elem-field layui-field-title"></fieldset>
+
     <div id="itemArea">
 
     </div>

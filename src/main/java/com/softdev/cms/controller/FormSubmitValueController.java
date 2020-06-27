@@ -147,10 +147,12 @@ public class FormSubmitValueController {
                 return new ModelAndView("cms/error","msg","专项表单只能提交一次");
             }
         }
+        FormSubmit formSubmit = formSubmitMapper.selectById(submitId);
         List<FormSubmitValueDTO> itemValueList = formSubmitValueMapper.getFormSubmitValue(formId,submitId);
         return new ModelAndView("cms/formSubmitValue-display","formId",formId)
                 .addObject("itemValueList",JSON.toJSONString(itemValueList))
                 .addObject("form",form)
+                .addObject("formSubmit",formSubmit)
                 .addObject("submitId",submitId)
                 .addObject("loginUser",user)
                 ;

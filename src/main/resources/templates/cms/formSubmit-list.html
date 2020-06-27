@@ -64,8 +64,8 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                    <button class="layui-btn layui-btn-sm data-audit-btn1"> <i class="layui-icon layui-icon-ok"></i>审核 </button>
-                    <button class="layui-btn layui-btn-sm layui-btn-danger data-unaudit-btn"> <i class="layui-icon layui-icon-close"></i>拒绝 </button>
+                    <button class="layui-btn layui-btn-sm data-audit-btn1" lay-event="audit"> <i class="layui-icon layui-icon-ok"></i>审核 </button>
+                    <button class="layui-btn layui-btn-sm layui-btn-danger data-unaudit-btn" lay-event="unaudit"> <i class="layui-icon layui-icon-close"></i>拒绝 </button>
             </div>
         </script>
 
@@ -108,7 +108,7 @@
             }],
             cols: [[
                 {type: "checkbox", width: 50, fixed: "left"},
-                {field: 'submitId', width: 100, title: '表单序号', sort: true},
+                {field: 'submitId', width: 100, title: '提交ID', sort: true},
                 {field: 'formName', width: 200, title: '表单名称', sort: true},
                 {templet:'#statusTemplate', width: 150, title: '状态', sort: true},
                 {field: 'userName', width: 150, title: '申请者', sort: true},
@@ -143,64 +143,44 @@
             return false;
         });
         var searchBtn = $("#searchBtn");
-        // 监听添加操作
-        $(".data-add-btn").on("click", function () {
-            var index = layer.open({
-                title: '添加',
-                type: 2,
-                shade: 0.2,
-                maxmin:true,
-                shadeClose: true,
-                area: ['800px', '500px'],
-                content: '${request.contextPath}/formSubmit/edit?id=0'+"&token="+layui.data('token').token,
-            });
-            return false;
-        });
-
-        // 监听审核通过操作
-        $(".data-audit-btn1").on("click", function () {
-            var checkStatus = table.checkStatus('currentTableId')
-                , data = checkStatus.data;
-            //layer.alert(JSON.stringify(data));
-            layer.confirm('是否标记为审核状态', function (index) {
-                $.ajax({
-                            type: 'POST',
-                            url: "${request.contextPath}/formSubmit/audit?status=2&userId=${(loginUser.userId)!!}&userName=${(loginUser.userName)!!}",
-                            data:JSON.stringify(data),
-                            contentType: "application/json", //必须有
-                            dataType: "json", //表示返回值类型，不必须
-                            success: function (responseData) {
-                                layer.alert(responseData.msg);searchBtn.click();
-                            }
-                 });
-            });
-            return false;
-        });
-        $(".data-audit-btn2").on("click", function () {
-            var checkStatus = table.checkStatus('currentTableId')
-                , data = checkStatus.data;
-            //layer.alert(JSON.stringify(data));
-            layer.confirm('是否标记为审核状态', function (index) {
-                $.ajax({
-                    type: 'POST',
-                    url: "${request.contextPath}/formSubmit/audit?status=3&userId=${(loginUser.userId)!!}&userName=${(loginUser.showName)!!}",
-                    data:JSON.stringify(data),
-                    contentType: "application/json", //必须有
-                    dataType: "json", //表示返回值类型，不必须
-                    success: function (responseData) {
-                        layer.alert(responseData.msg);searchBtn.click();
-                    }
+        /**
+         * toolbar监听事件:表格添加按钮
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {
+                var index = layer.open({
+                    title: '添加',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['800px', '500px'],
+                    content: '${request.contextPath}/formSubmit/edit?id=0'+"&token="+layui.data('token').token,
                 });
-            });
-            return false;
-        });
-        // 监听审核不通过操作
-        $(".data-unaudit-btn").on("click", function () {
-            var checkStatus = table.checkStatus('currentTableId')
-                , data = checkStatus.data;
-            //layer.alert(JSON.stringify(data));
-            layer.confirm('是否标记为审核不通过状态', function (index) {
-                        $.ajax({
+                return false;
+            }else if (obj.event === 'audit') {
+                var checkStatus = table.checkStatus('currentTableId')
+                    , data = checkStatus.data;
+                //layer.alert(JSON.stringify(data));
+                layer.confirm('是否标记为审核状态', function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "${request.contextPath}/formSubmit/audit?status=2&userId=${(loginUser.userId)!!}&userName=${(loginUser.userName)!!}",
+                        data:JSON.stringify(data),
+                        contentType: "application/json", //必须有
+                        dataType: "json", //表示返回值类型，不必须
+                        success: function (responseData) {
+                            layer.alert(responseData.msg);searchBtn.click();
+                        }
+                    });
+                });
+                return false;
+            }else if (obj.event === 'unaudit') {
+                var checkStatus = table.checkStatus('currentTableId')
+                    , data = checkStatus.data;
+                //layer.alert(JSON.stringify(data));
+                layer.confirm('是否标记为审核不通过状态', function (index) {
+                    $.ajax({
                         type: 'POST',
                         url: "${request.contextPath}/formSubmit/audit?status=0&userId=${(loginUser.userId)!!}&userName=${(loginUser.showName)!!}",
                         data:JSON.stringify(data),
@@ -209,9 +189,10 @@
                         success: function (responseData) {
                             layer.alert(responseData.msg);searchBtn.click();
                         }
+                    });
                 });
-            });
-            return false;
+                return false;
+            }
         });
 
         //监听表格复选框选择
@@ -239,8 +220,8 @@
                 layer.confirm('真的删除行么', function (index) {
                     $.ajax({
                         type: 'POST',
-                        url: "${request.contextPath}/formSubmit/delete",
-                        data:{"id":obj.data.formSubmitId},
+                        url: "${request.contextPath}/formSubmit/delete?token="+layui.data('token').token,
+                        data:{"id":obj.data.submitId},
                         success: function (responseData) {
                             if (responseData.code === 200) {
                                 layer.msg(responseData.msg, function () {

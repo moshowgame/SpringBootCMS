@@ -72,11 +72,11 @@ public class FormSubmit implements Serializable {
         this.createTime = new Date();
         this.updateTime = new Date();
     }
-    public FormSubmit(Integer formId, String userName,String phone ,String company) {
+    public FormSubmit(Integer formId, String showName,String phone ,String company) {
         this.formId = formId;
         this.phone = phone;
         this.company = company;
-        this.userName = userName;
+        this.showName = showName;
         this.createTime = new Date();
         this.updateTime = new Date();
     }

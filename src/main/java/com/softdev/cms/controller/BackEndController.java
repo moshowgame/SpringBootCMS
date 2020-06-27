@@ -71,12 +71,12 @@ public class BackEndController {
         if(user!=null&&user.getStatus()==1){
             loginSuccess = true;
             //放置用户信息到session中
-            request.getSession().setAttribute("loginUser",user);
-            request.getSession().setAttribute("loginUserId",user.getUserId());
-            request.getSession().setAttribute("loginUserName",user.getUserName());
-            request.getSession().setAttribute("roleId",user.getRoleId());
+//            request.getSession().setAttribute("loginUser",user);
+//            request.getSession().setAttribute("loginUserId",user.getUserId());
+//            request.getSession().setAttribute("loginUserName",user.getUserName());
+//            request.getSession().setAttribute("roleId",user.getRoleId());
             //设置session存储时间，以秒为单位，3600=60*30即为30分钟
-            request.getSession().setMaxInactiveInterval(1800);
+//            request.getSession().setMaxInactiveInterval(1800);
         }
         if(loginSuccess){
             //final UserDetails userDetails = userDetailsService.loadUserByUsername(username);

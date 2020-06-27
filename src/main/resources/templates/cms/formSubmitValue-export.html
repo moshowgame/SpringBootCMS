@@ -60,7 +60,7 @@
             //执行搜索重载
             var encodedData = encodeURI(result);
             console.log(encodedData);
-            window.location = '${request.contextPath}/formSubmitValue/excel/export?searchParams='+encodedData;
+            window.location = '${request.contextPath}/formSubmitValue/excel/export?searchParams='+encodedData+"&token="+layui.data('token').token;
             return false;
         });
     });
