@@ -239,7 +239,6 @@
                         var length = responseData.data.length;
                         $("#channelId").empty();
                         $("#channelId").append('<option value="">全部</option>');
-                        $("#channelId").append('<option value="0">主频道</option>');
                         for(var i = 0; i < length; i++) {
                             //添加option元素
                             $("#channelId").append("<option value='" + responseData.data[i].channelId + "'>" + responseData.data[i].channelName + "</option>");

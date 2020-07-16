@@ -1,0 +1,93 @@
+server:
+  port: 8888
+  servlet:
+    context-path: /cms
+spring:
+  banner:
+    charset: UTF-8
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+  application:
+    name: SpringBootCMS
+  freemarker:
+    request-context-attribute: request
+    suffix: .html
+    content-type: text/html
+    enabled: true
+    cache: false
+    charset: UTF-8
+    allow-request-override: false
+    expose-request-attributes: true
+    expose-session-attributes: true
+    expose-spring-macro-helpers: true
+    template-loader-path: classpath:/templates/
+    settings:
+      number_format: 0.##
+  mvc:
+    static-path-pattern: /static/**
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    platform: mysql
+    url: jdbc:mysql://127.0.0.1:3306/springbootcms?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    filters: stat,wall,log4j
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+    # 配置DruidStatFilter
+    web-stat-filter:
+      enabled: true
+      url-pattern: "/*"
+      exclusions: "*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*,/cms/druid/*"
+    # 配置DruidStatViewServlet
+    stat-view-servlet:
+      enabled: true
+      url-pattern: "/cms/druid/*"
+      # IP白名单(没有配置或者为空，则允许所有访问)
+      allow: localhost,127.0.0.1,192.168.*
+      # IP黑名单 (存在共同时，deny优先于allow)
+      deny: 10.1.*
+      #  禁用HTML页面上的“Reset All”功能
+      reset-enable: false
+      # 登录名
+      login-username: admin
+      # 登录密码
+      login-password: 123456
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  file:
+    winPath: D:\temp\java\
+    linuxPath: /dev/fileupload/
+  cache:
+    cache-names:
+      - cache-article
+      - cache-activity
+      - cache-form
+      - cache-page
+      - cache-channel
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#here is the importance configs of JWT
+jwt:
+  route:
+    authentication:
+      path: /auth
+  header: Authorization
+  expiration: 604800
+  secret: zhengkai.blog.csdn.net

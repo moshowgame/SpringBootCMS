@@ -16,7 +16,6 @@
                             <div class="layui-input-inline">
                                 <select id="parentChannelId" name="parentChannelId" lay-filter="parentChannelId" lay-verify="required"  class="layui-input">
                                     <option value="">全部</option>
-                                    <option value="0">主频道</option>
                                 </select>
                             </div>
                         </div>
@@ -231,7 +230,6 @@
                         var length = responseData.data.length;
                         console.log("parentChannelId.length:"+length);
                         $("#parentChannelId").empty();
-                        $("#parentChannelId").append('<option value="0">主频道</option>');
                         for(var i = 0; i < length; i++) {
                             //添加option元素
                             $("#parentChannelId").append("<option value='" + responseData.data[i].channelId + "'>" + responseData.data[i].channelName + "</option>");

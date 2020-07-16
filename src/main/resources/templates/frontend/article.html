@@ -120,121 +120,9 @@
                 </h6>
 
 					<section class="wt-section mb-0 pb-0">
-					  <!--comments area start-->
-                <!--<div class="comments mb-lg-5 mb-4">
-                    <h2 class="comments-title mb-lg-5 mb-4"> Comments</h2>
-                    <div class="media">
-					  <img src="assets/img/ava/img3.jpg" class="wt-box-shadow-lg img-fluid img-thumbnail rounded-circle mr-3" alt="...">
-					  <div class="media-body">
-						<h6 class="mt-0">Marcus James</h6> <span>September 2, 2018 at 12:17 pm</span>
-						<p class="text-muted">Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis.</p>
-
-						<div class="media mt-5">
-						  <a class="mr-3" href="#">
-							<img src="assets/img/ava/img2.jpg" class="wt-box-shadow-lg img-fluid img-thumbnail rounded-circle mr-3" alt="...">
-						  </a>
-						  <div class="media-body">
-							<h6 class="mt-0">Brandon Mark</h6>
-							<p class="text-muted">Cras sit amet nibh libero, in gravida vel metus scelerisque ante sollicitudin.</p>
-						  </div>
-						</div>
-					  </div>
-					</div> 
-                </div>  
-				<div class="comment-respond mb-lg-5 mb-4">
-                    <h3 class="comment-reply-title mb-lg-5 mb-4">
-                        Leave a Comment
-                    </h3>
-                    <form role="form" class="comment-form">
-                        <div class="row">
-                            <div class=" col-md-4">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Name*" required="">
-                                </div>
-                            </div>
-                            <div class=" col-md-4">
-                                <div class="form-group ">
-                                    <input type="email" class="form-control" placeholder="Email*" required="">
-                                </div>
-                            </div>
-                            <div class=" col-md-4">
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" placeholder="Website" required="">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="controls">
-                                <textarea id="message" rows="5" placeholder="Comments*" class="form-control" required=""></textarea>
-                            </div>
-                        </div>
-                        <p class="text-muted">Your email address will not be published. Required fields are marked *</p>
-                        <div class="text-center mt-md-5">
-                            <button type="submit" class="btn btn-pill btn-primary">Send</button>
-                        </div>
-                    </form>
-                </div>-->
 				</section>
 
             </div>
-            <!--<div class="col-lg-4">
-                <div class="blog-widget mb-4">
-                    <form>
-                        <div class="form-group">
-                            <div class="icon-field">
-                                <i class="vl-search"></i>
-                                <input type="text" class="form-control" placeholder="Search">
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="blog-widget mb-4">
-                    <h6 class="mb-4">Categories</h6>
-                    <div class="list-group list-group-right-arrow">
-                        <a href="#" class="list-group-item bg-light">Webdesign (10)</a>
-                        <a href="#" class="list-group-item bg-light">Front-end (22)</a>
-                        <a href="#" class="list-group-item bg-light">Fullstack (12)</a>
-                        <a href="#" class="list-group-item bg-light">UI Design (32)</a>
-                    </div>
-                </div> 
-                <div class="blog-widget mb-4">
-                    <h6 class="mb-4">Latest Post</h6>
-                    <div class="card border-0 bg-light mb-1">
-                        <div class="card-body row align-items-center">
-                            <div class="col-4">
-                                <a href="#"><img class="card-img" src="assets/img/blog/post1.jpg" alt=""></a>
-                            </div>
-                            <div class="col-8">
-                                <h6 class="my-2 font-size-14"><a href="#">Best UI Design Tip and Tricks</a></h6>
-                                <span class="font-size-14 text-muted">12 April 2019</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card border-0 bg-light mb-1">
-                        <div class="card-body row align-items-center">
-                            <div class="col-4">
-                                <a href="#"><img class="card-img" src="assets/img/blog/post2.jpg" alt=""></a>
-                            </div>
-                            <div class="col-8">
-                                <h6 class="my-2 font-size-14"><a href="#">Latest JavaScript Frameworks</a></h6>
-                                <span class="font-size-14 text-muted">14 May 2019</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card border-0 bg-light mb-1">
-                        <div class="card-body row align-items-center">
-                            <div class="col-4">
-                                <a href="#"><img class="card-img" src="assets/img/blog/post3.jpg" alt=""></a>
-                            </div>
-                            <div class="col-8">
-                                <h6 class="my-2 font-size-14"><a href="#">Free Fonts to use in UX</a></h6>
-                                <span class="font-size-14 text-muted">22 April 2019</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>  
-            </div>-->
         </div>
     </div>
 </section>
@@ -276,7 +164,18 @@
    <!--Plugin Initialize-->
    <script src="${request.contextPath}/static/frontend/js/global.js"></script>
    <script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
-
+    <script>
+        function renderFileLink(){
+            //$('a') 获取了所有的a标签，然后循环替换为系统内文章地址
+            $('img').each(function(){
+                const href = $(this).attr('src');
+                if(href.startsWith("@@@")){
+                    $(this).attr('src',href.replaceAll('@@@','${request.contextPath}/file/files/'));
+                }
+            });
+        }
+        renderFileLink();
+    </script>
    <!-- END JAVASCRIPTS -->
   </body> 
 </html>

@@ -273,7 +273,17 @@
         const searchUrl = "searchParam=" + $("#searchParam").val();
         console.log(searchUrl);
     }
-    
+    function renderArticleLink(){
+        //$('a') 获取了所有的a标签，然后循环替换为系统内文章地址
+        $('a').each(function(){
+            const href = $(this).attr('href');
+            if(href.startsWith("#")){
+                $(this).attr('href',href.replaceAll('#','${request.contextPath}/page/article/'));
+                //console.log(href.replaceAll('#','${request.contextPath}/page/article/'));
+            }
+        });
+    }
+    renderArticleLink();
 </script>
 <!-- END JAVASCRIPTS -->
 </body>

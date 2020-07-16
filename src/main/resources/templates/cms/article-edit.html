@@ -25,14 +25,13 @@
     <div class="layui-form-item">
         <label class="layui-form-label required">内容</label>
         <div class="layui-input-block">
-            <textarea name="content" required id="content" class="layui-input">${(article.content)!!}</textarea>
+            <textarea name="content" required id="content" class="layui-input">${(article.content?replace('@@@','${request.contextPath}/file/files/'))!!}</textarea>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label required">频道分类</label>
         <div class="layui-input-block">
             <select id="channelId" name="channelId" lay-filter="channelId" lay-verify="required"  class="layui-input">
-                <option value="0">主频道</option>
             </select>
         </div>
     </div>
@@ -72,7 +71,8 @@
         });
 
         //创建一个编辑器
-        var editIndex = layedit.build('content');
+        const editIndex = layedit.build('content');
+
         //监听uploadBtn提交
         form.on('submit(uploadBtn)', function (data) {
             let imgData = {};
@@ -84,7 +84,7 @@
                 let imgUrl = $(this).attr("src");
                 console.log("遍历img元素，SRC="+imgUrl);
                 //处理网络图片
-                if (imgUrl.indexOf("http") !== -1) {
+                if (imgUrl.indexOf("http") !== -1 && imgUrl.indexOf("${request.contextPath}") == -1) {
                     imgData.id = id;
                     imgData.imgUrl = imgUrl;
                     //imgDataArr[i]=imgData;
@@ -122,67 +122,13 @@
                     });
                 }
             });
-            /*$("#LAY_layedit_1").contents().find("img").each(function () {
-                console.log("遍历img元素");
-                let imgData = {};
-                let id = 'id_' + new Date().getTime();
-                let imgUrl = $(this).attr("src");
-                if (imgUrl.indexOf("data:image/png;base64,") != -1) {
-                    imgData.id = id;
-                    imgData.imgUrl = imgUrl.replace("data:image/png;base64,", "");
-                    imgDataArr[i]=imgData;
-                    i++;
-                    $(this).attr('id', id);
-                    let thisDom=$(this);
-                    //上传并回写图片
-                    $.ajax({
-                        type: 'POST',
-                        url: "${request.contextPath}/file/base64upload",
-                        data:"base64String="+imgData.imgUrl,
-                        success: function (responseData) {
-                            if (responseData.code === 200) {
-                                layer.msg(responseData.msg, function () {
-                                    thisDom.attr('src2', responseData.data.src);
-                                    //$("#LAY_layedit_1").contents().find("#"+item.id).attr("src",responseData.data.src);
-                                });
-                            } else {
-                                layer.msg(responseData.msg, function () {
-                                });
-                            }
-                        }
-                    });
-                }
-            });*/
-            /*if(i>0){
-                $.each(imgDataArr, function(i,item){
-                    console.log("这里有一个图片");
-                    //上传并回写图片
-                    $.ajax({
-                        type: 'POST',
-                        url: "${request.contextPath}/file/base64upload",
-                        data:"base64String="+imgDataArr[i].imgUrl,
-                        //data:JSON.stringify({"base64String":imgDataArr[i]}),
-                        //dataType: "json",
-                        //contentType: "application/json",
-                        success: function (responseData) {
-                            if (responseData.code === 200) {
-                                layer.msg(responseData.msg, function () {
-                                    $("#LAY_layedit_1").contents().find("#"+item.id).attr("src",responseData.data.src);
-                                });
-                            } else {
-                                layer.msg(responseData.msg, function () {
-                                });
-                            }
-                        }
-                    });
-                });
-            }*/
             layer.msg('提交成功');
         });
         //监听提交
         form.on('submit(saveBtn)', function (data) {
             //fix 关于layui富文本编辑器和form表单提交的问题
             data.field.content = layedit.getContent(editIndex);
+            data.field.content = data.field.content.replaceAll('${request.contextPath}/file/files/','@@@');
             $.ajax({
                 type: 'POST',
                 url: "${request.contextPath}/article/save",
@@ -218,7 +164,6 @@
                         var length = responseData.data.length;
                         console.log("parentChannelId.length:"+length);
                         $("#channelId").empty();
-                        $("#channelId").append('<option value="0">主频道</option>');
                         for(var i = 0; i < length; i++) {
                             //添加option元素
                             $("#channelId").append("<option value='" + responseData.data[i].channelId + "'>" + responseData.data[i].channelName + "</option>");
