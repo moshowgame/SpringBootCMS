@@ -1,7 +1,10 @@
 package com.softdev.cms.config;
 
+import com.softdev.cms.service.CmsUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,6 +23,15 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, CmsUserDetailsService userDetailsService) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+            .userDetailsService(userDetailsService)
+            .passwordEncoder(passwordEncoder)
+            .and()
+            .build();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
@@ -32,6 +44,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/", "/page/**", "/static/**").permitAll()
                 .requestMatchers("/admin/login", "/admin/captcha").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/file/files/*").permitAll()
                 // 管理员接口
                 .requestMatchers("/admin/api/user/**").hasRole("ADMIN")
                 // 其他后台接口需要认证
