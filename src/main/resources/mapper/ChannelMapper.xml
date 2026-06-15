@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.ChannelMapper">
+
+    <select id="selectById" resultType="Channel">
+        SELECT * FROM channel WHERE channel_id = #{channelId} AND deleted = 0
+    </select>
+
+    <select id="selectBySlug" resultType="Channel">
+        SELECT * FROM channel WHERE slug = #{slug} AND deleted = 0
+    </select>
+
+    <select id="selectByParentChannelId" resultType="Channel">
+        SELECT * FROM channel WHERE parent_channel_id = #{parentChannelId} AND status = 1 AND deleted = 0 ORDER BY seq
+    </select>
+
+    <select id="selectAll" resultType="Channel">
+        SELECT * FROM channel WHERE status = 1 AND deleted = 0 ORDER BY seq
+    </select>
+
+    <select id="pageAll" resultType="Channel">
+        SELECT * FROM channel WHERE deleted = 0
+        <if test="query.channelId != null"> AND channel_id = #{query.channelId} </if>
+        <if test="query.channelName != null and query.channelName != ''"> AND channel_name LIKE CONCAT('%', #{query.channelName}, '%') </if>
+        <if test="query.parentChannelId != null"> AND parent_channel_id = #{query.parentChannelId} </if>
+        ORDER BY seq
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM channel WHERE deleted = 0
+        <if test="query.channelId != null"> AND channel_id = #{query.channelId} </if>
+        <if test="query.channelName != null and query.channelName != ''"> AND channel_name LIKE CONCAT('%', #{query.channelName}, '%') </if>
+        <if test="query.parentChannelId != null"> AND parent_channel_id = #{query.parentChannelId} </if>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="channelId">
+        INSERT INTO channel (channel_name, slug, parent_channel_id, icon, cover_image, description, channel_type, status, seq)
+        VALUES (#{channelName}, #{slug}, #{parentChannelId}, #{icon}, #{coverImage}, #{description}, #{channelType}, #{status}, #{seq})
+    </insert>
+
+    <update id="updateById">
+        UPDATE channel
+        <set>
+            <if test="channelName != null">channel_name = #{channelName},</if>
+            <if test="slug != null">slug = #{slug},</if>
+            <if test="parentChannelId != null">parent_channel_id = #{parentChannelId},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="coverImage != null">cover_image = #{coverImage},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="channelType != null">channel_type = #{channelType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="seq != null">seq = #{seq},</if>
+        </set>
+        WHERE channel_id = #{channelId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE channel SET deleted = 1 WHERE channel_id = #{channelId}
+    </update>
+
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.MediaMapper">
+
+    <select id="selectById" resultType="Media">
+        SELECT * FROM media WHERE media_id = #{mediaId} AND deleted = 0
+    </select>
+
+    <select id="pageAll" resultType="Media">
+        SELECT * FROM media WHERE deleted = 0
+        <if test="fileName != null and fileName != ''"> AND file_name LIKE CONCAT('%', #{fileName}, '%') </if>
+        <if test="mediaType != null and mediaType != ''"> AND media_type = #{mediaType} </if>
+        <if test="uploadUserId != null"> AND upload_user_id = #{uploadUserId} </if>
+        ORDER BY media_id DESC
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM media WHERE deleted = 0
+        <if test="fileName != null and fileName != ''"> AND file_name LIKE CONCAT('%', #{fileName}, '%') </if>
+        <if test="mediaType != null and mediaType != ''"> AND media_type = #{mediaType} </if>
+        <if test="uploadUserId != null"> AND upload_user_id = #{uploadUserId} </if>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="mediaId">
+        INSERT INTO media (file_name, file_path, file_size, file_type, file_ext, media_type, width, height, title, alt_text, upload_user_id, upload_user_name)
+        VALUES (#{fileName}, #{filePath}, #{fileSize}, #{fileType}, #{fileExt}, #{mediaType}, #{width}, #{height}, #{title}, #{altText}, #{uploadUserId}, #{uploadUserName})
+    </insert>
+
+    <update id="updateById">
+        UPDATE media
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="altText != null">alt_text = #{altText},</if>
+        </set>
+        WHERE media_id = #{mediaId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE media SET deleted = 1 WHERE media_id = #{mediaId}
+    </update>
+
+</mapper>

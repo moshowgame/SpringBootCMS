@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.FormSubmitValueMapper">
+
+    <select id="selectById" resultType="FormSubmitValue">
+        SELECT * FROM form_submit_value WHERE value_id = #{valueId} AND deleted = 0
+    </select>
+
+    <select id="getFormSubmitValue" resultType="FormSubmitValueDTO">
+        SELECT t1.item_id, t1.item_name, t1.item_type, t1.default_value, t2.value_text, t2.user_id
+        FROM form_item t1
+        LEFT JOIN form_submit_value t2 ON t2.item_id = t1.item_id AND t2.submit_id = #{submitId} AND t2.deleted = 0
+        WHERE t1.form_id = #{formId} AND t1.deleted = 0
+        ORDER BY t1.sort, t1.item_id
+    </select>
+
+    <select id="getFormSubmitValueExcel" resultType="FormSubmitValueExcelDTO">
+        SELECT t.user_id, t.show_name, t.user_name, t1.submit_id, t2.item_id, t2.item_name, t2.item_type, t1.value_text
+        FROM user t0
+        LEFT JOIN form_submit t3 ON t3.user_id = t0.user_id AND t3.form_id = #{formId} AND t3.deleted = 0
+        LEFT JOIN form_submit_value t1 ON t1.submit_id = t3.submit_id AND t1.deleted = 0
+        LEFT JOIN form_item t2 ON t2.item_id = t1.item_id AND t2.deleted = 0
+        WHERE t2.item_name IS NOT NULL AND t0.deleted = 0
+        <if test="userId != null"> AND t0.user_id = #{userId} </if>
+        <if test="userName != null and userName != ''"> AND t0.user_name = #{userName} </if>
+        <if test="showName != null and showName != ''"> AND t0.show_name LIKE CONCAT('%', #{showName}, '%') </if>
+        ORDER BY t1.user_id, t1.value_id
+    </select>
+
+    <select id="getSelectCountList" resultType="FormSubmitValueDTO">
+        SELECT t1.item_id, t0.item_name, t1.value_text, COUNT(*) as count
+        FROM form_item t0
+        LEFT JOIN form_submit_value t1 ON t1.item_id = t0.item_id AND t1.deleted = 0
+        WHERE t0.item_type = 'select' AND t0.deleted = 0
+        GROUP BY t0.item_id, t0.item_name, t1.value_text
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="valueId">
+        INSERT INTO form_submit_value (item_id, form_id, value_text, user_id, submit_id)
+        VALUES (#{itemId}, #{formId}, #{valueText}, #{userId}, #{submitId})
+    </insert>
+
+    <update id="updateById">
+        UPDATE form_submit_value
+        SET value_text = #{valueText}
+        WHERE value_id = #{valueId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE form_submit_value SET deleted = 1 WHERE value_id = #{valueId}
+    </update>
+
+</mapper>

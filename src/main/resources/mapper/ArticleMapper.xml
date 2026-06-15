@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.ArticleMapper">
+
+    <select id="selectById" resultType="Article">
+        SELECT t0.*, t1.channel_name FROM article t0
+        LEFT JOIN channel t1 ON t0.channel_id = t1.channel_id
+        WHERE t0.article_id = #{articleId} AND t0.deleted = 0
+    </select>
+
+    <select id="selectByChannelId" resultType="Article">
+        SELECT * FROM article WHERE channel_id = #{channelId} AND status = 1 AND deleted = 0
+        ORDER BY is_top DESC, article_id DESC
+    </select>
+
+    <select id="selectBySlug" resultType="Article">
+        SELECT * FROM article WHERE slug = #{slug} AND deleted = 0
+    </select>
+
+    <update id="incrementViewCount">
+        UPDATE article SET view_count = view_count + 1 WHERE article_id = #{articleId} AND deleted = 0
+    </update>
+
+    <select id="pageAll" resultType="Article">
+        SELECT t0.*, t1.channel_name FROM article t0
+        LEFT JOIN channel t1 ON t0.channel_id = t1.channel_id AND t1.deleted = 0
+        WHERE t0.deleted = 0
+        <if test="articleId != null"> AND t0.article_id = #{articleId} </if>
+        <if test="title != null and title != ''"> AND t0.title LIKE CONCAT('%', #{title}, '%') </if>
+        <if test="createUserId != null"> AND t0.create_user_id = #{createUserId} </if>
+        <if test="channelId != null"> AND t0.channel_id = #{channelId} </if>
+        <if test="status != null"> AND t0.status = #{status} </if>
+        ORDER BY t0.is_top DESC, t0.article_id DESC
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM article t0
+        WHERE t0.deleted = 0
+        <if test="articleId != null"> AND t0.article_id = #{articleId} </if>
+        <if test="title != null and title != ''"> AND t0.title LIKE CONCAT('%', #{title}, '%') </if>
+        <if test="createUserId != null"> AND t0.create_user_id = #{createUserId} </if>
+        <if test="channelId != null"> AND t0.channel_id = #{channelId} </if>
+        <if test="status != null"> AND t0.status = #{status} </if>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="articleId">
+        INSERT INTO article (title, slug, content, summary, cover_image, channel_id, create_user_id, create_user_name, status, is_top, keyword, view_count, publish_time)
+        VALUES (#{title}, #{slug}, #{content}, #{summary}, #{coverImage}, #{channelId}, #{createUserId}, #{createUserName}, #{status}, #{isTop}, #{keyword}, 0, #{publishTime})
+    </insert>
+
+    <update id="updateById">
+        UPDATE article
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="slug != null">slug = #{slug},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="coverImage != null">cover_image = #{coverImage},</if>
+            <if test="channelId != null">channel_id = #{channelId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="isTop != null">is_top = #{isTop},</if>
+            <if test="keyword != null">keyword = #{keyword},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+        </set>
+        WHERE article_id = #{articleId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE article SET deleted = 1 WHERE article_id = #{articleId}
+    </update>
+
+</mapper>

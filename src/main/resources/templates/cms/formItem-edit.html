@@ -1,86 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <#import "common/common-import.html" as netCommon>
 <@netCommon.commonImport />
-<body>
-<div class="layui-form layuimini-form">
-    <input type="hidden" name="itemId" value="${(formItem.itemId)!!}" class="layui-input">
-    <input type="hidden" name="formId" value="${(formId)!!}" class="layui-input">
+<body class="p-3">
 
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-list-check me-2"></i><#if formItem??>编辑字段<#else>新增字段</#if></h6>
+    </div>
+    <div class="card-body">
+        <form id="formItemForm" class="cms-form">
+            <input type="hidden" name="itemId" value="${(formItem.itemId)!!}">
+            <input type="hidden" name="formId" value="${(formId)!!}">
 
-    <div class="layui-form-item">
-        <label class="layui-form-label required">表单项名称</label>
-        <div class="layui-input-block">
-            <input type="text" name="itemName" lay-verify="required" lay-reqtext="表单项名称不能为空" placeholder="请输入表单项名称" value="${(formItem.itemName)!!}" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">类型</label>
-        <div class="layui-input-block">
-            <input type="radio" name="itemType" value="input" title="输人框" <#if (formItem.itemType)??> ${(formItem.itemType == 'input')?string('checked=""','0')?html} </#if>>
-            <input type="radio" name="itemType" value="select" title="单选框" <#if (formItem.itemType)??> ${(formItem.itemType  == 'radio')?string('checked=""','0')?html} </#if>>
-            <input type="radio" name="itemType" disabled value="checkbox" title="复选框" <#if (formItem.itemType)??> ${(formItem.itemType == 'checkbox')?string('checked=""','0')?html} </#if>>
-            <input type="radio" name="itemType" value="date" title="日期" <#if (formItem.itemType)??> ${(formItem.itemType == 'date')?string('checked=""','0')?html} </#if>>
-            <input type="radio" name="itemType" value="textarea" title="文本域" <#if (formItem.itemType)??> ${(formItem.itemType == 'textarea')?string('checked=""','0')?html} </#if>>
-            <input type="radio" name="itemType" value="fileupload" title="文件上传" <#if (formItem.itemType)??> ${(formItem.itemType == 'fileupload')?string('checked=""','0')?html} </#if>>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">可选值</label>
-        <div class="layui-input-block">
-            <input type="text" name="defaultValue" placeholder="请输入默认值" value="${(formItem.defaultValue)!!}" class="layui-input">
-            <tip>当类型为单选框或者复选框时，请设置可选值。例如公司;企业;个人; 以英文分号;分隔</tip>
-        </div>
-    </div>
-    <!--<div class="layui-form-item">
-        <label class="layui-form-label">提示</label>
-        <div class="layui-input-block">
-            <input type="text" name="itemTip" placeholder="请输入提示" value="${(formItem.itemTip)!!}" class="layui-input">
-        </div>
-    </div>-->
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">字段名称 <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="itemName" value="${(formItem.itemName)!!}" placeholder="请输入字段名称" required>
+                </div>
+            </div>
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
-        </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">字段类型</label>
+                <div class="col-sm-10">
+                    <select class="form-select" name="itemType">
+                        <option value="text" <#if (formItem.itemType)?? && formItem.itemType == 'text'>selected</#if>>文本框</option>
+                        <option value="textarea" <#if (formItem.itemType)?? && formItem.itemType == 'textarea'>selected</#if>>文本域</option>
+                        <option value="select" <#if (formItem.itemType)?? && formItem.itemType == 'select'>selected</#if>>下拉选择</option>
+                        <option value="radio" <#if (formItem.itemType)?? && formItem.itemType == 'radio'>selected</#if>>单选</option>
+                        <option value="checkbox" <#if (formItem.itemType)?? && formItem.itemType == 'checkbox'>selected</#if>>多选</option>
+                        <option value="date" <#if (formItem.itemType)?? && formItem.itemType == 'date'>selected</#if>>日期</option>
+                        <option value="file" <#if (formItem.itemType)?? && formItem.itemType == 'file'>selected</#if>>文件上传</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">选项值</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="itemOptions" value="${(formItem.itemOptions)!!}" placeholder="下拉/单选/多选的选项，逗号分隔">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">必填</label>
+                <div class="col-sm-10">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="required" value="1" id="requiredSwitch" <#if (formItem.required)?? && formItem.required == 1>checked</#if>>
+                        <label class="form-check-label" for="requiredSwitch">必填字段</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">排序</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="sort" value="${(formItem.sort)!'0'}" placeholder="排序值">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-cms-primary"><i class="bi bi-check-lg me-1"></i>确认保存</button>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">返回</a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
-</div>
+
+<@netCommon.commonScript />
 <script>
-    layui.use(['form'], function () {
-        var form = layui.form,
-            layer = layui.layer,
-            $ = layui.$;
-    <@netCommon.jwtHandle />
-        form.render('select');
-        //监听提交
-        form.on('submit(saveBtn)', function (data) {
-            $.ajax({
-                type: 'POST',
-                url: "${request.contextPath}/formItem/save",
-                data:JSON.stringify(data.field),
-                dataType: "json",
-                contentType: "application/json",
-                success: function (responseData) {
-                    if (responseData.code === 200) {
-                        layer.msg(responseData.msg, function () {
-                            // 关闭弹出层
-                            //layer.close(index);
-                            var iframeIndex = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(iframeIndex);
-                            parent.searchBtn.click();
-                        });
-                    } else {
-                        layer.msg(responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
-                }
-            });
-            return false;
+$(function() {
+    $('#formItemForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = {};
+        $(this).serializeArray().forEach(function(item) {
+            formData[item.name] = item.value;
         });
-
+        // 处理checkbox
+        if (!$('#requiredSwitch').is(':checked')) {
+            formData.required = '0';
+        }
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/formItem/save',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '保存成功', 'success');
+                    setTimeout(function() { history.back(); }, 800);
+                } else {
+                    CmsUtil.showToast(res.msg || '保存失败', 'danger');
+                }
+            }
+        });
     });
+});
 </script>
 </body>
 </html>

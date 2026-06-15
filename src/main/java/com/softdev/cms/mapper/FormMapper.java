@@ -1,18 +1,24 @@
 package com.softdev.cms.mapper;
 
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
 import com.softdev.cms.entity.Form;
+import com.softdev.cms.entity.dto.QueryParamDTO;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
-/**
- * @description form
- * @author zhengkai.blog.csdn.net
- * @date 2020-03-06 23:00:35
- */
+import java.util.List;
+
 @Mapper
-public interface FormMapper extends BaseMapper<Form> {
+public interface FormMapper {
 
+    Form selectById(@Param("formId") Integer formId);
 
+    List<Form> pageAll(QueryParamDTO queryParamDTO);
 
+    int countAll(QueryParamDTO queryParamDTO);
+
+    int insert(Form form);
+
+    int updateById(Form form);
+
+    int deleteById(@Param("formId") Integer formId);
 }

@@ -1,17 +1,25 @@
 package com.softdev.cms.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
 import com.softdev.cms.entity.Menu;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
-/**
- * @description menu
- * @author zhengkai.blog.csdn.net
- * @date 2020-02-19 20:42:16
- */
+import java.util.List;
+
 @Mapper
-public interface MenuMapper extends BaseMapper<Menu> {
+public interface MenuMapper {
 
+    Menu selectById(@Param("menuId") Integer menuId);
 
+    List<Menu> selectByParentMenuId(@Param("parentMenuId") Integer parentMenuId);
 
+    List<Menu> selectByRoleId(@Param("roleId") String roleId);
+
+    List<Menu> selectAll();
+
+    int insert(Menu menu);
+
+    int updateById(Menu menu);
+
+    int deleteById(@Param("menuId") Integer menuId);
 }

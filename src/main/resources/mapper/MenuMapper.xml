@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.MenuMapper">
+
+    <resultMap id="menuResultMap" type="Menu">
+        <id property="menuId" column="menu_id"/>
+        <result property="href" column="href"/>
+        <result property="icon" column="icon"/>
+        <result property="target" column="target"/>
+        <result property="title" column="title"/>
+        <result property="roleId" column="role_id"/>
+        <result property="parentMenuId" column="parent_menu_id"/>
+        <result property="sort" column="sort"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="menuResultMap">
+        SELECT * FROM menu WHERE menu_id = #{menuId} AND deleted = 0
+    </select>
+
+    <select id="selectByParentMenuId" resultMap="menuResultMap">
+        SELECT * FROM menu WHERE parent_menu_id = #{parentMenuId} AND deleted = 0 ORDER BY sort, menu_id
+    </select>
+
+    <select id="selectByRoleId" resultMap="menuResultMap">
+        SELECT * FROM menu WHERE (role_id = #{roleId} OR role_id = '0') AND deleted = 0 ORDER BY sort, menu_id
+    </select>
+
+    <select id="selectAll" resultMap="menuResultMap">
+        SELECT * FROM menu WHERE deleted = 0 ORDER BY sort, menu_id
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="menuId">
+        INSERT INTO menu (href, icon, target, title, role_id, parent_menu_id, sort)
+        VALUES (#{href}, #{icon}, #{target}, #{title}, #{roleId}, #{parentMenuId}, #{sort})
+    </insert>
+
+    <update id="updateById">
+        UPDATE menu
+        <set>
+            <if test="href != null">href = #{href},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="target != null">target = #{target},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="parentMenuId != null">parent_menu_id = #{parentMenuId},</if>
+            <if test="sort != null">sort = #{sort},</if>
+        </set>
+        WHERE menu_id = #{menuId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE menu SET deleted = 1 WHERE menu_id = #{menuId}
+    </update>
+
+</mapper>

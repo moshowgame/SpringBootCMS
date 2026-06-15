@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.FormItemMapper">
+
+    <select id="selectById" resultType="FormItem">
+        SELECT * FROM form_item WHERE item_id = #{itemId} AND deleted = 0
+    </select>
+
+    <select id="selectByFormId" resultType="FormItem">
+        SELECT * FROM form_item WHERE form_id = #{formId} AND deleted = 0 ORDER BY sort, item_id
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="itemId">
+        INSERT INTO form_item (form_id, item_name, item_type, default_value, item_tip, placeholder, required, sort)
+        VALUES (#{formId}, #{itemName}, #{itemType}, #{defaultValue}, #{itemTip}, #{placeholder}, #{required}, #{sort})
+    </insert>
+
+    <update id="updateById">
+        UPDATE form_item
+        <set>
+            <if test="itemName != null">item_name = #{itemName},</if>
+            <if test="itemType != null">item_type = #{itemType},</if>
+            <if test="defaultValue != null">default_value = #{defaultValue},</if>
+            <if test="itemTip != null">item_tip = #{itemTip},</if>
+            <if test="placeholder != null">placeholder = #{placeholder},</if>
+            <if test="required != null">required = #{required},</if>
+            <if test="sort != null">sort = #{sort},</if>
+        </set>
+        WHERE item_id = #{itemId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE form_item SET deleted = 1 WHERE item_id = #{itemId}
+    </update>
+
+    <update id="deleteByFormId">
+        UPDATE form_item SET deleted = 1 WHERE form_id = #{formId}
+    </update>
+
+</mapper>

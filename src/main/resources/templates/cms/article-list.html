@@ -1,264 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <#import "common/common-import.html" as netCommon>
 <@netCommon.commonImport />
-<body>
-<div class="layuimini-container">
-    <div class="layuimini-main">
+<body class="p-3">
 
-        <fieldset class="table-search-fieldset">
-            <legend>搜索信息</legend>
-            <div style="margin: 10px 10px 10px 10px">
-                <form class="layui-form layui-form-pane" action="">
-                    <div class="layui-form-item">
-                        <div class="layui-inline">
-                            <label class="layui-form-label">所属频道</label>
-                            <div class="layui-input-inline">
-                                <select id="channelId" name="channelId" lay-filter="channelId" class="layui-input">
-                                    <option value="">全部</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <label class="layui-form-label">文章名称</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="articleName" autocomplete="off" class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <button id="searchBtn" type="submit" class="layui-btn layui-btn-primary" lay-submit  lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </fieldset>
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-file-text me-2"></i>文章管理</h6>
+        <button class="btn btn-cms-primary btn-sm" id="btnAdd">
+            <i class="bi bi-plus-lg me-1"></i>新增文章
+        </button>
+    </div>
+    <div class="card-body">
+        <!-- Search -->
+        <div class="cms-search">
+            <select class="form-select form-select-sm" id="searchChannelId" style="max-width:160px;">
+                <option value="">全部频道</option>
+            </select>
+            <input type="text" class="form-control form-control-sm" id="searchTitle" placeholder="文章标题">
+            <button class="btn btn-cms-primary btn-sm" id="btnSearch"><i class="bi bi-search me-1"></i>搜索</button>
+        </div>
 
-        <script type="text/html" id="toolbarDemo">
-            <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add">  <i class="layui-icon layui-icon-addition"></i>文章 </button>
-            </div>
-        </script>
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="cms-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>标题</th>
+                        <th>频道</th>
+                        <th>创建者</th>
+                        <th>置顶</th>
+                        <th>状态</th>
+                        <th>修改时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody"></tbody>
+            </table>
+        </div>
 
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-
-        <script type="text/html" id="currentTableBar">
-            {{#  if(d.status =='0' ) { }}
-            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="publish"><i class="layui-icon layui-icon-ok"></i>发布</a>
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
-            {{#  } }}
-            {{#  if(d.status =='1' ) { }}
-            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="unpublish"><i class="layui-icon layui-icon-pause"></i>停止</a>
-            {{#  } }}
-            <a class="layui-btn layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
-        </script>
-
-        <script type="text/html" id="typeTemplate">
-            {{#  if(d.type == '1'){ }}
-            常规
-            {{#  } else if(d.type =='2') { }}
-            专项
-            {{#  } else { }}
-            其它
-            {{#  } }}
-        </script>
-        <script type="text/html" id="statusTemplate">
-            {{#  if(d.status == '1' ){ }}
-            <i class="layui-icon layui-icon-ok"></i>已发布
-            {{#  } else { }}
-            - 未发布
-            {{#  } }}
-        </script>
-        <script type="text/html" id="topTemplate">
-            {{#  if(d.isTop == '1' ){ }}
-            <i class="layui-icon layui-icon-top"></i>置顶
-            {{#  } else { }}
-            -
-            {{#  } }}
-        </script>
+        <!-- Pagination -->
+        <div id="pagination"></div>
     </div>
 </div>
+
+<@netCommon.commonScript />
 <script>
-    layui.use(['form', 'table'], function () {
-        var $ = layui.jquery,
-            form = layui.form,
-            table = layui.table;
-    <@netCommon.jwtHandle />
-        table.render({
-            elem: '#currentTableId',
-            method: 'post',
-            url: '${request.contextPath}/article/list',
-            toolbar: '#toolbarDemo',
-            defaultToolbar: ['filter', 'exports', 'print', {
-                title: '提示',
-                layEvent: 'LAYTABLE_TIPS',
-                icon: 'layui-icon-tips'
-            }],
-            cols: [[
-                /*{type: "checkbox", width: 50, fixed: "left"},*/
-                {field: 'articleId', title: 'ID', sort: true},
-                {field: 'title', title: '标题', sort: true},
-                {field: 'createUserName', title: '创建者', sort: true},
-                {field: 'channelName', title: '频道', sort: true},
-                {field: 'keyword',  title: '关键字，逗号分隔', sort: true},
-                {templet: '#topTemplate',title: '是否置顶', sort: true},
-                {templet: '#statusTemplate',title: '状态', sort: true},
-                /*{title: '创建时间', sort: true,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},*/
-                {title: '修改时间', sort: true,templet: "<div>{{layui.util.toDateString(d.updateTime, 'yyyy-MM-dd')}}</div>"},
-                /* 需要时间请自行解封
-                {title: '创建时间', sort: true,templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}</div>"},
-                {title: '修改时间', sort: true,templet: "<div>{{layui.util.toDateString(d.updateTime, 'yyyy-MM-dd')}}</div>"},
-                */
-                {title: '操作', minWidth: 400, templet: '#currentTableBar', fixed: "right", align: "center"}
-            ]],
-            limits: [20 , 50 , 100],
-            limit: 20,
-            page: true
-        });
-
-        var result;
-        /**
-         * submit(data-search-btn):监听搜索操作
-         */
-        form.on('submit(data-search-btn)', function (data) {
-            result = JSON.stringify(data.field);
-
-            //执行搜索重载
-            table.reload('currentTableId', {
-                page: {
-                    curr: 1
+$(function() {
+    var table = new CmsTable({
+        apiList: '${request.contextPath}/article/list',
+        apiDelete: '${request.contextPath}/article/delete',
+        tableBody: '#dataTableBody',
+        paginationEl: '#pagination',
+        limit: 20,
+        columns: [
+            { field: 'articleId' },
+            { field: 'title' },
+            { field: 'channelName' },
+            { field: 'createUserName' },
+            { field: 'isTop', render: function(val) { return val == '1' ? '<span class="badge bg-warning badge-status">置顶</span>' : '-'; } },
+            { field: 'status', render: function(val) { return val == '1' ? '<span class="badge bg-success badge-status">已发布</span>' : '<span class="badge bg-secondary badge-status">未发布</span>'; } },
+            { field: 'updateTime' },
+            { field: 'articleId', render: function(val, row) {
+                var html = '';
+                if (row.status == '0') {
+                    html += '<button class="btn btn-success btn-sm me-1 btn-publish" data-id="'+val+'" data-status="1"><i class="bi bi-check-lg"></i>发布</button>';
+                    html += '<button class="btn btn-outline-danger btn-sm me-1 btn-delete" data-id="'+val+'"><i class="bi bi-trash"></i>删除</button>';
                 }
-                , where: {
-                    searchParams: result
+                if (row.status == '1') {
+                    html += '<button class="btn btn-outline-warning btn-sm me-1 btn-publish" data-id="'+val+'" data-status="0"><i class="bi bi-pause"></i>停止</button>';
                 }
-            }, 'data');
+                html += '<button class="btn btn-outline-primary btn-sm btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button>';
+                return html;
+            }}
+        ]
+    });
 
-            return false;
-        });
+    table.load();
 
-        var searchBtn = $("#searchBtn");
-        /**
-         * toolbar监听事件:表格添加按钮
-         */
-        table.on('toolbar(currentTableFilter)', function (obj) {
-            if (obj.event === 'add') {
-                var index = layer.open({
-                    title: '添加',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin:true,
-                    shadeClose: true,
-                    area: ['1000px', '700px'],
-                    content: '${request.contextPath}/article/edit?id=0'+"&token="+layui.data('token').token,
-                });
-                return false;
-            }else if(obj.event === 'del') {
-                var checkStatus = table.checkStatus('currentTableId')
-                    , data = checkStatus.data;
-                layer.alert(JSON.stringify(data));
-            }
-        });
-        /**
-         * checkbox(currentTableFilter):表格复选框选择
-         */
-        table.on('checkbox(currentTableFilter)', function (obj) {
-            //console.log(obj)
-        });
+    // 搜索
+    $('#btnSearch').on('click', function() {
+        var params = {};
+        var channelId = $('#searchChannelId').val();
+        var title = $('#searchTitle').val().trim();
+        if (channelId) params.channelId = channelId;
+        if (title) params.title = title;
+        table.search(params);
+    });
 
-        /**
-         * tool监听事件:表格编辑删除等功能按钮
-         */
-        table.on('tool(currentTableFilter)', function (obj) {
-            var data = obj.data;
-            if (obj.event === 'edit') {
-                var index = layer.open({
-                    title: '编辑',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin:true,
-                    shadeClose: true,
-                    area: ['1000px', '700px'],
-                    content: '${request.contextPath}/article/edit?id='+obj.data.articleId+"&token="+layui.data('token').token,
-                });
-                return false;
-            } else if (obj.event === 'delete') {
-                layer.confirm('确认删除该记录吗？', function (index) {
-                    $.ajax({
-                        type: 'POST',
-                        url: "${request.contextPath}/article/delete",
-                        data:{"id":obj.data.articleId},
-                        success: function (responseData) {
-                            if (responseData.code === 200) {
-                                layer.msg(responseData.msg, function () {
-                                    obj.del();
-                                });
-                            } else {
-                                layer.msg(responseData.msg, function () {
-                                    //window.location = '/index.html';
-                                });
-                            }
-                        }
-                    });
-                    layer.close(index);
-                });
-            }else if (obj.event === 'publish') {
-                layer.confirm('确定要发布吗？', function (index) {
-                    $.ajax({
-                        type: 'POST',
-                        url: "${request.contextPath}/article/publish",
-                        data:{"id":obj.data.articleId,"status":"1"},
-                        success: function (responseData) {
-                            searchBtn.click();
-                            layer.msg(responseData.msg);
-                        }
-                    });
-                    layer.close(index);
-                });
-            }else if (obj.event === 'unpublish') {
-                layer.confirm('确定要停止吗？', function (index) {
-                    $.ajax({
-                        type: 'POST',
-                        url: "${request.contextPath}/article/publish",
-                        data:{"id":obj.data.articleId,"status":"0"},
-                        success: function (responseData) {
-                            searchBtn.click();
-                            layer.msg(responseData.msg);
-                        }
-                    });
-                    layer.close(index);
-                });
-            }
-        });
+    // 新增
+    $('#btnAdd').on('click', function() {
+        window.location.href = '${request.contextPath}/article/edit?id=0';
+    });
 
-        function initChannel(){
-            $.ajax({
-                type: 'POST',
-                url: "${request.contextPath}/channel/list",
-                data:{"searchParams":"{'parentChannelId':'0'}","page":"1","limit":"99"},
-                success: function (responseData) {
-                    if (responseData.code === 200 || responseData.code === 0) {
-                        var length = responseData.data.length;
-                        $("#channelId").empty();
-                        $("#channelId").append('<option value="">全部</option>');
-                        for(var i = 0; i < length; i++) {
-                            //添加option元素
-                            $("#channelId").append("<option value='" + responseData.data[i].channelId + "'>" + responseData.data[i].channelName + "</option>");
-                        }
-                        form.render('select');
-                    } else {
-                        layer.msg("加载主菜单列表失败:"+responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
-                }
+    // 编辑
+    $(document).on('click', '.btn-edit', function() {
+        var id = $(this).data('id');
+        window.location.href = '${request.contextPath}/article/edit?id=' + id;
+    });
+
+    // 删除
+    $(document).on('click', '.btn-delete', function() {
+        var id = $(this).data('id');
+        table.delete(id, '文章');
+    });
+
+    // 发布/停止
+    $(document).on('click', '.btn-publish', function() {
+        var id = $(this).data('id');
+        var status = $(this).data('status');
+        var msg = status == '1' ? '确定要发布吗？' : '确定要停止吗？';
+        if (confirm(msg)) {
+            $.post('${request.contextPath}/article/publish', {id: id, status: status}, function(res) {
+                CmsUtil.showToast(res.msg || '操作成功', res.code === 200 ? 'success' : 'danger');
+                table.load();
             });
         }
-        initChannel();
-
     });
-</script>
-<script>
 
+    // 加载频道列表
+    $.post('${request.contextPath}/channel/list', {searchParams: '{"parentChannelId":"0"}', page: 1, limit: 99}, function(res) {
+        if (res.code === 200 && res.data) {
+            var html = '<option value="">全部频道</option>';
+            res.data.forEach(function(ch) {
+                html += '<option value="' + ch.channelId + '">' + ch.channelName + '</option>';
+            });
+            $('#searchChannelId').html(html);
+        }
+    });
+});
 </script>
-
 </body>
 </html>

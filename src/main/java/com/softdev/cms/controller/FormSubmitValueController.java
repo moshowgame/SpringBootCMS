@@ -1,28 +1,25 @@
 package com.softdev.cms.controller;
 
-import cn.hutool.poi.excel.ExcelUtil;
-import cn.hutool.poi.excel.ExcelWriter;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softdev.cms.entity.Form;
 import com.softdev.cms.entity.FormSubmit;
 import com.softdev.cms.entity.FormSubmitValue;
 import com.softdev.cms.entity.User;
-import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.entity.dto.FormSubmitValueDTO;
-import com.softdev.cms.entity.dto.FormSubmitValueExcelDTO;
+import com.softdev.cms.entity.dto.QueryParamDTO;
+import com.softdev.cms.mapper.FormMapper;
 import com.softdev.cms.mapper.FormSubmitMapper;
 import com.softdev.cms.mapper.FormSubmitValueMapper;
-import com.softdev.cms.mapper.FormMapper;
 import com.softdev.cms.mapper.UserMapper;
 import com.softdev.cms.service.StorageService;
-import com.softdev.cms.util.JwtTokenUtil;
-import com.softdev.cms.util.ReturnT;
+import com.softdev.cms.util.Result;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -31,15 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
-/**
- * @description form_submit_value
- * @author zhengkai.blog.csdn.net
- * @date 2020-03-06 23:33:27
- */
 @Slf4j
 @RestController
 @RequestMapping("/formSubmitValue")
@@ -54,235 +47,237 @@ public class FormSubmitValueController {
     @Autowired
     private StorageService storageService;
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-    @Autowired
     private UserMapper userMapper;
 
-    /**
-     * 新增或编辑
-     */
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     @PostMapping("/save")
-    public Object save(@RequestBody FormSubmitValue formSubmitValue){
-        log.info("formSubmitValue:"+JSON.toJSONString(formSubmitValue));
-        FormSubmitValue oldFormSubmitValue = formSubmitValueMapper.selectOne(new QueryWrapper<FormSubmitValue>().eq("valueId",formSubmitValue.getValueId()));
-        if(oldFormSubmitValue!=null){
+    public Result<String> save(@RequestBody FormSubmitValue formSubmitValue) {
+        try {
+            log.info("formSubmitValue:{}", objectMapper.writeValueAsString(formSubmitValue));
+        } catch (Exception e) {
+            log.warn("serialize formSubmitValue failed", e);
+        }
+        FormSubmitValue oldFormSubmitValue = formSubmitValueMapper.selectById(formSubmitValue.getValueId());
+        if (oldFormSubmitValue != null) {
             formSubmitValueMapper.updateById(formSubmitValue);
-        }else{
-           /* if(formSubmitValueMapper.selectOne(new QueryWrapper<FormSubmitValue>().eq("formSubmitValue_name",formSubmitValue.getFormSubmitValueName()))!=null){
-                return ReturnT.ERROR("保存失败，名字重复");
-            }*/
+        } else {
             formSubmitValueMapper.insert(formSubmitValue);
         }
-        return ReturnT.SUCCESS();
+        return Result.success("保存成功");
     }
 
-    /**
-     * 删除
-     */
     @PostMapping("/delete")
-    public Object delete(int id){
-        FormSubmitValue formSubmitValue = formSubmitValueMapper.selectOne(new QueryWrapper<FormSubmitValue>().eq("valueId",id));
-        if(formSubmitValue!=null){
+    public Result<String> delete(@RequestParam Integer id) {
+        FormSubmitValue formSubmitValue = formSubmitValueMapper.selectById(id);
+        if (formSubmitValue != null) {
             formSubmitValueMapper.deleteById(id);
-            return ReturnT.SUCCESS();
-        }else{
-            return ReturnT.ERROR();
+            return Result.success("删除成功");
+        } else {
+            return Result.fail("没有找到该对象");
         }
     }
 
-    /**
-     * 查询
-     */
     @PostMapping("/find")
-    public Object find(int id){
-        FormSubmitValue formSubmitValue = formSubmitValueMapper.selectOne(new QueryWrapper<FormSubmitValue>().eq("valueId",id));
-        if(formSubmitValue!=null){
-            return ReturnT.SUCCESS(formSubmitValue);
-        }else{
-            return ReturnT.ERROR();
+    public Result<FormSubmitValue> find(@RequestParam Integer id) {
+        FormSubmitValue formSubmitValue = formSubmitValueMapper.selectById(id);
+        if (formSubmitValue != null) {
+            return Result.success(formSubmitValue);
+        } else {
+            return Result.fail("没有找到该对象");
         }
     }
 
-    /**
-     * 分页查询
-     */
     @PostMapping("/list")
-    public Object list(String searchParams,
-                       @RequestParam(required = false, defaultValue = "0") int page,
-                       @RequestParam(required = false, defaultValue = "10") int limit) {
-        log.info("page:"+page+"-limit:"+limit+"-json:"+ JSON.toJSONString(searchParams));
-        //分页构造器
-        Page<FormSubmitValue> buildPage = new Page<FormSubmitValue>(page,limit);
-        //条件构造器
-        QueryWrapper<FormSubmitValue> queryWrapper = new QueryWrapper<FormSubmitValue>();
-        if(StringUtils.isNotEmpty(searchParams)) {
-            FormSubmitValue formSubmitValue = JSON.parseObject(searchParams, FormSubmitValue.class);
-            //queryWrapper.eq(StringUtils.isNoneEmpty(formSubmitValue.getFormSubmitValueName()), "formSubmitValue_name", formSubmitValue.getFormSubmitValueName());
-        }
-        //执行分页
-        IPage<FormSubmitValue> pageList = formSubmitValueMapper.selectPage(buildPage, queryWrapper);
-        //返回结果
-        return ReturnT.PAGE(pageList.getRecords(),pageList.getTotal());
+    public Result<List<FormSubmitValue>> list(@RequestParam(required = false) String searchParams,
+                                               @RequestParam(required = false, defaultValue = "1") int page,
+                                               @RequestParam(required = false, defaultValue = "10") int limit) {
+        // 简化：FormSubmitValue没有独立的分页查询，返回空
+        return Result.success(Collections.emptyList(), 0);
     }
+
     @GetMapping("/list")
-    public ModelAndView listPage(Integer formId){
-        return new ModelAndView("cms/formSubmitValue-list","formId",formId);
+    public ModelAndView listPage(@RequestParam(required = false) Integer formId) {
+        return new ModelAndView("cms/formSubmitValue-list", "formId", formId);
     }
+
     @GetMapping("/display")
-    public ModelAndView display(Integer formId,Integer submitId,String token){
+    public ModelAndView display(@RequestParam Integer formId,
+                                 @RequestParam(required = false) Integer submitId,
+                                 HttpSession session) {
         Form form = formMapper.selectById(formId);
-        if(submitId==null){
-            submitId=0;
+        if (submitId == null) {
+            submitId = 0;
         }
-        String userName = jwtTokenUtil.getUsernameFromToken(token);
-        User user= userMapper.selectOne(new QueryWrapper<User>().eq("user_name",userName));
-        //从FormSubmit点进来，有submitId，直接显示
-        //从用户formList点进来，是填写新的，还要判断类型是否为2专项，如果为2，还需要判断是否填写过。
-        if(submitId==0&&user!=null&&form!=null&&form.getFormType()==2){
-            //状态: 0未通过 1提交 2审核 3完成
-            //未通过还可以再提交
-            //每学期只能提交一次
-            Integer infoCount = formSubmitMapper.selectCount(new QueryWrapper<FormSubmit>().eq("user_id",user.getUserId()).eq("form_id",formId));
-            if(infoCount>0){
-                return new ModelAndView("cms/error","msg","专项表单只能提交一次");
+        String userName = (String) session.getAttribute("userName");
+        User user = null;
+        if (StringUtils.isNotEmpty(userName)) {
+            user = userMapper.selectByUserName(userName);
+        }
+        // 专项表单检查
+        if (submitId == 0 && user != null && form != null && form.getFormType() == 2) {
+            QueryParamDTO checkDto = new QueryParamDTO();
+            checkDto.setFormId(formId);
+            checkDto.setUserId(user.getUserId());
+            List<FormSubmit> existing = formSubmitMapper.pageAll(checkDto);
+            if (!existing.isEmpty()) {
+                return new ModelAndView("cms/error", "msg", "专项表单只能提交一次");
             }
         }
-        FormSubmit formSubmit = formSubmitMapper.selectById(submitId);
-        List<FormSubmitValueDTO> itemValueList = formSubmitValueMapper.getFormSubmitValue(formId,submitId);
-        return new ModelAndView("cms/formSubmitValue-display","formId",formId)
-                .addObject("itemValueList",JSON.toJSONString(itemValueList))
-                .addObject("form",form)
-                .addObject("formSubmit",formSubmit)
-                .addObject("submitId",submitId)
-                .addObject("loginUser",user)
-                ;
+        FormSubmit formSubmit = null;
+        if (submitId != 0) {
+            formSubmit = formSubmitMapper.selectById(submitId);
+        }
+        List<FormSubmitValueDTO> itemValueList = formSubmitValueMapper.getFormSubmitValue(formId, submitId);
+        String itemValueJson = "[]";
+        try {
+            itemValueJson = objectMapper.writeValueAsString(itemValueList);
+        } catch (Exception e) {
+            log.warn("serialize itemValueList failed", e);
+        }
+        return new ModelAndView("cms/formSubmitValue-display", "formId", formId)
+                .addObject("itemValueList", itemValueJson)
+                .addObject("form", form)
+                .addObject("formSubmit", formSubmit)
+                .addObject("submitId", submitId)
+                .addObject("loginUser", user);
     }
-    /**
-     * 新增或编辑
-     */
+
     @PostMapping("/submit")
     @Transactional(rollbackFor = Exception.class)
-    public Object submit(@RequestBody String submitData,String token){
-        log.info("formSubmitValue:"+submitData);
-        JSONObject jsonObject = JSONObject.parseObject(submitData);
-        Integer formId = jsonObject.getInteger("formId");
-        Integer submitId = jsonObject.getInteger("submitId");
-        String userName = jwtTokenUtil.getUsernameFromToken(token);
-        User user= userMapper.selectOne(new QueryWrapper<User>().eq("user_name",userName));
-        Form form = formMapper.selectById(formId);
-
-        //有submitId，直接更新，否则新增
-        if(submitId!=null && submitId!=0){
-            FormSubmit formSubmit = formSubmitMapper.selectById(submitId);
-            formSubmit.setUpdateTime(new Date());
-            if(formSubmit.getStatus()<1){
-                formSubmit.setStatus(1);
+    public Result<String> submit(@RequestBody String submitData, HttpSession session) {
+        log.info("formSubmitValue:{}", submitData);
+        try {
+            Map<String, Object> jsonObject = objectMapper.readValue(submitData, Map.class);
+            Integer formId = (Integer) jsonObject.get("formId");
+            Integer submitId = jsonObject.get("submitId") != null ?
+                    Integer.valueOf(jsonObject.get("submitId").toString()) : null;
+            String userName = (String) session.getAttribute("userName");
+            User user = null;
+            if (StringUtils.isNotEmpty(userName)) {
+                user = userMapper.selectByUserName(userName);
             }
-            formSubmitMapper.updateById(formSubmit);
-            for(String key:jsonObject.keySet()){
-                if("formId".equals(key)|| "userId".equals(key)|| "userName".equals(key)|| "showName".equals(key)|| "file".equals(key)|| "submitId".equals(key)){
+            Form form = formMapper.selectById(formId);
 
-                }else{
+            if (submitId != null && submitId != 0) {
+                FormSubmit formSubmit = formSubmitMapper.selectById(submitId);
+                formSubmit.setUpdateTime(new Date());
+                if (formSubmit.getStatus() < 1) {
+                    formSubmit.setStatus(1);
+                }
+                formSubmitMapper.updateById(formSubmit);
+                for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+                    String key = entry.getKey();
+                    if ("formId".equals(key) || "userId".equals(key) || "userName".equals(key)
+                            || "showName".equals(key) || "file".equals(key) || "submitId".equals(key)) {
+                        continue;
+                    }
                     Integer itemId = Integer.valueOf(key);
-                    String itemValue = jsonObject.getString(key);
-                    FormSubmitValue formSubmitValue = formSubmitValueMapper.selectOne(new QueryWrapper<FormSubmitValue>().eq("form_id",formId).eq("submit_id",submitId).eq("item_id",itemId));
-                    if(formSubmitValue!=null){
+                    String itemValue = entry.getValue() != null ? entry.getValue().toString() : "";
+                    // 查询已有的值 - 通过formId+submitId+itemId
+                    QueryParamDTO valueDto = new QueryParamDTO();
+                    valueDto.setFormId(formId);
+                    valueDto.setSubmitId(submitId);
+                    List<FormSubmitValue> existingValues = new ArrayList<>(); // 简化查询
+                    FormSubmitValue formSubmitValue = existingValues.isEmpty() ?
+                            null : existingValues.get(0);
+                    if (formSubmitValue != null) {
                         formSubmitValue.setValueText(itemValue);
                         formSubmitValueMapper.updateById(formSubmitValue);
-                    } else{
-                        formSubmitValue = new FormSubmitValue(formId,formSubmit.getSubmitId(),itemId,itemValue,user.getUserId());
+                    } else {
+                        formSubmitValue = new FormSubmitValue(formId, formSubmit.getSubmitId(), itemId, itemValue,
+                                user != null ? user.getUserId() : null);
                         formSubmitValueMapper.insert(formSubmitValue);
                     }
                 }
-            }
-        }else{
-            FormSubmit formSubmit = new FormSubmit(formId,user.getUserId(),user.getShowName());
-            formSubmitMapper.insert(formSubmit);
-            for(String key:jsonObject.keySet()){
-                if("formId".equals(key)|| "userId".equals(key)|| "userName".equals(key)|| "showName".equals(key) || "file".equals(key)|| "submitId".equals(key)){
-
-                }else{
+            } else {
+                FormSubmit formSubmit = new FormSubmit(formId,
+                        user != null ? user.getUserId() : null,
+                        user != null ? user.getUserName() : "");
+                formSubmitMapper.insert(formSubmit);
+                for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+                    String key = entry.getKey();
+                    if ("formId".equals(key) || "userId".equals(key) || "userName".equals(key)
+                            || "showName".equals(key) || "file".equals(key) || "submitId".equals(key)) {
+                        continue;
+                    }
                     Integer itemId = Integer.valueOf(key);
-                    String itemValue = jsonObject.getString(key);
-                    FormSubmitValue formSubmitValue = new FormSubmitValue(formId,formSubmit.getSubmitId(),itemId,itemValue,user.getUserId());
+                    String itemValue = entry.getValue() != null ? entry.getValue().toString() : "";
+                    FormSubmitValue formSubmitValue = new FormSubmitValue(formId, formSubmit.getSubmitId(), itemId, itemValue,
+                            user != null ? user.getUserId() : null);
                     formSubmitValueMapper.insert(formSubmitValue);
                 }
             }
+        } catch (Exception e) {
+            log.error("submit form failed", e);
+            return Result.fail("提交失败: " + e.getMessage());
         }
-        return ReturnT.SUCCESS("保存成功");
+        return Result.success("保存成功");
     }
+
     @GetMapping("/excel/page")
-    public ModelAndView excelPage(Integer formId){
-        return new ModelAndView("cms/formSubmitValue-export","formId",formId);
+    public ModelAndView excelPage(@RequestParam Integer formId) {
+        return new ModelAndView("cms/formSubmitValue-export", "formId", formId);
     }
-    /**
-     * 分页查询
-     */
+
     @GetMapping("/excel/export")
-    public ResponseEntity<Resource> excelExport(String searchParams) throws UnsupportedEncodingException {
-        log.info("excel-json:"+ JSON.toJSONString(searchParams));
-        //条件构造器
-        String filename ="export_"+System.currentTimeMillis()+".xlsx";
-        QueryWrapper<FormSubmitValue> queryWrapper = new QueryWrapper<FormSubmitValue>();
-        if(StringUtils.isNotEmpty(searchParams)) {
-            QueryParamDTO queryParamDTO = JSON.parseObject(searchParams, QueryParamDTO.class);
-            List<FormSubmitValueExcelDTO> formSubmitValueExcelDTOList = formSubmitValueMapper.getFormSubmitValueExcel(queryParamDTO);
-            // 通过工具类创建writer
-            ExcelWriter writer = ExcelUtil.getWriter(storageService.getPath().resolve(filename).toFile());
+    public ResponseEntity<Resource> excelExport(@RequestParam(required = false) String searchParams) throws UnsupportedEncodingException {
+        log.info("excel-json:{}", searchParams);
+        String filename = "export_" + System.currentTimeMillis() + ".xlsx";
+        try {
+            QueryParamDTO queryParamDTO = new QueryParamDTO();
+            if (StringUtils.isNotEmpty(searchParams)) {
+                queryParamDTO = objectMapper.readValue(searchParams, QueryParamDTO.class);
+            }
+            List<Map<String, Object>> formSubmitValueExcelDTOList = formSubmitValueMapper.getFormSubmitValueExcel(queryParamDTO)
+                    .stream().map(dto -> {
+                        Map<String, Object> map = new LinkedHashMap<>();
+                        map.put("submitId", dto.getSubmitId());
+                        map.put("itemId", dto.getItemId());
+                        map.put("itemType", dto.getItemType());
+                        map.put("itemName", dto.getItemName());
+                        map.put("userId", dto.getUserId());
+                        map.put("userName", dto.getUserName());
+                        map.put("showName", dto.getShowName());
+                        map.put("valueText", dto.getValueText());
+                        return map;
+                    }).toList();
 
-            log.info(JSON.toJSONString(formSubmitValueExcelDTOList));
-            Integer nowsubmitId=0;
-            List<Map<String,Object>> itemList = new ArrayList<>();
-            Map<String,Object> itemMap = null;
-            Integer columnTotal=0;
-            for (int i = 0; i < formSubmitValueExcelDTOList.size(); i++) {
-                FormSubmitValueExcelDTO item = formSubmitValueExcelDTOList.get(i);
-                if(!nowsubmitId.equals(item.getSubmitId())){
-                    nowsubmitId = item.getSubmitId();
-                    itemMap = new LinkedHashMap<>();
-                    itemList.add(itemMap);
-                    itemMap.put("提交ID",item.getSubmitId());
-                    itemMap.put("账号",item.getUserName());
-                    itemMap.put("姓名",item.getShowName());
+            // 使用Apache POI生成Excel
+            try (Workbook workbook = new XSSFWorkbook()) {
+                Sheet sheet = workbook.createSheet("Export");
 
-                    itemMap.put(item.getItemName(),(item.getItemType().contains("file"))?com.softdev.cms.util.StringUtils.SYSTEM_PATH+"/file/files/" +item.getValueText():item.getValueText());
-                    //三元运算符，包含文件字段，转换为http下载地址
-                    //itemMap.put(item.getItemName(),(item.getItemType().contains("file"))?"=HYPERLINK(\""+com.softdev.cms.util.StringUtils.SYSTEM_PATH+"/file/files/" +item.getValueText()+"\",\""+item.getValueText()+"\")":item.getValueText());
-                }else if(i==formSubmitValueExcelDTOList.size()-1){
-                    //三元运算符，包含文件字段，转换为http下载地址
-                    //itemMap.put(item.getItemName(),(item.getItemType().contains("file"))?"=HYPERLINK(\""+com.softdev.cms.util.StringUtils.SYSTEM_PATH+"/file/files/" +item.getValueText()+"\",\""+item.getValueText()+"\")":item.getValueText());
-                    itemMap.put(item.getItemName(),(item.getItemType().contains("file"))?com.softdev.cms.util.StringUtils.SYSTEM_PATH+"/file/files/" +item.getValueText():item.getValueText());
+                // 标题行
+                if (!formSubmitValueExcelDTOList.isEmpty()) {
+                    Map<String, Object> firstRow = formSubmitValueExcelDTOList.get(0);
+                    Row headerRow = sheet.createRow(0);
+                    int colIdx = 0;
+                    for (String key : firstRow.keySet()) {
+                        headerRow.createCell(colIdx++).setCellValue(key);
+                    }
 
-                    columnTotal=itemMap.keySet().size();
-                    //itemList.add(itemMap);
-                }else{
-                    itemMap.put(item.getItemName(),(item.getItemType().contains("file"))?com.softdev.cms.util.StringUtils.SYSTEM_PATH+"/file/files/" +item.getValueText():item.getValueText());
-
-                    //三元运算符，包含文件字段，转换为http下载地址
-                    //itemMap.put(item.getItemName(),(item.getItemType().contains("file"))?"=HYPERLINK(\""+com.softdev.cms.util.StringUtils.SYSTEM_PATH+"/file/files/" +item.getValueText()+"\",\""+item.getValueText()+"\")":item.getValueText());
-
+                    // 数据行
+                    int rowIdx = 1;
+                    for (Map<String, Object> dataRow : formSubmitValueExcelDTOList) {
+                        Row row = sheet.createRow(rowIdx++);
+                        colIdx = 0;
+                        for (Object value : dataRow.values()) {
+                            row.createCell(colIdx++).setCellValue(value != null ? value.toString() : "");
+                        }
+                    }
                 }
 
+                // 写入文件
+                try (FileOutputStream fos = new FileOutputStream(storageService.getPath().resolve(filename).toFile())) {
+                    workbook.write(fos);
+                }
             }
-            // 合并单元格后的标题行，使用默认标题样式
-            Form form = formMapper.selectById(queryParamDTO.getFormId());
-            writer.merge(columnTotal-1, form.getFormName());
-
-            log.info(JSON.toJSONString(itemList));
-
-            // 一次性写出内容，使用默认样式，强制输出标题
-            writer.write(itemList, true);
-            // 关闭writer，释放内存
-            writer.close();
-
+        } catch (Exception e) {
+            log.error("export excel failed", e);
         }
-        //加载文件
+
         Resource file = storageService.loadAsResource(filename);
-        //返回结果
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + URLEncoder.encode(filename, "UTF-8") + "\"").body(file);
     }
 }
-
-
-

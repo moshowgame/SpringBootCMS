@@ -1,290 +1,110 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
-<head>
-    <title>${(templateMap.companyName)!!}</title>
-
-    <!-- Meta -->
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no,user-scalable=no">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="keywords" content="${(templateMap.companyName)!!}">
-    <meta name="description" content="${(templateMap.companyName)!!}">
-    <meta name="author" content="zhengkai.blog.csdn.net">
-
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="${request.contextPath}/static/frontend/img/favicon.png" type="image/x-icon">
-
-    <!-- Styles -->
-    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/font-awesome/css/fontawesome-all.min.css">
-    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.css">
-    <link href="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.css" rel="stylesheet" type="text/css" />
-    <link href="${request.contextPath}/static/frontend/vendors/aos/aos.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/theme.css">
-    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/styles.css">
-
-</head>
+<html lang="zh-CN">
+<#import "common-import.html" as ft>
+<@ft.frontendHead />
 <body>
-<header class="main-header">
+<@ft.frontendHeader />
+
+<!-- Hero Banner -->
+<section class="hero-banner">
     <div class="container">
-        <div class="logo">
-            <a href="${request.contextPath}/page/index">
-                <h2><span>${(templateMap.companyName)!!}</span></h2>
-            </a>
-        </div>
-        <!-- Navbar -->
-        <nav class="mainNav">
-            <!-- Menu Toggle btn-->
-            <div class="menu-toggle">
-                <h3>Menu</h3>
-                <button type="button" id="menu-btn">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="mb-3">${(templateMap.bannerTitle)!!}</h1>
+                <p class="lead mb-4">${(templateMap.bannerDescription)!!}</p>
+                <a href="${(templateMap.bannerUrl)!!}" class="btn btn-light btn-lg px-4">${(templateMap.bannerButton)!!}</a>
             </div>
-            <!-- Responsive Menu Structure class="active"-->
-            <!--Note: declare the Menu style in the data-menu-style="horizontal" (options: horizontal, vertical, accordion) -->
-            <ul id="respMenu" class="ace-responsive-menu" data-menu-style="horizontal">
-                <#if channelList??>
-                <#list channelList as item>
-                <li>
-                    <a href="${request.contextPath}/page/channel/${item.channelId}" >
-                        <span class="title">${item.channelName}</span>
-                    </a>
-                </li>
-                </#list>
-                </#if>
-                <li>
-                    <a href="${request.contextPath}/page/activity/search" >
-                        <span class="title">活动签到</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${request.contextPath}/page/form/search" >
-                        <span class="title">表单提交</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="${request.contextPath}/page/search" >
-                        <span class="title">搜索</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        </div>
     </div>
-</header>
-<!-- End Navbar -->
-<section class="wt-section hero-large position-relative overflow-hidden mt-md-2">
-    <div class="hero-img bg-overlay" data-overlay="0" style="background-image: url(${request.contextPath}/static/frontend${(templateMap.bannerImage)!!});" data-aos="fade-right" data-aos-easing="linear" data-aos-delay="50"></div>
+</section>
+
+<!-- Services -->
+<section class="section-padding">
     <div class="container">
-        <div class="row align-items-center my-5">
-            <div class="col-md-6 py-5" data-aos="fade-left" data-aos-easing="linear" data-aos-delay="100">
-                <!-- heading -->
-                <h1 class="text-uppercase mb-3 display-4 font-weight-bolder">
-                    ${(templateMap.bannerTitle)!!}
-                </h1>
-                <p class="mb-4 h5">${(templateMap.bannerDescription)!!}</p>
-                <div class=" mb-0">
-                    <a href="${(templateMap.bannerUrl)!!}" class="btn btn-pill btn-primary mr-3 mb-md-0 mb-3">
-                        ${(templateMap.bannerButton)!!}
-                    </a>
+        <div class="text-center mb-5">
+            <h2>${(templateMap.serviceTitle)!!}</h2>
+            <p class="lead text-muted">${(templateMap.serviceDescription)!!}</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="${request.contextPath}/static/frontend${(templateMap.service1icon)!!}" width="64" alt="">
+                    <h5 class="mt-3">${(templateMap.service1title)!!}</h5>
+                    <p class="text-muted">${(templateMap.service1description)!!}</p>
+                    <a href="${(templateMap.service1url)!!}" class="btn btn-outline-primary">${(templateMap.readMore)!!}</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="${request.contextPath}/static/frontend${(templateMap.service2icon)!!}" width="64" alt="">
+                    <h5 class="mt-3">${(templateMap.service2title)!!}</h5>
+                    <p class="text-muted">${(templateMap.service2description)!!}</p>
+                    <a href="${(templateMap.service2url)!!}" class="btn btn-outline-primary">${(templateMap.readMore)!!}</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="${request.contextPath}/static/frontend${(templateMap.service3icon)!!}" width="64" alt="">
+                    <h5 class="mt-3">${(templateMap.service3title)!!}</h5>
+                    <p class="text-muted">${(templateMap.service3description)!!}</p>
+                    <a href="${(templateMap.service3url)!!}" class="btn btn-outline-primary">${(templateMap.readMore)!!}</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
-<!-- End Header -->
 
-<main role="main">
-    <section class="wt-section">
-        <div class="container">
-            <div class="row justify-content-md-center text-center pb-lg-4 mb-lg-5 mb-4">
-                <div class="col-md-8 text-center w-md-50 mx-auto mb-0 ">
-                    <h2 class="mb-md-2">${(templateMap.serviceTitle)!!}</h2>
-                    <p class="lead text-muted">${(templateMap.serviceDescription)!!}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="bg-white p-4 mb-4 text-center border rounded-md py-5" data-aos="fade-up" data-aos-easing="linear" data-aos-delay="50">
-                        <div class="mb-4"><img src="${request.contextPath}/static/frontend${(templateMap.service1icon)!!}" width="80px" alt=""/></div>
-                        <h5 class="mb-2">${(templateMap.service1title)!!}</h5>
-                        <p class="text-muted">${(templateMap.service1description)!!}</p>
-                        <a href="${(templateMap.service1url)!!}" class="btn btn-pill btn-primary mt-4">${(templateMap.readMore)!!}</a>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="bg-white p-4 mb-4 text-center border rounded-md py-5" data-aos="fade-up" data-aos-easing="linear" data-aos-delay="150">
-                        <div class="mb-4"><img src="${request.contextPath}/static/frontend${(templateMap.service2icon)!!}" width="80px" alt=""/></div>
-                        <h5 class="mb-2">${(templateMap.service2title)!!}</h5>
-                        <p class="text-muted">${(templateMap.service2description)!!}</p>
-                        <a href="${(templateMap.service2url)!!}" class="btn btn-pill btn-primary mt-4">${(templateMap.readMore)!!}</a>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="bg-white p-4 mb-4 text-center border rounded-md py-5" data-aos="fade-up" data-aos-easing="linear" data-aos-delay="200">
-                        <div class="mb-4"><img src="${request.contextPath}/static/frontend${(templateMap.service3icon)!!}" width="80px" alt=""/></div>
-                        <h5 class="mb-2">${(templateMap.service3title)!!}</h5>
-                        <p class="text-muted">${(templateMap.service3description)!!}</p>
-                        <a href="${(templateMap.service3url)!!}" class="btn btn-pill btn-primary mt-4">${(templateMap.readMore)!!}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="wt-section bg-light">
-        <div class="container">
-            <div class="row justify-content-md-center text-center">
-                <div class="col-md-8" data-aos="fade-up" data-aos-easing="linear" data-aos-delay="50">
-                    <h1 class="mb-md-4">${(templateMap.solutionTitle)!!}</h1>
-                    <p class="lead text-muted">${(templateMap.solutionDescription)!!}</p>
-
-                    <div class="mt-md-5">
-                        <a href="${(templateMap.solutionUrl)!!}" class="btn btn-primary btn-pill">${(templateMap.readMore)!!}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <div class="card bg-primary border-0 rounded-0 p-5">
-        <div class="container">
-            <div class="row justify-content-between align-items-center text-center text-md-left" data-aos="fade-in" data-aos-easing="linear" data-aos-delay="50">
-                <div class="col-md-8">
-                    <h5 class="mb-1">${(templateMap.quoteTitle)!!}</h5>
-                    <p class="mb-0">${(templateMap.quoteDescription)!!}</p>
-                </div>
-                <div class="col-md-4 text-lg-right mt-md-0 mt-3">
-                    <a href="${(templateMap.quoteUrl)!!}" class="btn btn btn-outline-light btn-pill">${(templateMap.readMore)!!}</a>
-                </div>
-            </div>
-        </div>
+<!-- Solution -->
+<section class="section-padding section-bg">
+    <div class="container text-center">
+        <h1 class="mb-3">${(templateMap.solutionTitle)!!}</h1>
+        <p class="lead text-muted mb-4">${(templateMap.solutionDescription)!!}</p>
+        <a href="${(templateMap.solutionUrl)!!}" class="btn btn-primary btn-lg">${(templateMap.readMore)!!}</a>
     </div>
-    <section class="wt-section">
-        <div class="container">
-            <div class="row justify-content-md-center align-items-center text-center mb-lg-5 mb-4 pb-lg-5" data-aos="fade-left" data-aos-easing="linear" data-aos-delay="50">
-                <div class="col-md-6 px-md-5">
-                    <i class="fab fa-connectdevelop display-4 text-primary mb-4"></i>
-                    <h2 class="mb-md-4 mt-3">${(templateMap.consultingTitle)!!}</h2>
-                    <p class="text-muted">${(templateMap.consultingDescription)!!}</p>
-                    <div class="mb-md-5 mb-4">
-                        <a href="${(templateMap.consultingUrl)!!}" class="btn btn-primary btn-pill">${(templateMap.readMore)!!}</a>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <img class="rounded mw-100" src="${request.contextPath}/static/frontend/img/intro/team.jpg" alt="">
-                </div>
-            </div>
+</section>
 
-        </div>
-    </section>
-
-    <!--<div class="wt-section pb-0">
-        <div class="container">
-            <div class="row justify-content-between align-items-center" data-aos="fade-right" data-aos-easing="linear" data-aos-delay="50">
-                <div class="col-md-5">
-                    <h2 class="mb-4">Industry leader in consulting services</h2>
-                    <p class="text-muted">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius eligendi fugiat!</p>
-                </div>
-                <div class="col-md-6">
-                    <img src="${request.contextPath}/static/frontend/img/intro/img-woman-1.jpg" class="w-100" alt="">
-                </div>
-            </div>
-        </div>
-    </div>-->
-
-
-    <!--<section class="wt-section bg-light">
-        <div class="container">
-            <header class="text-center w-md-50 mx-auto mb-5">
-                <h2 class="h1 mb-0">Our Clients</h2>
-            </header>
-
-            <div class="js-clients wt-clients mb-4" data-aos="fade-up" data-aos-easing="linear" data-aos-delay="50">
-                <div>
-                    <img class="wt-clients__image" src="${request.contextPath}/static/frontend/img/clients/img1.png" alt="Image Description">
-                </div>
-                <div>
-                    <img class="wt-clients__image" src="${request.contextPath}/static/frontend/img/clients/img4.png" alt="Image Description">
-                </div>
-                <div>
-                    <img class="wt-clients__image" src="${request.contextPath}/static/frontend/img/clients/img2.png" alt="Image Description">
-                </div>
-                <div>
-                    <img class="wt-clients__image" src="${request.contextPath}/static/frontend/img/clients/img3.png" alt="Image Description">
-                </div>
-                <div>
-                    <img class="wt-clients__image" src="${request.contextPath}/static/frontend/img/clients/img7.png" alt="Image Description">
-                </div>
-                <div>
-                    <img class="wt-clients__image" src="${request.contextPath}/static/frontend/img/clients/img5.png" alt="Image Description">
-                </div>
-                <div>
-                    <img class="wt-clients__image" src="${request.contextPath}/static/frontend/img/clients/img6.png" alt="Image Description">
-                </div>
-                <div>
-                    <img class="wt-clients__image" src="${request.contextPath}/static/frontend/img/clients/img8.png" alt="Image Description">
-                </div>
-            </div>
-        </div>
-    </section>-->
-</main>
-
-<!-- Footer -->
-<footer class="wt-section bg-dark main-footer">
+<!-- CTA -->
+<section class="cta-banner">
     <div class="container">
-        <div class="row">
-            <div class=" col-sm-4 col-md col-sm-4 col-12 col mb-4">
-                <h5 class="mb-4">联系我们</h5>
-
-                <p><i class="fa fa-location-arrow mr-2"></i> ${(templateMap.location)!!} </p>
-                <p><i class="fa fa-phone mr-2"></i>  ${(templateMap.phone)!!}  </p>
-                <p><i class="fa fa fa-envelope mr-2"></i> ${(templateMap.email)!!}  </p>
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h5 class="mb-1">${(templateMap.quoteTitle)!!}</h5>
+                <p class="mb-0">${(templateMap.quoteDescription)!!}</p>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 pt-4">
-                <p class="text-center copyrights"> © ${(templateMap.companyName)!!} All Rights Reserved</p>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="${(templateMap.quoteUrl)!!}" class="btn btn-outline-light">${(templateMap.readMore)!!}</a>
             </div>
         </div>
     </div>
-</footer>
-<!-- End Footer -->
-<!-- JS Script Files -->
-<!-- Global Vendor -->
-<script src="${request.contextPath}/static/frontend/vendors/jquery.min.js"></script>
-<script src="${request.contextPath}/static/frontend/vendors/jquery.migrate.min.js"></script>
-<script src="${request.contextPath}/static/frontend/vendors/popper.min.js"></script>
-<script src="${request.contextPath}/static/frontend/vendors/bootstrap/js/bootstrap.min.js"></script>
-<script src="${request.contextPath}/static/frontend/vendors/aos/aos.js"></script>
+</section>
 
-<!-- Components Vendor  -->
-<script src="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.min.js"></script>
-<script src="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.js"></script>
+<!-- Consulting -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <h2 class="mb-3">${(templateMap.consultingTitle)!!}</h2>
+                <p class="text-muted">${(templateMap.consultingDescription)!!}</p>
+                <a href="${(templateMap.consultingUrl)!!}" class="btn btn-primary">${(templateMap.readMore)!!}</a>
+            </div>
+            <div class="col-md-6 mt-4 mt-md-0">
+                <img src="${request.contextPath}/static/frontend/img/intro/team.jpg" class="img-fluid rounded" alt="">
+            </div>
+        </div>
+    </div>
+</section>
 
-<!--Plugin Initialize-->
-<script src="${request.contextPath}/static/frontend/js/global.js"></script>
-<script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
-
+<@ft.frontendFooter />
+<@ft.frontendScript />
 <script>
-    function searchAction() {
-        const searchUrl = "searchParam=" + $("#searchParam").val();
-        console.log(searchUrl);
-    }
-    function renderArticleLink(){
-        //$('a') 获取了所有的a标签，然后循环替换为系统内文章地址
-        $('a').each(function(){
-            const href = $(this).attr('href');
-            if(href.startsWith("#")){
-                $(this).attr('href',href.replaceAll('#','${request.contextPath}/page/article/'));
-                //console.log(href.replaceAll('#','${request.contextPath}/page/article/'));
-            }
-        });
-    }
-    renderArticleLink();
+$(function() {
+    $('a').each(function() {
+        var href = $(this).attr('href');
+        if (href && href.startsWith('#')) {
+            $(this).attr('href', href.replaceAll('#', '${request.contextPath}/page/article/'));
+        }
+    });
+});
 </script>
-<!-- END JAVASCRIPTS -->
 </body>
 </html>

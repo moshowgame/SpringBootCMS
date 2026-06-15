@@ -1,125 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <#import "common/common-import.html" as netCommon>
 <@netCommon.commonImport />
-<body>
-<div class="layui-form layuimini-form">
-    <input type="hidden" name="menuId" value="${(menu.menuId)!!}" class="layui-input">
+<body class="p-3">
 
-    <div class="layui-form-item">
-        <label class="layui-form-label required">名字</label>
-        <div class="layui-input-block">
-            <input type="text" name="title" lay-verify="required" lay-reqtext="名字不能为空" placeholder="请输入名字" value="${(menu.title)!!}" class="layui-input">
-        </div>
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-menu-button-wide me-2"></i><#if menu??>编辑菜单<#else>新增菜单</#if></h6>
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">链接</label>
-        <div class="layui-input-block">
-            <input type="text" name="href" lay-verify="required" lay-reqtext="地址不能为空" placeholder="请输入地址" value="${(menu.href)!'/cms/xxx/list'}" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">图标</label>
-        <div class="layui-input-block">
-            <input type="text" name="icon" lay-verify="required" lay-reqtext="图标不能为空" placeholder="请输入图标" value="${(menu.icon)!'fa fa-tachometer'}" class="layui-input">
-            <tip>图标请参考 <a href="https://www.layui.com/doc/element/icon.html">https://www.layui.com/doc/element/icon.html</a> </tip>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">目标</label>
-        <div class="layui-input-block">
-            <input type="text" name="target" lay-verify="required" lay-reqtext="目标不能为空" placeholder="请输入目标" value="${(menu.target)!'_self'}" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">父菜单id</label>
-        <div class="layui-input-block">
-                <select id="parentMenuId" name="parentMenuId" lay-filter="parentMenuId" lay-verify="required"  class="layui-input">
-                    <option value="0">主菜单</option>
-                </select>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">角色</label>
-        <div class="layui-input-block">
-            <input type="checkbox" id="role1" name="roleId" value="1" title="普通用户"   <#if (menu.roleId)??> ${(menu.roleId?contains('1'))?string('checked','')?html} <#else>checked </#if> >
-            <input type="checkbox" id="role9" name="roleId" value="9" title="管理员" <#if (menu.roleId)??> ${(menu.roleId?contains('9'))?string('checked','')?html} <#else>checked </#if> >
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
-        </div>
+    <div class="card-body">
+        <form id="menuForm" class="cms-form">
+            <input type="hidden" name="menuId" value="${(menu.menuId)!!}">
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">菜单名称 <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="menuName" value="${(menu.menuName)!!}" placeholder="请输入菜单名称" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">菜单URL</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="url" value="${(menu.url)!!}" placeholder="请输入菜单URL">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">图标</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="icon" value="${(menu.icon)!!}" placeholder="Bootstrap Icons类名，如 bi-house">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">父菜单</label>
+                <div class="col-sm-10">
+                    <select class="form-select" name="parentId" id="parentId">
+                        <option value="0">顶级菜单</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">排序</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="sort" value="${(menu.sort)!'0'}" placeholder="排序值">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">角色</label>
+                <div class="col-sm-10" id="roleCheckboxes">
+                    <#if roleList??>
+                        <#list roleList as role>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="roleIds" id="role_${role.roleId}" value="${role.roleId}"
+                                <#if menu?? && menu.roleIds??><#list menu.roleIds?split(',') as rid><#if rid == role.roleId?string>checked</#if></#list></#if>>
+                            <label class="form-check-label" for="role_${role.roleId}">${role.roleName!''}</label>
+                        </div>
+                        </#list>
+                    </#if>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-cms-primary"><i class="bi bi-check-lg me-1"></i>确认保存</button>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">返回</a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
-</div>
+
+<@netCommon.commonScript />
 <script>
-    layui.use(['form'], function () {
-        var form = layui.form,
-            layer = layui.layer,
-            $ = layui.$;
-        <@netCommon.jwtHandle />
-        //监听提交
-        form.on('submit(saveBtn)', function (data) {
-            var roleIds = "";
-            $("input[name='roleId']:checked").each(function(i){
-                //把所有被选中的复选框的值存入数组 by zhengkai.blog.csdn.net
-                roleIds = roleIds+$(this).val()+",";
+$(function() {
+    // 加载父菜单
+    $.post('${request.contextPath}/menu/list', {page: 1, limit: 99}, function(res) {
+        if (res.code === 200 && res.data) {
+            var html = '<option value="0">顶级菜单</option>';
+            res.data.forEach(function(m) {
+                var selected = m.menuId == '${(menu.parentId)!"0"}' ? ' selected' : '';
+                html += '<option value="' + m.menuId + '"' + selected + '>' + m.menuName + '</option>';
             });
-            var submitData = data.field;
-            submitData['roleId'] = roleIds;
-            console.log(submitData);
-            $.ajax({
-                type: 'POST',
-                url: "${request.contextPath}/menu/save",
-                data:JSON.stringify(submitData),
-                dataType: "json",
-                contentType: "application/json",
-                success: function (responseData) {
-                    if (responseData.code === 200) {
-                        layer.msg(responseData.msg, function () {
-                            // 关闭弹出层
-                            //layer.close(index);
-                            var iframeIndex = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(iframeIndex);
-                            parent.searchBtn.click();
-                        });
-                    } else {
-                        layer.msg(responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
-                }
-            });
-            return false;
-        });
-        function initMenu(){
-            $.ajax({
-                type: 'POST',
-                url: "${request.contextPath}/menu/list",
-                data:{"searchParams":"{'parentMenuId':'0'}","page":"1","limit":"99"},
-                success: function (responseData) {
-                    if (responseData.code === 200 || responseData.code === 0) {
-                        var length = responseData.data.length;
-                        console.log("parentMenuId.length:"+length);
-                        $("#parentMenuId").empty();
-                        $("#parentMenuId").append('<option value="0">主菜单</option>');
-                        for(var i = 0; i < length; i++) {
-                            //添加option元素
-                            $("#parentMenuId").append("<option value='" + responseData.data[i].menuId + "'>" + responseData.data[i].title + "</option>");
-                        }
-                        $("#parentMenuId").val("${(menu.parentMenuId)!'0'}");
-                        form.render('select');
-                    } else {
-                        layer.msg("加载主菜单列表失败:"+responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
-                }
-            });
+            $('#parentId').html(html);
         }
-        initMenu();
     });
+
+    $('#menuForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = {};
+        $(this).serializeArray().forEach(function(item) {
+            if (item.name === 'roleIds') {
+                if (!formData.roleIds) formData.roleIds = '';
+                formData.roleIds += (formData.roleIds ? ',' : '') + item.value;
+            } else {
+                formData[item.name] = item.value;
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/menu/save',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '保存成功', 'success');
+                    setTimeout(function() { history.back(); }, 800);
+                } else {
+                    CmsUtil.showToast(res.msg || '保存失败', 'danger');
+                }
+            }
+        });
+    });
+});
 </script>
 </body>
 </html>

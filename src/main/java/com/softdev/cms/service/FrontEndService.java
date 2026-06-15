@@ -1,13 +1,11 @@
 package com.softdev.cms.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.softdev.cms.entity.Article;
 import com.softdev.cms.entity.Channel;
 import com.softdev.cms.entity.Template;
 import com.softdev.cms.mapper.ArticleMapper;
 import com.softdev.cms.mapper.ChannelMapper;
 import com.softdev.cms.mapper.TemplateMapper;
-import com.softdev.cms.util.EhCacheUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,6 +17,7 @@ import java.util.Map;
 
 @Service
 public class FrontEndService {
+
     @Autowired
     TemplateMapper templateMapper;
 
@@ -28,49 +27,46 @@ public class FrontEndService {
     @Autowired
     ChannelMapper channelMapper;
 
-    /**
-     * 获取模板map（缓存）
-     * @param pageName
-     * @return
-     */
-    @Cacheable(value = EhCacheUtil.CACHE_NAME_PAGE, key = EhCacheUtil.CACHE_KEY_PAGE)
-    public Map getTemplateMap(String pageName){
-        //获取基础信息
-        List<Template> baseList = templateMapper.selectList(new QueryWrapper<Template>().eq("page","base"));
-        //获取当前页面信息
-        List<Template> templateList = templateMapper.selectList(new QueryWrapper<Template>().eq("page",pageName));
-        Map<String,Object> templateMap = new LinkedHashMap<>(baseList.size()+templateList.size()+1);
-        //封装成templateMap
-        baseList.stream().forEach(m->{templateMap.put(m.getTemplateName(),m.getTemplateValue());});
-        templateList.stream().forEach(m->{templateMap.put(m.getTemplateName(),m.getTemplateValue());});
+    @Cacheable(value = "cache-page", key = "#pageName")
+    public Map<String, Object> getTemplateMap(String pageName) {
+        List<Template> baseList = templateMapper.selectByPage("base");
+        List<Template> templateList = templateMapper.selectByPage(pageName);
+        Map<String, Object> templateMap = new LinkedHashMap<>(baseList.size() + templateList.size() + 1);
+        baseList.forEach(m -> templateMap.put(m.getTemplateName(), m.getTemplateValue()));
+        templateList.forEach(m -> templateMap.put(m.getTemplateName(), m.getTemplateValue()));
         return templateMap;
     }
-    @CacheEvict(value = EhCacheUtil.CACHE_NAME_PAGE, key = EhCacheUtil.CACHE_KEY_PAGE)
-    public void refreshTemplateMap(String pageName){
 
+    @CacheEvict(value = "cache-page", key = "#pageName")
+    public void refreshTemplateMap(String pageName) {
+        // Cache eviction only
     }
-    /**
-     * 获取文章（缓存）
-     * @return
-     */
-    @Cacheable(value = EhCacheUtil.CACHE_NAME_ARTICLE, key = EhCacheUtil.CACHE_KEY_ARTICLE)
-    public Article getArticle(String articleId){
-        return articleMapper.selectById(articleId);
+
+    @Cacheable(value = "cache-article", key = "#articleId")
+    public Article getArticle(String articleId) {
+        try {
+            Integer id = Integer.valueOf(articleId);
+            return articleMapper.selectById(id);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
-    /**
-     * 获取栏目（缓存）
-     * @return
-     */
-    @Cacheable(value = EhCacheUtil.CACHE_NAME_CHANNEL, key = EhCacheUtil.CACHE_KEY_CHANNEL)
-    public List<Channel> getChannelList(Integer status){
-        return channelMapper.selectList(new QueryWrapper<Channel>().eq("status",status).orderByAsc("seq"));
+
+    @Cacheable(value = "cache-channel", key = "#status")
+    public List<Channel> getChannelList(Integer status) {
+        List<Channel> all = channelMapper.selectAll();
+        return all.stream()
+                .filter(c -> status.equals(c.getStatus()))
+                .sorted((a, b) -> {
+                    if (a.getSeq() == null) return 1;
+                    if (b.getSeq() == null) return -1;
+                    return a.getSeq().compareTo(b.getSeq());
+                })
+                .toList();
     }
-    /**
-     * 获取栏目（缓存）
-     * @return
-     */
-    @Cacheable(value = EhCacheUtil.CACHE_NAME_CHANNEL, key = EhCacheUtil.CACHE_KEY_CHANNEL_ID)
-    public Channel getChannelById(Integer channelId){
+
+    @Cacheable(value = "cache-channel", key = "#channelId")
+    public Channel getChannelById(Integer channelId) {
         return channelMapper.selectById(channelId);
     }
 }

@@ -1,107 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <#import "common/common-import.html" as netCommon>
 <@netCommon.commonImport />
-<body>
-<div class="layui-form layuimini-form">
-    <input type="hidden" name="channelId" value="${(channel.channelId)!!}" class="layui-input">
+<body class="p-3">
 
-    <div class="layui-form-item">
-        <label class="layui-form-label required">频道名称</label>
-        <div class="layui-input-block">
-            <input type="text" name="channelName" lay-verify="required" lay-reqtext="频道名称不能为空" placeholder="请输入频道名称" value="${(channel.channelName)!!}" class="layui-input">
-        </div>
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-collection me-2"></i><#if channel??>编辑频道<#else>新增频道</#if></h6>
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">父类频道</label>
-        <div class="layui-input-block">
-            <select id="parentChannelId" name="parentChannelId" lay-filter="parentChannelId" lay-verify="required"  class="layui-input">
-            </select>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">频道图标</label>
-        <div class="layui-input-block">
-            <input type="text" name="icon" lay-verify="required" lay-reqtext="频道图标不能为空" placeholder="请输入频道图标" value="${(channel.icon)!!}" class="layui-input">
-            <tip>图标请参考 <a href="https://www.layui.com/doc/element/icon.html">https://www.layui.com/doc/element/icon.html</a> </tip>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">排序</label>
-        <div class="layui-input-block">
-            <input type="text" name="seq" lay-verify="required" lay-reqtext="排序不能为空" placeholder="请输入排序" value="${(channel.seq)!!}" class="layui-input">
-            <tip>默认0，越高越靠前</tip>
-        </div>
-    </div>
+    <div class="card-body">
+        <form id="channelForm" class="cms-form">
+            <input type="hidden" name="channelId" value="${(channel.channelId)!!}">
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
-        </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">频道名称 <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="channelName" value="${(channel.channelName)!!}" placeholder="请输入频道名称" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">父频道</label>
+                <div class="col-sm-10">
+                    <select class="form-select" name="parentChannelId" id="parentChannelId">
+                        <option value="0">顶级频道</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">排序</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="sort" value="${(channel.sort)!'0'}" placeholder="排序值">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-cms-primary"><i class="bi bi-check-lg me-1"></i>确认保存</button>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">返回</a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
-</div>
-<script src="${request.contextPath}/static/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+
+<@netCommon.commonScript />
 <script>
-    layui.use(['form'], function () {
-        var form = layui.form,
-            layer = layui.layer,
-            $ = layui.$;
-    <@netCommon.jwtHandle />
-        //监听提交
-        form.on('submit(saveBtn)', function (data) {
-            $.ajax({
-                type: 'POST',
-                url: "${request.contextPath}/channel/save",
-                data:JSON.stringify(data.field),
-                dataType: "json",
-                contentType: "application/json",
-                success: function (responseData) {
-                    if (responseData.code === 200) {
-                        layer.msg(responseData.msg, function () {
-                            // 关闭弹出层
-                            //layer.close(index);
-                            var iframeIndex = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(iframeIndex);
-                            parent.searchBtn.click();
-                        });
-                    } else {
-                        layer.msg(responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
-                }
+$(function() {
+    // 加载父频道
+    $.post('${request.contextPath}/channel/list', {searchParams: '{"parentChannelId":"0"}', page: 1, limit: 99}, function(res) {
+        if (res.code === 200 && res.data) {
+            var html = '<option value="0">顶级频道</option>';
+            res.data.forEach(function(ch) {
+                var selected = ch.channelId == '${(channel.parentChannelId)!"0"}' ? ' selected' : '';
+                html += '<option value="' + ch.channelId + '"' + selected + '>' + ch.channelName + '</option>';
             });
-            return false;
-        });
-
-        function initChannel(){
-            $.ajax({
-                type: 'POST',
-                url: "${request.contextPath}/channel/list",
-                data:{"searchParams":"{'parentChannelId':'0'}","page":"1","limit":"99"},
-                success: function (responseData) {
-                    if (responseData.code === 200 || responseData.code === 0) {
-                        var length = responseData.data.length;
-                        console.log("parentChannelId.length:"+length);
-                        $("#parentChannelId").empty();
-                        for(var i = 0; i < length; i++) {
-                            //添加option元素
-                            $("#parentChannelId").append("<option value='" + responseData.data[i].channelId + "'>" + responseData.data[i].channelName + "</option>");
-                        }
-                        $("#parentChannelId").val("${(channel.parentChannelId)!'0'}");
-                        form.render('select');
-                    } else {
-                        layer.msg("加载主菜单列表失败:"+responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
-                }
-            });
+            $('#parentChannelId').html(html);
         }
-        initChannel();
-
     });
+
+    $('#channelForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = {};
+        $(this).serializeArray().forEach(function(item) {
+            formData[item.name] = item.value;
+        });
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/channel/save',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '保存成功', 'success');
+                    setTimeout(function() { history.back(); }, 800);
+                } else {
+                    CmsUtil.showToast(res.msg || '保存失败', 'danger');
+                }
+            }
+        });
+    });
+});
 </script>
 </body>
 </html>

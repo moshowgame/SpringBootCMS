@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.SiteConfigMapper">
+
+    <select id="selectById" resultType="SiteConfig">
+        SELECT * FROM site_config WHERE config_id = #{configId} AND deleted = 0
+    </select>
+
+    <select id="selectByKey" resultType="SiteConfig">
+        SELECT * FROM site_config WHERE config_key = #{configKey} AND deleted = 0
+    </select>
+
+    <select id="selectByGroup" resultType="SiteConfig">
+        SELECT * FROM site_config WHERE config_group = #{configGroup} AND deleted = 0 ORDER BY sort
+    </select>
+
+    <select id="selectAll" resultType="SiteConfig">
+        SELECT * FROM site_config WHERE deleted = 0 ORDER BY config_group, sort
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="configId">
+        INSERT INTO site_config (config_key, config_value, config_group, description, sort)
+        VALUES (#{configKey}, #{configValue}, #{configGroup}, #{description}, #{sort})
+    </insert>
+
+    <update id="updateById">
+        UPDATE site_config
+        <set>
+            <if test="configValue != null">config_value = #{configValue},</if>
+            <if test="configGroup != null">config_group = #{configGroup},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="sort != null">sort = #{sort},</if>
+        </set>
+        WHERE config_id = #{configId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE site_config SET deleted = 1 WHERE config_id = #{configId}
+    </update>
+
+</mapper>

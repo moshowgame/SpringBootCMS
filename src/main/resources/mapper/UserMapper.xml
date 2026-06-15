@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.UserMapper">
+
+    <select id="selectByUserName" resultType="User">
+        SELECT * FROM user WHERE user_name = #{userName} AND deleted = 0
+    </select>
+
+    <select id="selectById" resultType="User">
+        SELECT * FROM user WHERE user_id = #{userId} AND deleted = 0
+    </select>
+
+    <select id="pageAll" resultType="User">
+        SELECT * FROM user WHERE deleted = 0
+        <if test="userName != null and userName != ''"> AND user_name LIKE CONCAT('%', #{userName}, '%') </if>
+        <if test="showName != null and showName != ''"> AND show_name LIKE CONCAT('%', #{showName}, '%') </if>
+        ORDER BY user_id DESC
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM user WHERE deleted = 0
+        <if test="userName != null and userName != ''"> AND user_name LIKE CONCAT('%', #{userName}, '%') </if>
+        <if test="showName != null and showName != ''"> AND show_name LIKE CONCAT('%', #{showName}, '%') </if>
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(1) FROM user WHERE deleted = 0
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user (user_name, password, show_name, phone, email, company_name, company_address, role_id, status)
+        VALUES (#{userName}, #{password}, #{showName}, #{phone}, #{email}, #{companyName}, #{companyAddress}, #{roleId}, #{status})
+    </insert>
+
+    <update id="updateById">
+        UPDATE user
+        <set>
+            <if test="showName != null">show_name = #{showName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="companyName != null">company_name = #{companyName},</if>
+            <if test="companyAddress != null">company_address = #{companyAddress},</if>
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="password != null">password = #{password},</if>
+        </set>
+        WHERE user_id = #{userId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE user SET deleted = 1 WHERE user_id = #{userId}
+    </update>
+
+</mapper>

@@ -1,20 +1,20 @@
 package com.softdev.cms.config;
 
-import javax.servlet.http.HttpServletRequest;
-
-import com.softdev.cms.util.ReturnT;
+import com.softdev.cms.util.Result;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalDefaultExceptionHandler {
-	
-	@ExceptionHandler(Exception.class)
-	@ResponseBody
-	public ReturnT defaultExceptionHandler(HttpServletRequest req,Exception e) {
-		e.printStackTrace();
-		return ReturnT.ERROR(e.getMessage());
-	}
-	
+
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public Result<String> defaultExceptionHandler(HttpServletRequest req, Exception e) {
+        log.error("Unhandled exception on {}", req.getRequestURI(), e);
+        return Result.fail("服务器内部错误: " + e.getMessage());
+    }
 }

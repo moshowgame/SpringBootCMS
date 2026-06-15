@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.AuditLogMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="logId">
+        INSERT INTO audit_log (user_id, user_name, action, module, target_id, target_name, detail, ip, user_agent)
+        VALUES (#{userId}, #{userName}, #{action}, #{module}, #{targetId}, #{targetName}, #{detail}, #{ip}, #{userAgent})
+    </insert>
+
+    <select id="pageAll" resultType="AuditLog">
+        SELECT * FROM audit_log WHERE 1=1
+        <if test="userId != null"> AND user_id = #{userId} </if>
+        <if test="userName != null and userName != ''"> AND user_name LIKE CONCAT('%', #{userName}, '%') </if>
+        <if test="action != null and action != ''"> AND action = #{action} </if>
+        <if test="module != null and module != ''"> AND module = #{module} </if>
+        ORDER BY log_id DESC
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM audit_log WHERE 1=1
+        <if test="userId != null"> AND user_id = #{userId} </if>
+        <if test="userName != null and userName != ''"> AND user_name LIKE CONCAT('%', #{userName}, '%') </if>
+        <if test="action != null and action != ''"> AND action = #{action} </if>
+        <if test="module != null and module != ''"> AND module = #{module} </if>
+    </select>
+
+</mapper>

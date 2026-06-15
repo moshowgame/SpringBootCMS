@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.FormSubmitMapper">
+
+    <select id="selectById" resultType="FormSubmit">
+        SELECT * FROM form_submit WHERE submit_id = #{submitId} AND deleted = 0
+    </select>
+
+    <select id="pageAll" resultType="FormSubmit">
+        SELECT t0.*, t2.form_name FROM form_submit t0
+        LEFT JOIN user t1 ON t1.user_id = t0.user_id AND t1.deleted = 0
+        LEFT JOIN form t2 ON t2.form_id = t0.form_id AND t2.deleted = 0
+        WHERE t0.deleted = 0
+        <if test="formId != null"> AND t0.form_id = #{formId} </if>
+        <if test="userId != null"> AND t0.user_id = #{userId} </if>
+        <if test="status != null"> AND t0.status = #{status} </if>
+        <if test="userName != null and userName != ''"> AND t1.user_name = #{userName} </if>
+        <if test="showName != null and showName != ''"> AND t1.show_name LIKE CONCAT('%', #{showName}, '%') </if>
+        ORDER BY t0.submit_id DESC
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM form_submit t0
+        LEFT JOIN user t1 ON t1.user_id = t0.user_id AND t1.deleted = 0
+        LEFT JOIN form t2 ON t2.form_id = t0.form_id AND t2.deleted = 0
+        WHERE t0.deleted = 0
+        <if test="formId != null"> AND t0.form_id = #{formId} </if>
+        <if test="userId != null"> AND t0.user_id = #{userId} </if>
+        <if test="status != null"> AND t0.status = #{status} </if>
+        <if test="userName != null and userName != ''"> AND t1.user_name = #{userName} </if>
+        <if test="showName != null and showName != ''"> AND t1.show_name LIKE CONCAT('%', #{showName}, '%') </if>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="submitId">
+        INSERT INTO form_submit (form_id, user_id, user_name, show_name, phone, company, status)
+        VALUES (#{formId}, #{userId}, #{userName}, #{showName}, #{phone}, #{company}, #{status})
+    </insert>
+
+    <update id="updateById">
+        UPDATE form_submit
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="auditUserId != null">audit_user_id = #{auditUserId},</if>
+            <if test="auditUserName != null">audit_user_name = #{auditUserName},</if>
+            <if test="status != null and status == 2">audit_time = NOW(),</if>
+        </set>
+        WHERE submit_id = #{submitId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE form_submit SET deleted = 1 WHERE submit_id = #{submitId}
+    </update>
+
+</mapper>

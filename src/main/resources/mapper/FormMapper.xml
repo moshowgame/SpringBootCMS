@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.FormMapper">
+
+    <select id="selectById" resultType="Form">
+        SELECT * FROM form WHERE form_id = #{formId} AND deleted = 0
+    </select>
+
+    <select id="pageAll" resultType="Form">
+        SELECT * FROM form WHERE deleted = 0
+        <if test="formId != null"> AND form_id = #{formId} </if>
+        <if test="formName != null and formName != ''"> AND form_name LIKE CONCAT('%', #{formName}, '%') </if>
+        <if test="createUserId != null"> AND create_user_id = #{createUserId} </if>
+        <if test="status != null"> AND status = #{status} </if>
+        ORDER BY form_id DESC
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM form WHERE deleted = 0
+        <if test="formId != null"> AND form_id = #{formId} </if>
+        <if test="formName != null and formName != ''"> AND form_name LIKE CONCAT('%', #{formName}, '%') </if>
+        <if test="createUserId != null"> AND create_user_id = #{createUserId} </if>
+        <if test="status != null"> AND status = #{status} </if>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="formId">
+        INSERT INTO form (form_name, form_type, create_user_id, create_user_name, form_desc, status, attachment)
+        VALUES (#{formName}, #{formType}, #{createUserId}, #{createUserName}, #{formDesc}, #{status}, #{attachment})
+    </insert>
+
+    <update id="updateById">
+        UPDATE form
+        <set>
+            <if test="formName != null">form_name = #{formName},</if>
+            <if test="formType != null">form_type = #{formType},</if>
+            <if test="formDesc != null">form_desc = #{formDesc},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="attachment != null">attachment = #{attachment},</if>
+        </set>
+        WHERE form_id = #{formId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE form SET deleted = 1 WHERE form_id = #{formId}
+    </update>
+
+</mapper>

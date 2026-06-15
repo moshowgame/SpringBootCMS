@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.ActivityMapper">
+
+    <select id="selectById" resultType="Activity">
+        SELECT * FROM activity WHERE activity_id = #{activityId} AND deleted = 0
+    </select>
+
+    <select id="pageAll" resultType="Activity">
+        SELECT * FROM activity WHERE deleted = 0
+        <if test="activityId != null"> AND activity_id = #{activityId} </if>
+        <if test="activityName != null and activityName != ''"> AND activity_name LIKE CONCAT('%', #{activityName}, '%') </if>
+        <if test="createUserId != null"> AND create_user_id = #{createUserId} </if>
+        <if test="status != null"> AND status = #{status} </if>
+        ORDER BY activity_id DESC
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM activity WHERE deleted = 0
+        <if test="activityId != null"> AND activity_id = #{activityId} </if>
+        <if test="activityName != null and activityName != ''"> AND activity_name LIKE CONCAT('%', #{activityName}, '%') </if>
+        <if test="createUserId != null"> AND create_user_id = #{createUserId} </if>
+        <if test="status != null"> AND status = #{status} </if>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="activityId">
+        INSERT INTO activity (activity_name, activity_desc, start_time, end_time, create_user_id, create_user_name, status)
+        VALUES (#{activityName}, #{activityDesc}, #{startTime}, #{endTime}, #{createUserId}, #{createUserName}, #{status})
+    </insert>
+
+    <update id="updateById">
+        UPDATE activity
+        <set>
+            <if test="activityName != null">activity_name = #{activityName},</if>
+            <if test="activityDesc != null">activity_desc = #{activityDesc},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE activity_id = #{activityId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE activity SET deleted = 1 WHERE activity_id = #{activityId}
+    </update>
+
+</mapper>

@@ -1,19 +1,24 @@
 package com.softdev.cms.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
 import com.softdev.cms.entity.Activity;
-import org.apache.ibatis.annotations.Select;
+import com.softdev.cms.entity.dto.QueryParamDTO;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * @description activity
- * @author zhengkai.blog.csdn.net
- * @date 2020-02-26 23:27:13
- */
 @Mapper
-public interface ActivityMapper extends BaseMapper<Activity> {
+public interface ActivityMapper {
 
+    Activity selectById(@Param("activityId") Integer activityId);
 
+    List<Activity> pageAll(QueryParamDTO queryParamDTO);
+
+    int countAll(QueryParamDTO queryParamDTO);
+
+    int insert(Activity activity);
+
+    int updateById(Activity activity);
+
+    int deleteById(@Param("activityId") Integer activityId);
 }

@@ -1,78 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <#import "common/common-import.html" as netCommon>
 <@netCommon.commonImport />
-<body>
-<div class="layui-form layuimini-form">
-    <input type="hidden" name="templateId" value="${(template.templateId)!!}" class="layui-input">
-    <div class="layui-form-item">
-        <label class="layui-form-label required">页面</label>
-        <div class="layui-input-block">
-            <input type="text" name="page" lay-verify="required" lay-reqtext="页面不能为空" placeholder="请输入页面" value="${(template.page)!!}" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">模板名(DIV ID)</label>
-        <div class="layui-input-block">
-            <input type="text" name="templateName" lay-verify="required" lay-reqtext="div id不能为空" placeholder="请输入div id" value="${(template.templateName)!!}" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">值</label>
-        <div class="layui-input-block">
-            <input type="text" name="templateValue" lay-verify="required" lay-reqtext="值不能为空" placeholder="请输入值" value="${(template.templateValue)!!}" class="layui-input">
-            <tip>如果是超链接类型，可以通过 #+文章ID 对内部文章进行引用，例如 #1 。</tip>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">描述</label>
-        <div class="layui-input-block">
-            <input type="text" name="description" lay-reqtext="描述不能为空" placeholder="请输入描述" value="${(template.description)!!}" class="layui-input">
-        </div>
-    </div>
+<body class="p-3">
 
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
-        </div>
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-code-square me-2"></i><#if template??>编辑模板<#else>新增模板</#if></h6>
     </div>
+    <div class="card-body">
+        <form id="templateForm" class="cms-form">
+            <input type="hidden" name="templateId" value="${(template.templateId)!!}">
 
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">模板名称 <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="templateName" value="${(template.templateName)!!}" placeholder="请输入模板名称" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">模板类型</label>
+                <div class="col-sm-10">
+                    <select class="form-select" name="templateType">
+                        <option value="page" <#if (template.templateType)?? && template.templateType == 'page'>selected</#if>>页面模板</option>
+                        <option value="email" <#if (template.templateType)?? && template.templateType == 'email'>selected</#if>>邮件模板</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">模板内容</label>
+                <div class="col-sm-10">
+                    <textarea class="form-control" name="templateContent" rows="15" placeholder="请输入模板内容（HTML/FreeMarker）">${(template.templateContent)!!}</textarea>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-cms-primary"><i class="bi bi-check-lg me-1"></i>确认保存</button>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">返回</a>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
-</div>
+
+<@netCommon.commonScript />
 <script>
-    layui.use(['form'], function () {
-        var form = layui.form,
-            layer = layui.layer,
-            $ = layui.$;
-        <@netCommon.jwtHandle />
-        //监听提交
-        form.on('submit(saveBtn)', function (data) {
-            $.ajax({
-                type: 'POST',
-                url: "${request.contextPath}/template/save",
-                data:JSON.stringify(data.field),
-                dataType: "json",
-                contentType: "application/json",
-                success: function (responseData) {
-                    if (responseData.code === 200) {
-                        layer.msg(responseData.msg, function () {
-                            // 关闭弹出层
-                            //layer.close(index);
-                            var iframeIndex = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(iframeIndex);
-                            parent.searchBtn.click();
-                        });
-                    } else {
-                        layer.msg(responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
-                }
-            });
-            return false;
+$(function() {
+    $('#templateForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = {};
+        $(this).serializeArray().forEach(function(item) {
+            formData[item.name] = item.value;
         });
-
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/template/save',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '保存成功', 'success');
+                    setTimeout(function() { history.back(); }, 800);
+                } else {
+                    CmsUtil.showToast(res.msg || '保存失败', 'danger');
+                }
+            }
+        });
     });
+});
 </script>
 </body>
 </html>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.ActivitySignMapper">
+
+    <select id="selectById" resultType="ActivitySign">
+        SELECT * FROM activity_sign WHERE sign_id = #{signId} AND deleted = 0
+    </select>
+
+    <select id="validSignTotal" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM activity_sign t
+        INNER JOIN user t2 ON t2.user_name = t.user_name AND t2.deleted = 0
+        WHERE t.activity_id = #{activityId} AND t.sign_type = #{signType} AND t.deleted = 0
+    </select>
+
+    <select id="pageAll" resultType="ActivitySign">
+        SELECT t0.* FROM activity_sign t0
+        LEFT JOIN user t1 ON t1.user_id = t0.user_id AND t1.deleted = 0
+        WHERE t0.deleted = 0
+        <if test="showName != null and showName != ''"> AND t0.show_name LIKE CONCAT('%', #{showName}, '%') </if>
+        <if test="userName != null and userName != ''"> AND t0.user_name = #{userName} </if>
+        <if test="activityId != null"> AND t0.activity_id = #{activityId} </if>
+        ORDER BY t0.sign_id DESC
+        LIMIT #{page}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(1) FROM activity_sign t0
+        LEFT JOIN user t1 ON t1.user_id = t0.user_id AND t1.deleted = 0
+        WHERE t0.deleted = 0
+        <if test="showName != null and showName != ''"> AND t0.show_name LIKE CONCAT('%', #{showName}, '%') </if>
+        <if test="userName != null and userName != ''"> AND t0.user_name = #{userName} </if>
+        <if test="activityId != null"> AND t0.activity_id = #{activityId} </if>
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="signId">
+        INSERT INTO activity_sign (activity_id, user_id, sign_time, user_name, show_name, sign_type, leave_reason, phone, company)
+        VALUES (#{activityId}, #{userId}, #{signTime}, #{userName}, #{showName}, #{signType}, #{leaveReason}, #{phone}, #{company})
+    </insert>
+
+    <update id="updateById">
+        UPDATE activity_sign
+        <set>
+            <if test="signType != null">sign_type = #{signType},</if>
+            <if test="leaveReason != null">leave_reason = #{leaveReason},</if>
+        </set>
+        WHERE sign_id = #{signId} AND deleted = 0
+    </update>
+
+    <update id="deleteById">
+        UPDATE activity_sign SET deleted = 1 WHERE sign_id = #{signId}
+    </update>
+
+</mapper>

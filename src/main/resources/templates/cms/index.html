@@ -1,151 +1,201 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="zh-CN">
 <#import "common/common-import.html" as netCommon>
 <@netCommon.indexImport />
+<body>
 
-<body class="layui-layout-body layuimini-all">
-<div class="layui-layout layui-layout-admin">
+<!-- Sidebar -->
+<nav class="cms-sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-gear-wide-connected"></i>
+        <span>SpringBootCMS</span>
+    </div>
+    <div class="nav-section">导航菜单</div>
+    <#if menuList??>
+        <#list menuList as menu>
+            <#if menu.children?? && (menu.children?size > 0)>
+                <div class="nav-section">${menu.menuName!''}</div>
+                <#list menu.children as child>
+                    <a href="javascript:;" class="nav-link" data-url="${request.contextPath}${child.url!''}" data-title="${child.menuName!''}">
+                        <i class="bi ${child.icon!'bi-folder'}"></i>
+                        <span>${child.menuName!''}</span>
+                    </a>
+                </#list>
+            <#else>
+                <a href="javascript:;" class="nav-link" data-url="${request.contextPath}${menu.url!''}" data-title="${menu.menuName!''}">
+                    <i class="bi ${menu.icon!'bi-folder'}"></i>
+                    <span>${menu.menuName!''}</span>
+                </a>
+            </#if>
+        </#list>
+    </#if>
+</nav>
 
-    <div class="layui-header header">
-        <div class="layui-logo layuimini-logo"></div>
-
-        <div class="layuimini-header-content">
-            <a>
-                <div class="layuimini-tool"><i title="展开" class="fa fa-outdent" data-side-fold="1"></i></div>
-            </a>
-
-            <!--电脑端头部菜单-->
-            <ul class="layui-nav layui-layout-left layuimini-header-menu layuimini-menu-header-pc layuimini-pc-show">
-            </ul>
-
-            <!--手机端头部菜单-->
-            <ul class="layui-nav layui-layout-left layuimini-header-menu layuimini-mobile-show">
-                <li class="layui-nav-item">
-                    <a href="javascript:;"><i class="fa fa-list-ul"></i> 选择模块</a>
-                    <dl class="layui-nav-child layuimini-menu-header-mobile">
-                    </dl>
-                </li>
-            </ul>
-
-            <ul class="layui-nav layui-layout-right">
-
-                <li class="layui-nav-item" lay-unselect>
-                    <a href="javascript:;" data-refresh="刷新"><i class="fa fa-refresh"></i></a>
-                </li>
-                <li class="layui-nav-item" lay-unselect>
-                    <a href="javascript:;" data-clear="清理" class="layuimini-clear"><i class="fa fa-trash-o"></i></a>
-                </li>
-                <li class="layui-nav-item mobile layui-hide-xs" lay-unselect>
-                    <a href="javascript:;" data-check-screen="full"><i class="fa fa-arrows-alt"></i></a>
-                </li>
-                <li class="layui-nav-item layuimini-setting">
-                    <a href="javascript:;">${(loginUser.userName)!!}</a>
-                    <dl class="layui-nav-child">
-                        <dd>
-                            <a href="javascript:;" layuimini-content-href="${request.contextPath}/user/info" data-title="基本资料" data-icon="fa fa-gears">基本资料<span class="layui-badge-dot"></span></a>
-                        </dd>
-                        <dd>
-                            <a href="javascript:;" layuimini-content-href="${request.contextPath}/user/password" data-title="修改密码" data-icon="fa fa-gears">修改密码</a>
-                        </dd>
-                        <dd>
-                            <hr>
-                        </dd>
-                        <dd>
-                            <a href="javascript:;" class="login-out">退出登录</a>
-                        </dd>
-                    </dl>
-                </li>
-                <li class="layui-nav-item layuimini-select-bgcolor" lay-unselect>
-                    <a href="javascript:;" data-bgcolor="配色方案"><i class="fa fa-ellipsis-v"></i></a>
-                </li>
-            </ul>
+<!-- Main Content -->
+<div class="cms-main">
+    <!-- Header -->
+    <header class="cms-header">
+        <div class="header-left">
+            <button class="toggle-sidebar" title="折叠菜单">
+                <i class="bi bi-list"></i>
+            </button>
+            <span class="text-muted" id="currentTabTitle">首页</span>
         </div>
-    </div>
-
-    <!--无限极左侧菜单-->
-    <div class="layui-side layui-bg-black layuimini-menu-left">
-    </div>
-
-    <!--初始化加载层-->
-    <div class="layuimini-loader">
-        <div class="layuimini-loader-inner"></div>
-    </div>
-
-    <!--手机端遮罩层-->
-    <div class="layuimini-make"></div>
-
-    <!-- 移动导航 -->
-    <div class="layuimini-site-mobile"><i class="layui-icon"></i></div>
-
-    <div class="layui-body">
-
-        <div class="layuimini-tab layui-tab-rollTool layui-tab" lay-filter="layuiminiTab" lay-allowclose="true">
-            <ul class="layui-tab-title">
-                <li class="layui-this" id="layuiminiHomeTabId" lay-id=""></li>
-            </ul>
-            <div class="layui-tab-control">
-                <li class="layuimini-tab-roll-left layui-icon layui-icon-left"></li>
-                <li class="layuimini-tab-roll-right layui-icon layui-icon-right"></li>
-                <li class="layui-tab-tool layui-icon layui-icon-down">
-                    <ul class="layui-nav close-box">
-                        <li class="layui-nav-item">
-                            <a href="javascript:;"><span class="layui-nav-more"></span></a>
-                            <dl class="layui-nav-child">
-                                <dd><a href="javascript:;" layuimini-tab-close="current">关 闭 当 前</a></dd>
-                                <dd><a href="javascript:;" layuimini-tab-close="other">关 闭 其 他</a></dd>
-                                <dd><a href="javascript:;" layuimini-tab-close="all">关 闭 全 部</a></dd>
-                            </dl>
-                        </li>
-                    </ul>
-                </li>
-            </div>
-            <div class="layui-tab-content">
-                <div id="layuiminiHomeTabIframe" class="layui-tab-item layui-show"></div>
+        <div class="header-right">
+            <button class="btn btn-sm btn-outline-secondary" id="btnRefresh" title="刷新">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle me-1"></i>${(loginUser.userName)!!}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item cms-nav-link" href="javascript:;" data-url="${request.contextPath}/user/info" data-title="基本资料">
+                        <i class="bi bi-gear me-2"></i>基本资料
+                    </a></li>
+                    <li><a class="dropdown-item cms-nav-link" href="javascript:;" data-url="${request.contextPath}/user/password" data-title="修改密码">
+                        <i class="bi bi-key me-2"></i>修改密码
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="${request.contextPath}/admin/logout">
+                        <i class="bi bi-box-arrow-right me-2"></i>退出登录
+                    </a></li>
+                </ul>
             </div>
         </div>
+    </header>
 
+    <!-- Tab Bar -->
+    <div class="bg-white border-bottom px-3 pt-2" id="tabBar" style="display:none;">
+        <ul class="nav nav-tabs border-0" id="cmsTabs" role="tablist">
+        </ul>
+    </div>
+
+    <!-- Content iframe -->
+    <div class="cms-content">
+        <iframe id="mainFrame" src="${request.contextPath}/admin/welcome" width="100%" frameborder="0"
+                style="min-height: calc(100vh - 120px); border: none; border-radius: 8px; background: #fff;"></iframe>
     </div>
 </div>
 
+<@netCommon.commonScript />
 <script>
-    layui.use(['jquery', 'layer', 'miniAdmin'], function () {
-        var $ = layui.jquery,
-            layer = layui.layer,
-            miniAdmin = layui.miniAdmin;
-        var options = {
-            iniUrl: "${request.contextPath}/menu/init?token="+layui.data('token').token,    // 初始化接口
-            clearUrl: "${request.contextPath}/clear", // 缓存清理接口
-            urlHashLocation: true,      // 是否打开hash定位
-            bgColorDefault: false,      // 主题默认配置
-            multiModule: true,          // 是否开启多模块
-            menuChildOpen: false,       // 是否默认展开菜单
-            loadingTime: 0,             // 初始化加载时间
-            pageAnim: true,             // iframe窗口动画
-            maxTabNum: 20,              // 最大的tab打开数量
-        };
-        miniAdmin.render(options);
+$(function() {
+    var $sidebar = $('#sidebar');
+    var $mainFrame = $('#mainFrame');
+    var $tabBar = $('#tabBar');
+    var $tabs = $('#cmsTabs');
+    var $currentTitle = $('#currentTabTitle');
+    var tabs = [];
+    var activeTabId = 'home';
 
-        $('.login-out').on("click", function () {
-            $.ajax({
-                headers: {'Authorization':'Bearer '+layui.data('token').token},
-                type: 'POST',
-                data: {"userId":"${(loginUser.userId)!!}"},
-                url: "${request.contextPath}/logout",
-                success: function (responseData) {
-                    if (responseData.code === 200) {
-                        layer.msg(responseData.msg, function () {
-                            window.location = '${request.contextPath}/login';
-                        });
-                    } else {
-                        layer.msg(responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
+    // 侧边栏折叠
+    $('.toggle-sidebar').on('click', function() {
+        $sidebar.toggleClass('collapsed');
+    });
+
+    // 导航点击
+    $(document).on('click', '.nav-link, .cms-nav-link', function(e) {
+        e.preventDefault();
+        var url = $(this).data('url');
+        var title = $(this).data('title');
+        if (!url) return;
+        openTab(title, url);
+    });
+
+    // 刷新
+    $('#btnRefresh').on('click', function() {
+        $mainFrame.attr('src', $mainFrame.attr('src'));
+    });
+
+    function openTab(title, url) {
+        var tabId = 'tab_' + url.replace(/[^a-zA-Z0-9]/g, '_');
+
+        // 已存在则激活
+        if (tabs.indexOf(tabId) >= 0) {
+            activateTab(tabId);
+            return;
+        }
+
+        tabs.push(tabId);
+        $tabBar.show();
+
+        // 添加tab
+        var tabHtml = '<li class="nav-item" data-tab="' + tabId + '">' +
+            '<a class="nav-link" href="#">' + title +
+            ' <button type="button" class="btn-close btn-close-white ms-2" style="font-size:0.6em;" data-close="' + tabId + '"></button></a></li>';
+        $tabs.append(tabHtml);
+
+        activateTab(tabId);
+        $mainFrame.attr('src', url);
+        $currentTitle.text(title);
+    }
+
+    function activateTab(tabId) {
+        activeTabId = tabId;
+        $tabs.find('.nav-link').removeClass('active');
+        $tabs.find('[data-tab="' + tabId + '"] .nav-link').addClass('active');
+    }
+
+    // 关闭tab
+    $(document).on('click', '[data-close]', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var tabId = $(this).data('close');
+        var idx = tabs.indexOf(tabId);
+        if (idx < 0) return;
+
+        tabs.splice(idx, 1);
+        $('[data-tab="' + tabId + '"]').remove();
+
+        if (tabs.length === 0) {
+            $tabBar.hide();
+            $mainFrame.attr('src', '${request.contextPath}/admin/welcome');
+            $currentTitle.text('首页');
+            activeTabId = 'home';
+        } else {
+            var newActive = tabs[Math.max(0, idx - 1)];
+            activateTab(newActive);
+        }
+    });
+
+    // Tab点击
+    $(document).on('click', '#cmsTabs .nav-link', function(e) {
+        e.preventDefault();
+        var tabId = $(this).closest('[data-tab]').data('tab');
+        activateTab(tabId);
+    });
+
+    // 加载菜单
+    $.getJSON('${request.contextPath}/menu/init', function(data) {
+        if (data && data.menuList) {
+            var html = '';
+            data.menuList.forEach(function(menu) {
+                if (menu.children && menu.children.length > 0) {
+                    html += '<div class="nav-section">' + menu.title + '</div>';
+                    menu.children.forEach(function(child) {
+                        html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + child.url + '" data-title="' + child.title + '">' +
+                            '<i class="bi ' + (child.icon || 'bi-folder') + '"></i>' +
+                            '<span>' + child.title + '</span></a>';
+                    });
+                } else {
+                    html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + menu.url + '" data-title="' + menu.title + '">' +
+                        '<i class="bi ' + (menu.icon || 'bi-folder') + '"></i>' +
+                        '<span>' + menu.title + '</span></a>';
                 }
             });
-        });
+            $sidebar.find('.nav-section').first().after(html);
+        }
     });
+
+    // iframe自适应高度
+    function resizeFrame() {
+        var h = window.innerHeight - 120;
+        $mainFrame.css('min-height', h + 'px');
+    }
+    $(window).on('resize', resizeFrame);
+    resizeFrame();
+});
 </script>
 </body>
 </html>

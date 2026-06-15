@@ -1,0 +1,245 @@
+/**
+ * SpringBootCMS Admin Common JS
+ * jQuery3 + Bootstrap5
+ */
+
+// 通用API请求封装
+const CmsApi = {
+    contextPath: '',
+
+    post: function(url, data, callback) {
+        $.ajax({
+            url: this.contextPath + url,
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(res) {
+                if (typeof callback === 'function') callback(res);
+            },
+            error: function(xhr) {
+                CmsUtil.showToast('请求失败: ' + (xhr.responseText || '未知错误'), 'danger');
+            }
+        });
+    },
+
+    postJson: function(url, data, callback) {
+        $.ajax({
+            url: this.contextPath + url,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function(res) {
+                if (typeof callback === 'function') callback(res);
+            },
+            error: function(xhr) {
+                CmsUtil.showToast('请求失败: ' + (xhr.responseText || '未知错误'), 'danger');
+            }
+        });
+    },
+
+    get: function(url, callback) {
+        $.ajax({
+            url: this.contextPath + url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(res) {
+                if (typeof callback === 'function') callback(res);
+            },
+            error: function(xhr) {
+                CmsUtil.showToast('请求失败: ' + (xhr.responseText || '未知错误'), 'danger');
+            }
+        });
+    }
+};
+
+// 通用工具
+const CmsUtil = {
+    // 显示Toast提示
+    showToast: function(message, type) {
+        type = type || 'success';
+        const iconMap = {
+            success: 'bi-check-circle-fill',
+            danger: 'bi-exclamation-triangle-fill',
+            warning: 'bi-exclamation-circle-fill',
+            info: 'bi-info-circle-fill'
+        };
+        const bgMap = {
+            success: 'bg-success',
+            danger: 'bg-danger',
+            warning: 'bg-warning',
+            info: 'bg-info'
+        };
+
+        let container = $('.cms-toast');
+        if (container.length === 0) {
+            container = $('<div class="cms-toast"></div>');
+            $('body').append(container);
+        }
+
+        const toast = $(`
+            <div class="toast align-items-center text-white ${bgMap[type]} border-0 show" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi ${iconMap[type]} me-2"></i>${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `);
+
+        container.append(toast);
+        setTimeout(function() {
+            toast.remove();
+        }, 3000);
+    },
+
+    // 确认对话框
+    confirm: function(message, onConfirm) {
+        if (confirm(message)) {
+            if (typeof onConfirm === 'function') onConfirm();
+        }
+    },
+
+    // 格式化日期
+    formatDate: function(dateStr) {
+        if (!dateStr) return '-';
+        return dateStr;
+    },
+
+    // 状态标签
+    statusBadge: function(status) {
+        if (status === 1) {
+            return '<span class="badge bg-success badge-status">启用</span>';
+        } else {
+            return '<span class="badge bg-secondary badge-status">停用</span>';
+        }
+    },
+
+    // 分页HTML生成
+    renderPagination: function(total, page, limit, onPageChange) {
+        const totalPages = Math.ceil(total / limit);
+        if (totalPages <= 1) return '';
+
+        let html = '<nav><ul class="pagination pagination-sm mb-0">';
+        html += `<li class="page-item ${page <= 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${page - 1}">&laquo;</a>
+                 </li>`;
+
+        const startPage = Math.max(1, page - 2);
+        const endPage = Math.min(totalPages, page + 2);
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<li class="page-item ${i === page ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                     </li>`;
+        }
+
+        html += `<li class="page-item ${page >= totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${page + 1}">&raquo;</a>
+                 </li>`;
+        html += '</ul></nav>';
+
+        return html;
+    }
+};
+
+// 通用CRUD表格类
+class CmsTable {
+    constructor(options) {
+        this.apiList = options.apiList;
+        this.apiDelete = options.apiDelete;
+        this.columns = options.columns;
+        this.searchFields = options.searchFields || [];
+        this.tableBody = $(options.tableBody || '#dataTableBody');
+        this.paginationEl = $(options.paginationEl || '#pagination');
+        this.page = 1;
+        this.limit = options.limit || 10;
+        this.searchParams = {};
+    }
+
+    load() {
+        const self = this;
+        const params = { page: this.page, limit: this.limit };
+        if (this.searchParams.searchParams) {
+            params.searchParams = this.searchParams.searchParams;
+        }
+
+        CmsApi.post(this.apiList, params, function(res) {
+            if (res.code === 200) {
+                self.render(res.data || []);
+                self.renderPagination(res.count || 0);
+            } else {
+                CmsUtil.showToast(res.msg || '加载失败', 'danger');
+            }
+        });
+    }
+
+    render(data) {
+        const self = this;
+        let html = '';
+        if (data.length === 0) {
+            html = `<tr><td colspan="${this.columns.length + 1}" class="text-center text-muted py-4">暂无数据</td></tr>`;
+        } else {
+            data.forEach(function(row, idx) {
+                html += '<tr>';
+                html += `<td>${(self.page - 1) * self.limit + idx + 1}</td>`;
+                self.columns.forEach(function(col) {
+                    let val = row[col.field];
+                    if (col.render) {
+                        val = col.render(val, row);
+                    }
+                    html += `<td>${val !== null && val !== undefined ? val : '-'}</td>`;
+                });
+                html += '</tr>';
+            });
+        }
+        this.tableBody.html(html);
+    }
+
+    renderPagination(total) {
+        const self = this;
+        const totalPages = Math.ceil(total / this.limit);
+        let html = `<div class="cms-pagination">
+            <span>共 ${total} 条记录，第 ${this.page}/${totalPages || 1} 页</span>`;
+        html += CmsUtil.renderPagination(total, this.page, this.limit);
+        html += '</div>';
+        this.paginationEl.html(html);
+
+        this.paginationEl.find('.page-link').off('click').on('click', function(e) {
+            e.preventDefault();
+            const p = parseInt($(this).data('page'));
+            if (p >= 1 && p <= totalPages) {
+                self.page = p;
+                self.load();
+            }
+        });
+    }
+
+    search(params) {
+        this.searchParams = { searchParams: JSON.stringify(params) };
+        this.page = 1;
+        this.load();
+    }
+
+    delete(id, name) {
+        const self = this;
+        CmsUtil.confirm('确定要删除' + (name ? ' "' + name + '"' : '') + '吗？', function() {
+            CmsApi.post(self.apiDelete, { id: id }, function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast('删除成功', 'success');
+                    self.load();
+                } else {
+                    CmsUtil.showToast(res.msg || '删除失败', 'danger');
+                }
+            });
+        });
+    }
+}
+
+// 侧边栏折叠
+$(document).ready(function() {
+    $('.toggle-sidebar').on('click', function() {
+        $('.cms-sidebar').toggleClass('collapsed');
+    });
+});

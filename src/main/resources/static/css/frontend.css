@@ -1,0 +1,167 @@
+:root {
+    --ft-primary: #4361ee;
+    --ft-primary-dark: #3a56d4;
+    --ft-dark: #1a1a2e;
+    --ft-body-bg: #ffffff;
+    --ft-section-bg: #f8f9fa;
+    --ft-text: #333333;
+    --ft-text-muted: #6c757d;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ft-text);
+}
+
+/* Header */
+.site-header {
+    background: var(--ft-dark);
+    padding: 0;
+}
+.site-header .navbar {
+    padding: 0.75rem 0;
+}
+.site-header .navbar-brand {
+    color: #fff !important;
+    font-size: 1.5rem;
+}
+.site-header .nav-link {
+    color: rgba(255,255,255,0.8) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    transition: color 0.2s;
+}
+.site-header .nav-link:hover {
+    color: #fff !important;
+}
+.site-header .navbar-toggler {
+    border-color: rgba(255,255,255,0.3);
+}
+.site-header .navbar-toggler-icon {
+    filter: brightness(0) invert(1);
+}
+
+/* Hero Banner */
+.hero-banner {
+    background: linear-gradient(135deg, var(--ft-dark) 0%, var(--ft-primary) 100%);
+    color: #fff;
+    padding: 5rem 0;
+    position: relative;
+    overflow: hidden;
+}
+.hero-banner h1 {
+    font-weight: 800;
+    font-size: 3rem;
+}
+.hero-banner .lead {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--ft-dark) 0%, var(--ft-primary) 100%);
+    color: #fff;
+    padding: 3rem 0;
+    text-align: center;
+}
+.page-header h1 {
+    font-weight: 700;
+}
+
+/* Sections */
+.section-padding {
+    padding: 4rem 0;
+}
+.section-bg {
+    background: var(--ft-section-bg);
+}
+
+/* Service Card */
+.service-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+}
+.service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+.service-card img {
+    margin-bottom: 1rem;
+}
+
+/* Article Card */
+.article-card {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem 0;
+}
+.article-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+.article-card h3 a {
+    color: var(--ft-text);
+    text-decoration: none;
+}
+.article-card h3 a:hover {
+    color: var(--ft-primary);
+}
+.article-card .meta {
+    color: var(--ft-text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+/* CTA Banner */
+.cta-banner {
+    background: var(--ft-primary);
+    color: #fff;
+    padding: 2.5rem 0;
+}
+
+/* Footer */
+.site-footer {
+    background: var(--ft-dark);
+    color: rgba(255,255,255,0.8);
+    padding: 3rem 0 1.5rem;
+}
+.site-footer h5 {
+    color: #fff;
+}
+.site-footer p {
+    margin-bottom: 0.5rem;
+}
+
+/* Form Styles */
+.sign-form {
+    max-width: 700px;
+    margin: 0 auto;
+}
+.sign-form .form-control,
+.sign-form .form-select {
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: var(--ft-primary);
+    border-radius: 4px;
+    margin: 0 2px;
+}
+.pagination .page-item.active .page-link {
+    background: var(--ft-primary);
+    border-color: var(--ft-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-banner h1 { font-size: 2rem; }
+    .hero-banner { padding: 3rem 0; }
+    .page-header { padding: 2rem 0; }
+}

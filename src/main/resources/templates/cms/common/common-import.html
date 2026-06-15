@@ -1,118 +1,93 @@
+<#-- 后台管理框架页头部引入 -->
 <#macro indexImport>
 <head>
     <meta charset="utf-8">
     <title>SpringBootCMS</title>
-    <meta name="renderer" content="webkit">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="SpringBootCMS Content Management System">
     <link rel="icon" href="${request.contextPath}/static/images/favicon.ico">
-    <link rel="stylesheet" href="${request.contextPath}/static/lib/layui-v2.5.5/css/layui.css" media="all">
-    <link rel="stylesheet" href="${request.contextPath}/static/css/layuimini.css?v=2.0.4.2" media="all">
-    <link rel="stylesheet" href="${request.contextPath}/static/css/themes/default.css" media="all">
-    <link rel="stylesheet" href="${request.contextPath}/static/lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
-    <!--[if lt IE 9]>
-    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    <script src="${request.contextPath}/static/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
-    <script src="${request.contextPath}/static/js/lay-config.js?v=2.0.0" charset="utf-8"></script>
+    <!-- Bootstrap5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Admin Custom CSS -->
+    <link rel="stylesheet" href="${request.contextPath}/static/css/admin.css">
 </head>
 </#macro>
 
+<#-- 通用CRUD页面头部引入 -->
 <#macro commonImport>
 <head>
     <meta charset="utf-8">
     <title>SpringBootCMS</title>
-    <meta name="renderer" content="webkit">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="${request.contextPath}/static/lib/layui-v2.5.5/css/layui.css" media="all">
-    <link rel="stylesheet" href="${request.contextPath}/static/css/public.css" media="all">
-    <script src="${request.contextPath}/static/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="${request.contextPath}/static/images/favicon.ico">
+    <!-- Bootstrap5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Admin Custom CSS -->
+    <link rel="stylesheet" href="${request.contextPath}/static/css/admin.css">
 </head>
 </#macro>
 
+<#-- 状态页头部引入 -->
 <#macro statusPageImport>
 <head>
     <meta charset="UTF-8">
     <title>SpringBootCMS</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="format-detection" content="telephone=no">
-    <link rel="stylesheet" href="${request.contextPath}/static/lib/layui-v2.5.5/css/layui.css" media="all">
-    <link rel="stylesheet" href="${request.contextPath}/static/css/404.css" media="all">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="${request.contextPath}/static/css/admin.css">
 </head>
 </#macro>
 
+<#-- 文件上传组件引入 -->
 <#macro uploadImport>
     <link rel="stylesheet" href="${request.contextPath}/static/lib/jq-module/zyupload/zyupload-1.0.0.min.css" media="all">
-    <script src="${request.contextPath}/static/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="${request.contextPath}/static/lib/jq-module/zyupload/zyupload-1.0.0.min.js" charset="utf-8"></script>
 </#macro>
 
+<#-- Session认证处理（空操作，cookie自动处理） -->
 <#macro jwtHandle>
-$.ajaxSetup({
-    headers: {
-        "Author": "zhengkai.blog.csdn.net" ,
-        "Authorization": "Bearer "+layui.data('token').token
-    }
- });
- if(typeof(table)!="undefined"){
-     table.set({
-         headers: { //通过 request 头传递
-             Authorization: "Bearer "+layui.data('token').token
-         }
-         ,where: { //通过参数传递
-             token: layui.data('token').token
-         }
-     });
- }
 </#macro>
 
+<#-- 通用JS引入（放在body末尾） -->
+<#macro commonScript>
+    <!-- jQuery3 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <!-- Bootstrap5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Admin Common JS -->
+    <script src="${request.contextPath}/static/js/admin-common.js"></script>
+</#macro>
 
+<#-- 前端页面头部引入 -->
 <#macro frontEndPageImport>
   <head>
-    <!-- Meta -->
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="keywords" content="${(templateMap.companyName)!!}">
     <meta name="description" content="${(templateMap.companyName)!!}">
-    <meta name="author" content="zhengkai.blog.csdn.net">
-
-    <!-- Favicon -->
     <link rel="shortcut icon" href="${request.contextPath}/static/frontend/img/favicon.png" type="image/x-icon">
-
-    <!-- Styles -->
-    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/font-awesome/css/fontawesome-all.min.css">
-    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.css">
-	<link href="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.css" rel="stylesheet" type="text/css" />
-	<link href="${request.contextPath}/static/frontend/vendors/aos/aos.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/theme.css">
+    <!-- Bootstrap5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- AOS Animation -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <!-- Frontend Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/theme.css">
     <link rel="stylesheet" type="text/css" href="${request.contextPath}/static/frontend/css/styles.css">
-
-    <!-- JS Script Files -->
-    <!-- Global Vendor -->
-    <script src="${request.contextPath}/static/frontend/vendors/jquery.min.js"></script>
-    <script src="${request.contextPath}/static/frontend/vendors/jquery.migrate.min.js"></script>
-    <script src="${request.contextPath}/static/frontend/vendors/popper.min.js"></script>
-    <script src="${request.contextPath}/static/frontend/vendors/bootstrap/js/bootstrap.min.js"></script>
-    <script src="${request.contextPath}/static/frontend/vendors/aos/aos.js"></script>
-
-    <!-- Components Vendor  -->
-    <script src="${request.contextPath}/static/frontend/vendors/slick-carousel/slick.min.js"></script>
-    <script src="${request.contextPath}/static/frontend/vendors/ace-responsive-menu/ace-responsive-menu.js"></script>
-
-    <!--Plugin Initialize-->
-    <script src="${request.contextPath}/static/frontend/js/global.js"></script>
-    <script src="${request.contextPath}/static/frontend/vendors/carousel.js"></script>
-
-    <!-- END JAVASCRIPTS -->
   </head>
+</#macro>
+
+<#-- 前端页面JS引入 -->
+<#macro frontEndScript>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="${request.contextPath}/static/frontend/js/global.js"></script>
+    <script>AOS.init();</script>
 </#macro>

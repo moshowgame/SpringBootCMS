@@ -1,93 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <#import "common/common-import.html" as netCommon>
 <@netCommon.commonImport />
-<body>
-<div class="layui-form layuimini-form">
-    <input type="hidden" name="activityId" value="${(activity.activityId)!!}" class="layui-input">
-    <input type="hidden" name="createUserId" value="${(loginUser.userId)!'0'}" class="layui-input">
-    <input type="hidden" name="createUserName" value="${(loginUser.userName)!'管理员'}" class="layui-input">
+<body class="p-3">
 
-    <div class="layui-form-item">
-        <label class="layui-form-label required">活动名称</label>
-        <div class="layui-input-block">
-            <input type="text" name="activityName" lay-verify="required" lay-reqtext="活动名称不能为空" placeholder="请输入活动名称" value="${(activity.activityName)!!}" class="layui-input">
-        </div>
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-calendar-event me-2"></i><#if activity??>编辑活动<#else>新增活动</#if></h6>
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">活动开始时间</label>
-        <div class="layui-input-block">
-            <input type="text" id="startTime" name="startTime" lay-verify="required" lay-reqtext="活动开始时间不能为空" placeholder="请输入活动开始时间" value="${(activity.startTime?string('yyyy-MM-dd HH:mm:ss'))!!}" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">活动结束时间</label>
-        <div class="layui-input-block">
-            <input type="text" id="endTime" name="endTime" lay-verify="required" lay-reqtext="活动结束时间不能为空" placeholder="请输入活动结束时间" value="${(activity.endTime?string('yyyy-MM-dd HH:mm:ss'))!!}" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">活动简介</label>
-        <div class="layui-input-block">
-            <textarea name="activityDesc"  required id="activityDesc" class="layui-input">${(activity.activityDesc)!!}</textarea>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit lay-filter="saveBtn">确认保存</button>
-        </div>
+    <div class="card-body">
+        <form id="activityForm" class="cms-form">
+            <input type="hidden" name="activityId" value="${(activity.activityId)!!}">
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">活动名称 <span class="text-danger">*</span></label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="title" value="${(activity.title)!!}" placeholder="请输入活动名称" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">活动描述</label>
+                <div class="col-sm-10">
+                    <textarea class="form-control" name="description" rows="3" placeholder="请输入活动描述">${(activity.description)!!}</textarea>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">开始时间</label>
+                <div class="col-sm-10">
+                    <input type="datetime-local" class="form-control" name="startTime" value="${(activity.startTime)!!}">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">结束时间</label>
+                <div class="col-sm-10">
+                    <input type="datetime-local" class="form-control" name="endTime" value="${(activity.endTime)!!}">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">状态</label>
+                <div class="col-sm-10">
+                    <select class="form-select" name="status">
+                        <option value="0" <#if (activity.status)?? && activity.status == 0>selected</#if>>未开始</option>
+                        <option value="1" <#if (activity.status)?? && activity.status == 1>selected</#if>>进行中</option>
+                        <option value="2" <#if (activity.status)?? && activity.status == 2>selected</#if>>已结束</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-cms-primary"><i class="bi bi-check-lg me-1"></i>确认保存</button>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">返回</a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
-</div>
+
+<@netCommon.commonScript />
 <script>
-    layui.use(['form', 'layedit', 'laydate'], function () {
-        var form = layui.form,
-            layer = layui.layer,
-            layedit =layui.layedit,
-            laydate = layui.laydate,
-            $ = layui.$;
-    <@netCommon.jwtHandle />
-        //日期
-        laydate.render({
-            elem: '#startTime',
-            type: 'datetime'
+$(function() {
+    $('#activityForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = {};
+        $(this).serializeArray().forEach(function(item) {
+            formData[item.name] = item.value;
         });
-        laydate.render({
-            elem: '#endTime',
-            type: 'datetime'
-        });
-
-        //创建一个编辑器
-        var editIndex = layedit.build('activityDesc');
-
-        //监听提交
-        form.on('submit(saveBtn)', function (data) {
-            $.ajax({
-                type: 'POST',
-                url: "${request.contextPath}/activity/save",
-                data:JSON.stringify(data.field),
-                dataType: "json",
-                contentType: "application/json",
-                success: function (responseData) {
-                    if (responseData.code === 200) {
-                        layer.msg(responseData.msg, function () {
-                            // 关闭弹出层
-                            //layer.close(index);
-                            var iframeIndex = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(iframeIndex);
-                            parent.searchBtn.click();
-                        });
-                    } else {
-                        layer.msg(responseData.msg, function () {
-                            //window.location = '/index.html';
-                        });
-                    }
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/activity/save',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '保存成功', 'success');
+                    setTimeout(function() { history.back(); }, 800);
+                } else {
+                    CmsUtil.showToast(res.msg || '保存失败', 'danger');
                 }
-            });
-            return false;
+            }
         });
-
     });
+});
 </script>
 </body>
 </html>

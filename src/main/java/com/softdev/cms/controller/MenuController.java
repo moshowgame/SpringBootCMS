@@ -1,28 +1,19 @@
 package com.softdev.cms.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softdev.cms.entity.Menu;
 import com.softdev.cms.mapper.MenuMapper;
-import com.softdev.cms.util.JwtTokenUtil;
-import com.softdev.cms.util.ReturnT;
+import com.softdev.cms.util.Result;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @description menu
- * @author zhengkai.blog.csdn.net
- * @date 2020-02-19 20:42:16
- */
 @Slf4j
 @RestController
 @RequestMapping("/menu")
@@ -31,134 +22,137 @@ public class MenuController {
     @Autowired
     private MenuMapper menuMapper;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-    /**
-     * 新增或编辑
-     */
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     @PostMapping("/save")
-    public Object save(@RequestBody Menu menu){
-        log.info("menu:"+JSON.toJSONString(menu));
-        Menu oldMenu = menuMapper.selectOne(new QueryWrapper<Menu>().eq("menu_id",menu.getMenuId()));
-        if(oldMenu!=null){
+    public Result<String> save(@RequestBody Menu menu) {
+        try {
+            log.info("menu:{}", objectMapper.writeValueAsString(menu));
+        } catch (Exception e) {
+            log.warn("serialize menu failed", e);
+        }
+        Menu oldMenu = menuMapper.selectById(menu.getMenuId());
+        if (oldMenu != null) {
             menuMapper.updateById(menu);
-        }else{
-            if(menuMapper.selectOne(new QueryWrapper<Menu>().eq("title",menu.getTitle()))!=null){
-                return ReturnT.ERROR("保存失败，名字重复");
+        } else {
+            List<Menu> all = menuMapper.selectAll();
+            boolean titleDuplicate = all.stream()
+                    .anyMatch(m -> m.getTitle().equals(menu.getTitle()));
+            if (titleDuplicate) {
+                return Result.fail("保存失败，名字重复");
             }
             menuMapper.insert(menu);
         }
-        return ReturnT.SUCCESS();
+        return Result.success("保存成功");
     }
 
-    /**
-     * 删除
-     */
     @PostMapping("/delete")
-    public Object delete(int id){
-        Menu menu = menuMapper.selectOne(new QueryWrapper<Menu>().eq("menu_id",id));
-        if(menu!=null){
+    public Result<String> delete(@RequestParam Integer id) {
+        Menu menu = menuMapper.selectById(id);
+        if (menu != null) {
             menuMapper.deleteById(id);
-            return ReturnT.SUCCESS("删除成功");
-        }else{
-            return ReturnT.ERROR();
+            return Result.success("删除成功");
+        } else {
+            return Result.fail("没有找到该对象");
         }
     }
 
-    /**
-     * 查询
-     */
     @PostMapping("/find")
-    public Object find(int id){
-        Menu menu = menuMapper.selectOne(new QueryWrapper<Menu>().eq("menu_id",id));
-        if(menu!=null){
-            return ReturnT.SUCCESS(menu);
-        }else{
-            return ReturnT.ERROR();
+    public Result<Menu> find(@RequestParam Integer id) {
+        Menu menu = menuMapper.selectById(id);
+        if (menu != null) {
+            return Result.success(menu);
+        } else {
+            return Result.fail("没有找到该对象");
         }
     }
 
-    /**
-     * 分页查询
-     */
     @PostMapping("/list")
-    public Object list(String searchParams,
-                       @RequestParam(required = false, defaultValue = "0") int page,
-                       @RequestParam(required = false, defaultValue = "10") int limit) {
-        log.info("page:"+page+"-limit:"+limit+"-json:"+ JSON.toJSONString(searchParams));
-        //分页构造器
-        Page<Menu> buildPage = new Page<Menu>(page,limit);
-        //条件构造器
-        QueryWrapper<Menu> queryWrapper = new QueryWrapper<Menu>();
-        if(StringUtils.isNotEmpty(searchParams)) {
-            Menu menu = JSON.parseObject(searchParams, Menu.class);
-            queryWrapper.eq(menu.getMenuId()!=null, "menu_id", menu.getMenuId());
-            queryWrapper.eq(menu.getParentMenuId()!=null, "parent_menu_id", menu.getParentMenuId());
+    public Result<List<Menu>> list(@RequestParam(required = false) String searchParams,
+                                    @RequestParam(required = false, defaultValue = "1") int page,
+                                    @RequestParam(required = false, defaultValue = "10") int limit) {
+        // Menu使用selectAll + 内存过滤（菜单数量通常不多）
+        List<Menu> allMenus = menuMapper.selectAll();
+        if (StringUtils.isNotEmpty(searchParams)) {
+            Menu query;
+            try {
+                query = objectMapper.readValue(searchParams, Menu.class);
+            } catch (Exception e) {
+                log.warn("parse searchParams failed", e);
+                return Result.success(allMenus, allMenus.size());
+            }
+            if (query.getMenuId() != null) {
+                allMenus = allMenus.stream()
+                        .filter(m -> query.getMenuId().equals(m.getMenuId()))
+                        .collect(Collectors.toList());
+            }
+            if (query.getParentMenuId() != null) {
+                allMenus = allMenus.stream()
+                        .filter(m -> query.getParentMenuId().equals(m.getParentMenuId()))
+                        .collect(Collectors.toList());
+            }
         }
-        //执行分页
-        IPage<Menu> pageList = menuMapper.selectPage(buildPage, queryWrapper);
-        //返回结果
-        return ReturnT.PAGE(pageList.getRecords(),pageList.getTotal());
+        int total = allMenus.size();
+        int fromIndex = Math.min((page - 1) * limit, total);
+        int toIndex = Math.min(fromIndex + limit, total);
+        return Result.success(allMenus.subList(fromIndex, toIndex), total);
     }
+
     @GetMapping("/list")
-    public ModelAndView listPage(){
+    public ModelAndView listPage() {
         return new ModelAndView("cms/menu-list");
     }
+
     @GetMapping("/edit")
-    public ModelAndView editPage(int id){
-        Menu menu = menuMapper.selectOne(new QueryWrapper<Menu>().eq("menu_id",id));
-        return new ModelAndView("cms/menu-edit","menu",menu);
+    public ModelAndView editPage(@RequestParam Integer id) {
+        Menu menu = menuMapper.selectById(id);
+        return new ModelAndView("cms/menu-edit", "menu", menu);
     }
 
     @GetMapping("/init")
-    public Object initMenu(String token){
-        //获取当前用户权限
-        //Integer roleId = Integer.parseInt(session.getAttribute("roleId")+"");
-        //jwt
-        Integer roleId = jwtTokenUtil.getRoleIdFromToken(token);
-        //根据角色查询可用菜单
-        QueryWrapper<Menu> queryWrapper = new QueryWrapper<Menu>().like("role_id",roleId);
-        List<Menu> pageList = menuMapper.selectList(queryWrapper);
-        //jwt
-        pageList.forEach(m->m.setHref(m.getHref()+"?token="+token));
-        //最终返回的jsonMap
-        Map<String,Object> parentMap = new HashMap<>();
-        //clear信息
-        Map<String,String> clearInfo = new HashMap<>();
-        clearInfo.put("clearUrl","/static/api/clear.json");
-        parentMap.put("clearInfo",clearInfo);
-        //home首页信息
-        Map<String,String> homeInfo = new HashMap<>();
-        homeInfo.put("title","首页");
-        homeInfo.put("icon","fa fa-home");
-        homeInfo.put("href","/cms/admin/welcome?token="+token);
-        parentMap.put("homeInfo",homeInfo);
-        //info系统左边logo文字信息
-        Map<String,String> logoInfo = new HashMap<>();
-        logoInfo.put("title","CMS");
-        logoInfo.put("image","/cms/static/images/logo.png");
-        logoInfo.put("href","#");
-        parentMap.put("logoInfo",logoInfo);
-        //通过jdk8的lambda过滤父选项list
-        List<Menu> parentMenuList = pageList.stream().filter(m -> m.getParentMenuId()==0).collect(Collectors.toList());
-        //遍历父选项，再从所有菜单中找到自己的子选项（仅支持二级菜单）
-        for(Menu menu:parentMenuList){
-            menu.setHref("");
-            menu.setChild(pageList.stream().filter(m -> menu.getMenuId().equals(m.getParentMenuId())).collect(Collectors.toList()));
+    public Map<String, Object> initMenu(HttpSession session) {
+        Integer roleId = (Integer) session.getAttribute("roleId");
+        if (roleId == null) {
+            return Collections.emptyMap();
         }
-        //currency系统上方信息
-        Map<String,Object> menuInfo = new HashMap<>();
-        //Map<String,Object> currency = new HashMap<>();
-        menuInfo.put("title","SpringBootCMS");
-        menuInfo.put("href","");
-        menuInfo.put("icon","fa fa-home");
-        menuInfo.put("target","_self");
-        menuInfo.put("child",parentMenuList);
-        //加载封装的菜单信息
+        List<Menu> pageList = menuMapper.selectByRoleId(String.valueOf(roleId));
+
+        Map<String, Object> parentMap = new HashMap<>();
+
+        Map<String, String> clearInfo = new HashMap<>();
+        clearInfo.put("clearUrl", "/static/api/clear.json");
+        parentMap.put("clearInfo", clearInfo);
+
+        Map<String, String> homeInfo = new HashMap<>();
+        homeInfo.put("title", "首页");
+        homeInfo.put("icon", "fa fa-home");
+        homeInfo.put("href", "/cms/admin/welcome");
+        parentMap.put("homeInfo", homeInfo);
+
+        Map<String, String> logoInfo = new HashMap<>();
+        logoInfo.put("title", "CMS");
+        logoInfo.put("image", "/cms/static/images/logo.png");
+        logoInfo.put("href", "#");
+        parentMap.put("logoInfo", logoInfo);
+
+        List<Menu> parentMenuList = pageList.stream()
+                .filter(m -> m.getParentMenuId() == 0)
+                .collect(Collectors.toList());
+        for (Menu menu : parentMenuList) {
+            menu.setHref("");
+            menu.setChild(pageList.stream()
+                    .filter(m -> menu.getMenuId().equals(m.getParentMenuId()))
+                    .collect(Collectors.toList()));
+        }
+
+        Map<String, Object> menuInfo = new HashMap<>();
+        menuInfo.put("title", "SpringBootCMS");
+        menuInfo.put("href", "");
+        menuInfo.put("icon", "fa fa-home");
+        menuInfo.put("target", "_self");
+        menuInfo.put("child", parentMenuList);
         parentMap.put("menuInfo", Arrays.asList(menuInfo));
+
         return parentMap;
     }
 }
-
-
-

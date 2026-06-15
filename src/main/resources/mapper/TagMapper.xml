@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.softdev.cms.mapper.TagMapper">
+
+    <select id="selectById" resultType="Tag">
+        SELECT * FROM tag WHERE tag_id = #{tagId} AND deleted = 0
+    </select>
+
+    <select id="selectByName" resultType="Tag">
+        SELECT * FROM tag WHERE tag_name = #{tagName} AND tag_type = #{tagType} AND deleted = 0
+    </select>
+
+    <select id="selectAll" resultType="Tag">
+        SELECT * FROM tag WHERE deleted = 0
+        <if test="tagType != null and tagType != ''"> AND tag_type = #{tagType} </if>
+        ORDER BY tag_id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="tagId">
+        INSERT INTO tag (tag_name, tag_type)
+        VALUES (#{tagName}, #{tagType})
+    </insert>
+
+    <update id="deleteById">
+        UPDATE tag SET deleted = 1 WHERE tag_id = #{tagId}
+    </update>
+
+</mapper>
