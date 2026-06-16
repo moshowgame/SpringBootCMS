@@ -79,15 +79,16 @@ public class FormItemController {
             }
         }
         // FormItem通过formId查询全部，内存分页
+        final FormItem finalQuery = query;
         List<FormItem> allItems;
-        if (query.getFormId() != null) {
-            allItems = formItemMapper.selectByFormId(query.getFormId());
+        if (finalQuery.getFormId() != null) {
+            allItems = formItemMapper.selectByFormId(finalQuery.getFormId());
         } else {
             allItems = formItemMapper.selectByFormId(0); // 返回空
         }
-        if (StringUtils.isNotEmpty(query.getItemName())) {
+        if (StringUtils.isNotEmpty(finalQuery.getItemName())) {
             allItems = allItems.stream()
-                    .filter(i -> i.getItemName().contains(query.getItemName()))
+                    .filter(i -> i.getItemName().contains(finalQuery.getItemName()))
                     .collect(java.util.stream.Collectors.toList());
         }
         int total = allItems.size();

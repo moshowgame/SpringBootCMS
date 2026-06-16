@@ -19,7 +19,7 @@ public class AuditLogHelper {
         log.setUserName(userName);
         log.setAction(action);
         log.setModule(module);
-        log.setTargetId(targetId);
+        log.setTargetId(targetId != null ? String.valueOf(targetId) : null);
         log.setTargetName(targetName);
         log.setDetail(detail);
         if (request != null) {
