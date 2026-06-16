@@ -8,8 +8,8 @@
 <!-- Page Header -->
 <section class="page-header">
     <div class="container">
-        <h1>${(form.formName)!!}</h1>
-        <p class="mt-2 opacity-75">发布者：${(form.createUserName)!!} | 发布时间：${(form.createTime?string('yyyy年MM月dd日'))!!}</p>
+        <h1>${(form.formName)!'表单'}</h1>
+        <p class="mt-2 opacity-75">发布者：${(form.createUserName)!'系统'} | 发布时间：<#if form?? && form.createTime??>${form.createTime?string('yyyy年MM月dd日')}</#if></p>
     </div>
 </section>
 
@@ -18,30 +18,33 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <#if (form.formDesc)??>
-                <div class="mb-3">${(form.formDesc)!!}</div>
+                <#if form?? && form.formDesc?? && (form.formDesc?length > 0)>
+                <div class="mb-3">${form.formDesc}</div>
                 </#if>
 
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-                        <h4 class="mb-4">表单提交</h4>
+                        <h4 class="mb-4"><i class="bi bi-pencil-square text-primary me-2"></i>表单提交</h4>
                         <form id="form" role="form">
-                            <input type="hidden" id="formId" name="formId" value="${(form.formId)!!}">
+                            <input type="hidden" id="formId" name="formId" value="${(form.formId)!'0'}">
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control" id="phone" name="phone" placeholder="手机" required>
+                                    <label class="form-label small text-muted mb-1">手机号 *</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="手机号" required>
                                 </div>
                                 <div class="col-md-4">
+                                    <label class="form-label small text-muted mb-1">姓名 *</label>
                                     <input type="text" class="form-control" id="showName" name="showName" placeholder="姓名" required>
                                 </div>
                                 <div class="col-md-4">
+                                    <label class="form-label small text-muted mb-1">公司 *</label>
                                     <input type="text" class="form-control" id="company" name="company" placeholder="公司" required>
                                 </div>
                             </div>
                             <div id="itemArea" class="mt-3"></div>
-                            <p class="text-muted mt-3 small">请如实填写信息，所有信息将被严格保密 *</p>
+                            <p class="text-muted mt-3 small"><i class="bi bi-shield-lock me-1"></i>请如实填写信息，所有信息将被严格保密 *</p>
                             <div class="text-center mt-3">
-                                <button type="button" class="btn btn-primary btn-lg px-5" onclick="submitForm()">提交</button>
+                                <button type="button" class="btn btn-primary btn-lg px-5" onclick="submitForm()"><i class="bi bi-send me-2"></i>提交</button>
                             </div>
                         </form>
                         <div id="resultMsg"></div>
@@ -55,32 +58,36 @@
 <@ft.frontendFooter />
 <@ft.frontendScript />
 <script>
+var ctxPath = '${request.contextPath}';
 var submitted = 0;
 var fileUploadList = [];
 
 function submitForm() {
-    if ($('#phone').val().length < 1 || $('#showName').val().length < 1 || $('#company').val().length < 1) {
-        alert('姓名/手机/公司不能为空');
+    if (!$('#phone').val() || !$('#showName').val() || !$('#company').val()) {
+        $('#resultMsg').html('<div class="alert alert-warning mt-3"><i class="bi bi-exclamation-triangle me-2"></i>姓名/手机/公司不能为空</div>');
         return;
     }
     if (submitted === 0) {
         $.ajax({
             type: 'POST',
-            url: '${request.contextPath}/page/formSubmit/save',
+            url: ctxPath + '/page/formSubmit/save',
             data: JSON.stringify($('#form').serializeArray()),
             dataType: 'json',
             contentType: 'application/json',
             success: function(res) {
                 if (res.code === 200) {
                     submitted = 1;
-                    $('#resultMsg').html('<div class="alert alert-success mt-3">' + res.msg + '</div>');
+                    $('#resultMsg').html('<div class="alert alert-success mt-3"><i class="bi bi-check-circle me-2"></i>' + res.msg + '</div>');
                 } else {
-                    $('#resultMsg').html('<div class="alert alert-danger mt-3">' + res.msg + '</div>');
+                    $('#resultMsg').html('<div class="alert alert-danger mt-3"><i class="bi bi-x-circle me-2"></i>' + res.msg + '</div>');
                 }
+            },
+            error: function() {
+                $('#resultMsg').html('<div class="alert alert-danger mt-3"><i class="bi bi-x-circle me-2"></i>网络错误，请稍后重试</div>');
             }
         });
     } else {
-        $('#resultMsg').html('<div class="alert alert-info mt-3">已提交成功，请勿重复提交</div>');
+        $('#resultMsg').html('<div class="alert alert-info mt-3"><i class="bi bi-info-circle me-2"></i>已提交成功，请勿重复提交</div>');
     }
 }
 
@@ -89,12 +96,12 @@ function getOptionListHtml(typeStr, nameStr, valueStr, titleStr, defaultValueStr
     if (typeStr === 'input') {
         return '<input type="text" name="' + nameStr + '" placeholder="请输入' + titleStr + '" value="' + valueStr + '" class="form-control">';
     } else if (typeStr === 'textarea') {
-        return '<textarea name="' + nameStr + '" class="form-control">' + valueStr + '</textarea>';
+        return '<textarea name="' + nameStr + '" class="form-control" rows="3">' + valueStr + '</textarea>';
     } else if (typeStr === 'fileupload') {
         fileUploadList.push(nameStr);
         var downloadBtn = '';
         if (valueStr) {
-            downloadBtn = '<div class="form-text"><a href="${request.contextPath}/file/files/' + valueStr + '">点击下载附件</a></div>';
+            downloadBtn = '<div class="form-text"><a href="' + ctxPath + '/file/files/' + valueStr + '">点击下载附件</a></div>';
         }
         return '<input type="text" readonly name="' + nameStr + '" id="' + nameStr + '" placeholder="点击上传文件" value="' + valueStr + '" class="form-control">' + downloadBtn;
     } else if (typeStr === 'select') {
@@ -111,7 +118,7 @@ function getOptionListHtml(typeStr, nameStr, valueStr, titleStr, defaultValueStr
 }
 
 function init() {
-    var data = ${(itemValueList)!!};
+    var data = ${(itemValueList)!'[]'};
     var nowItemId = '', nowItemName = '', optionListHtml = '';
 
     for (var n in data) {
