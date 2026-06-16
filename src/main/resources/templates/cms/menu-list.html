@@ -23,10 +23,10 @@
                     <tr>
                         <th>ID</th>
                         <th>菜单名称</th>
-                        <th>菜单URL</th>
+                        <th>链接</th>
                         <th>图标</th>
                         <th>排序</th>
-                        <th>状态</th>
+                        <th>角色</th>
                         <th>操作</th>
                     </tr>
                 </thead>
@@ -47,11 +47,11 @@ $(function() {
         paginationEl: '#pagination',
         columns: [
             { field: 'menuId' },
-            { field: 'menuName' },
-            { field: 'url', render: function(val) { return val || '-'; } },
+            { field: 'title' },
+            { field: 'href', render: function(val) { return val || '-'; } },
             { field: 'icon', render: function(val) { return val ? '<i class="bi ' + val + '"></i> ' + val : '-'; } },
             { field: 'sort' },
-            { field: 'status', render: function(val) { return val == '1' ? '<span class="badge bg-success badge-status">启用</span>' : '<span class="badge bg-secondary badge-status">停用</span>'; } },
+            { field: 'roleId', render: function(val) { return val || '-'; } },
             { field: 'menuId', render: function(val) {
                 return '<button class="btn btn-outline-primary btn-sm btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button> ' +
                        '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="'+val+'"><i class="bi bi-trash"></i>删除</button>';

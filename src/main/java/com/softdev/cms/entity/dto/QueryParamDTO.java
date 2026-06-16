@@ -20,6 +20,8 @@ public class QueryParamDTO implements Serializable {
     Integer channelId;
     Integer classesId;
     Integer activityId;
+    String activityName;
+    String formName;
     Integer status;
     Integer page;
     Integer limit;

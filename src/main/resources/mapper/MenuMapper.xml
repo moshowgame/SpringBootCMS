@@ -22,7 +22,7 @@
     </select>
 
     <select id="selectByRoleId" resultMap="menuResultMap">
-        SELECT * FROM menu WHERE (role_id = #{roleId} OR role_id = '0') AND deleted = 0 ORDER BY sort, menu_id
+        SELECT * FROM menu WHERE (FIND_IN_SET(#{roleId}, role_id) OR role_id = '0') AND deleted = 0 ORDER BY sort, menu_id
     </select>
 
     <select id="selectAll" resultMap="menuResultMap">

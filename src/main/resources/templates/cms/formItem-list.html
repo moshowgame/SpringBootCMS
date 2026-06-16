@@ -45,7 +45,7 @@ $(function() {
             { field: 'itemId' },
             { field: 'itemName' },
             { field: 'itemType' },
-            { field: 'required', render: function(val) { return val == '1' ? '<span class="badge bg-danger badge-status">必填</span>' : '-'; } },
+            { field: 'required', render: function(val) { return val == 1 ? '<span class="badge bg-danger badge-status">必填</span>' : '-'; } },
             { field: 'sort' },
             { field: 'itemId', render: function(val) {
                 return '<button class="btn btn-outline-primary btn-sm me-1 btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button>' +

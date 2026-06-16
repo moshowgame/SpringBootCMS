@@ -116,4 +116,41 @@ public class UserController {
         }
         return new ModelAndView("cms/user-info", "user", user);
     }
+
+    @GetMapping("/password")
+    public ModelAndView passwordPage() {
+        return new ModelAndView("cms/user-password");
+    }
+
+    @PostMapping("/updatePassword")
+    public Result<String> updatePassword(@RequestBody java.util.Map<String, String> body,
+                                          HttpServletRequest request) {
+        Object loginUserId = request.getSession().getAttribute("userId");
+        if (!(loginUserId instanceof Integer)) {
+            return Result.fail("请先登录");
+        }
+        User user = userMapper.selectById((Integer) loginUserId);
+        if (user == null) {
+            return Result.fail("用户不存在");
+        }
+        String oldPassword = body.get("oldPassword");
+        String newPassword = body.get("newPassword");
+        if (StringUtils.isEmpty(oldPassword) || StringUtils.isEmpty(newPassword)) {
+            return Result.fail("密码不能为空");
+        }
+        // 兼容 BCrypt 和明文密码
+        boolean passwordOk;
+        String dbPassword = user.getPassword();
+        if (dbPassword != null && dbPassword.startsWith("$2")) {
+            passwordOk = passwordEncoder.matches(oldPassword, dbPassword);
+        } else {
+            passwordOk = oldPassword.equals(dbPassword);
+        }
+        if (!passwordOk) {
+            return Result.fail("原密码错误");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userMapper.updateById(user);
+        return Result.success("修改成功");
+    }
 }

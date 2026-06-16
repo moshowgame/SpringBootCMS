@@ -46,10 +46,10 @@ $(function() {
         paginationEl: '#pagination',
         columns: [
             { field: 'activityId' },
-            { field: 'title' },
+            { field: 'activityName' },
             { field: 'startTime' },
             { field: 'endTime' },
-            { field: 'status', render: function(val) { return val == '1' ? '<span class="badge bg-success badge-status">进行中</span>' : '<span class="badge bg-secondary badge-status">已结束</span>'; } },
+            { field: 'status', render: function(val) { return val == 1 ? '<span class="badge bg-success badge-status">进行中</span>' : '<span class="badge bg-secondary badge-status">已结束</span>'; } },
             { field: 'activityId', render: function(val, row) {
                 return '<button class="btn btn-outline-primary btn-sm me-1 btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button>' +
                        '<button class="btn btn-outline-danger btn-sm me-1 btn-delete" data-id="'+val+'"><i class="bi bi-trash"></i>删除</button>' +

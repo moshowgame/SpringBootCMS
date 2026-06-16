@@ -59,16 +59,16 @@ $(function() {
             { field: 'title' },
             { field: 'channelName' },
             { field: 'createUserName' },
-            { field: 'isTop', render: function(val) { return val == '1' ? '<span class="badge bg-warning badge-status">置顶</span>' : '-'; } },
-            { field: 'status', render: function(val) { return val == '1' ? '<span class="badge bg-success badge-status">已发布</span>' : '<span class="badge bg-secondary badge-status">未发布</span>'; } },
+            { field: 'isTop', render: function(val) { return val == 1 ? '<span class="badge bg-warning badge-status">置顶</span>' : '-'; } },
+            { field: 'status', render: function(val) { return val == 1 ? '<span class="badge bg-success badge-status">已发布</span>' : '<span class="badge bg-secondary badge-status">未发布</span>'; } },
             { field: 'updateTime' },
             { field: 'articleId', render: function(val, row) {
                 var html = '';
-                if (row.status == '0') {
+                if (row.status == 0) {
                     html += '<button class="btn btn-success btn-sm me-1 btn-publish" data-id="'+val+'" data-status="1"><i class="bi bi-check-lg"></i>发布</button>';
                     html += '<button class="btn btn-outline-danger btn-sm me-1 btn-delete" data-id="'+val+'"><i class="bi bi-trash"></i>删除</button>';
                 }
-                if (row.status == '1') {
+                if (row.status == 1) {
                     html += '<button class="btn btn-outline-warning btn-sm me-1 btn-publish" data-id="'+val+'" data-status="0"><i class="bi bi-pause"></i>停止</button>';
                 }
                 html += '<button class="btn btn-outline-primary btn-sm btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button>';

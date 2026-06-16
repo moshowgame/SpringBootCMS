@@ -47,9 +47,9 @@ $(function() {
         columns: [
             { field: 'userId' },
             { field: 'userName' },
-            { field: 'nickName', render: function(val) { return val || '-'; } },
-            { field: 'roleName', render: function(val) { return val || '-'; } },
-            { field: 'status', render: function(val) { return val == '1' ? '<span class="badge bg-success badge-status">启用</span>' : '<span class="badge bg-secondary badge-status">停用</span>'; } },
+            { field: 'showName', render: function(val) { return val || '-'; } },
+            { field: 'roleId', render: function(val) { return val == 9 ? '管理员' : '普通用户'; } },
+            { field: 'status', render: function(val) { return val == 1 ? '<span class="badge bg-success badge-status">启用</span>' : '<span class="badge bg-secondary badge-status">停用</span>'; } },
             { field: 'userId', render: function(val) {
                 return '<button class="btn btn-outline-primary btn-sm me-1 btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button>' +
                        '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="'+val+'"><i class="bi bi-trash"></i>删除</button>';

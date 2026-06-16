@@ -39,10 +39,10 @@ $(function() {
         paginationEl: '#pagination',
         columns: [
             { field: 'submitId' },
-            { field: 'submitUserName', render: function(val) { return val || '-'; } },
-            { field: 'auditStatus', render: function(val) {
-                if (val == '1') return '<span class="badge bg-success badge-status">已审核</span>';
-                if (val == '2') return '<span class="badge bg-danger badge-status">已拒绝</span>';
+            { field: 'showName', render: function(val) { return val || '-'; } },
+            { field: 'status', render: function(val) {
+                if (val == 1) return '<span class="badge bg-success badge-status">已审核</span>';
+                if (val == 2) return '<span class="badge bg-danger badge-status">已拒绝</span>';
                 return '<span class="badge bg-warning badge-status">待审核</span>';
             }},
             { field: 'createTime' },

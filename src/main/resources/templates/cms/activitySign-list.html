@@ -44,12 +44,12 @@ $(function() {
         paginationEl: '#pagination',
         columns: [
             { field: 'signId' },
-            { field: 'signUserName', render: function(val) { return val || '-'; } },
+            { field: 'showName', render: function(val) { return val || '-'; } },
             { field: 'phone', render: function(val) { return val || '-'; } },
-            { field: 'createTime' },
-            { field: 'status', render: function(val) {
-                if (val == '1') return '<span class="badge bg-success badge-status">已确认</span>';
-                if (val == '2') return '<span class="badge bg-danger badge-status">已取消</span>';
+            { field: 'signTime' },
+            { field: 'signType', render: function(val) {
+                if (val == 1) return '<span class="badge bg-success badge-status">已签到</span>';
+                if (val == 2) return '<span class="badge bg-danger badge-status">请假</span>';
                 return '<span class="badge bg-warning badge-status">待确认</span>';
             }},
             { field: 'signId', render: function(val) {

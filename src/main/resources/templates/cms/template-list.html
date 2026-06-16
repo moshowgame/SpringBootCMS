@@ -46,8 +46,8 @@ $(function() {
         columns: [
             { field: 'templateId' },
             { field: 'templateName' },
-            { field: 'templateType' },
-            { field: 'status', render: function(val) { return val == '1' ? '<span class="badge bg-success badge-status">启用</span>' : '<span class="badge bg-secondary badge-status">停用</span>'; } },
+            { field: 'page', render: function(val) { return val || '-'; } },
+            { field: 'description', render: function(val) { return val || '-'; } },
             { field: 'templateId', render: function(val) {
                 return '<button class="btn btn-outline-primary btn-sm me-1 btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button>' +
                        '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="'+val+'"><i class="bi bi-trash"></i>删除</button>';

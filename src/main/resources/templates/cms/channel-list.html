@@ -50,16 +50,16 @@ $(function() {
         columns: [
             { field: 'channelId' },
             { field: 'channelName' },
-            { field: 'parentChannelName', render: function(val) { return val || '-'; } },
-            { field: 'sort' },
-            { field: 'status', render: function(val) { return val == '1' ? '<span class="badge bg-success badge-status">启用</span>' : '<span class="badge bg-secondary badge-status">停用</span>'; } },
+            { field: 'parentChannelId', render: function(val) { return val && val != 0 ? val : '顶级'; } },
+            { field: 'seq' },
+            { field: 'status', render: function(val) { return val == 1 ? '<span class="badge bg-success badge-status">启用</span>' : '<span class="badge bg-secondary badge-status">停用</span>'; } },
             { field: 'channelId', render: function(val, row) {
                 var html = '';
-                if (row.status == '0') {
+                if (row.status == 0) {
                     html += '<button class="btn btn-success btn-sm me-1 btn-publish" data-id="'+val+'" data-status="1"><i class="bi bi-check-lg"></i>启用</button>';
                     html += '<button class="btn btn-outline-danger btn-sm me-1 btn-delete" data-id="'+val+'"><i class="bi bi-trash"></i>删除</button>';
                 }
-                if (row.status == '1') {
+                if (row.status == 1) {
                     html += '<button class="btn btn-outline-warning btn-sm me-1 btn-publish" data-id="'+val+'" data-status="0"><i class="bi bi-pause"></i>停用</button>';
                 }
                 html += '<button class="btn btn-outline-primary btn-sm btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button>';

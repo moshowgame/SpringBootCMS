@@ -11,24 +11,7 @@
         <span>SpringBootCMS</span>
     </div>
     <div class="nav-section">导航菜单</div>
-    <#if menuList??>
-        <#list menuList as menu>
-            <#if menu.children?? && (menu.children?size > 0)>
-                <div class="nav-section">${menu.menuName!''}</div>
-                <#list menu.children as child>
-                    <a href="javascript:;" class="nav-link" data-url="${request.contextPath}${child.url!''}" data-title="${child.menuName!''}">
-                        <i class="bi ${child.icon!'bi-folder'}"></i>
-                        <span>${child.menuName!''}</span>
-                    </a>
-                </#list>
-            <#else>
-                <a href="javascript:;" class="nav-link" data-url="${request.contextPath}${menu.url!''}" data-title="${menu.menuName!''}">
-                    <i class="bi ${menu.icon!'bi-folder'}"></i>
-                    <span>${menu.menuName!''}</span>
-                </a>
-            </#if>
-        </#list>
-    </#if>
+    <!-- 菜单通过 AJAX 动态加载 -->
 </nav>
 
 <!-- Main Content -->
@@ -168,20 +151,33 @@ $(function() {
 
     // 加载菜单
     $.getJSON('${request.contextPath}/menu/init', function(data) {
-        if (data && data.menuList) {
+        if (data && data.menuInfo) {
             var html = '';
-            data.menuList.forEach(function(menu) {
-                if (menu.children && menu.children.length > 0) {
-                    html += '<div class="nav-section">' + menu.title + '</div>';
-                    menu.children.forEach(function(child) {
-                        html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + child.url + '" data-title="' + child.title + '">' +
-                            '<i class="bi ' + (child.icon || 'bi-folder') + '"></i>' +
-                            '<span>' + child.title + '</span></a>';
+            data.menuInfo.forEach(function(group) {
+                if (group.child && group.child.length > 0) {
+                    group.child.forEach(function(menu) {
+                        if (menu.child && menu.child.length > 0) {
+                            html += '<div class="nav-section">' + menu.title + '</div>';
+                            menu.child.forEach(function(child) {
+                                var url = child.href || '';
+                                // 去掉可能的 contextPath 前缀，避免重复
+                                if (url.indexOf('${request.contextPath}') === 0) {
+                                    url = url.substring('${request.contextPath}'.length);
+                                }
+                                html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + url + '" data-title="' + child.title + '">' +
+                                    '<i class="bi ' + (child.icon || 'bi-folder') + '"></i>' +
+                                    '<span>' + child.title + '</span></a>';
+                            });
+                        } else {
+                            var url = menu.href || '';
+                            if (url.indexOf('${request.contextPath}') === 0) {
+                                url = url.substring('${request.contextPath}'.length);
+                            }
+                            html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + url + '" data-title="' + menu.title + '">' +
+                                '<i class="bi ' + (menu.icon || 'bi-folder') + '"></i>' +
+                                '<span>' + menu.title + '</span></a>';
+                        }
                     });
-                } else {
-                    html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + menu.url + '" data-title="' + menu.title + '">' +
-                        '<i class="bi ' + (menu.icon || 'bi-folder') + '"></i>' +
-                        '<span>' + menu.title + '</span></a>';
                 }
             });
             $sidebar.find('.nav-section').first().after(html);

@@ -45,9 +45,9 @@ $(function() {
         paginationEl: '#pagination',
         columns: [
             { field: 'formId' },
-            { field: 'title' },
-            { field: 'description', render: function(val) { return val || '-'; } },
-            { field: 'status', render: function(val) { return val == '1' ? '<span class="badge bg-success badge-status">启用</span>' : '<span class="badge bg-secondary badge-status">停用</span>'; } },
+            { field: 'formName' },
+            { field: 'formDesc', render: function(val) { return val || '-'; } },
+            { field: 'status', render: function(val) { return val == 1 ? '<span class="badge bg-success badge-status">启用</span>' : '<span class="badge bg-secondary badge-status">停用</span>'; } },
             { field: 'formId', render: function(val, row) {
                 return '<button class="btn btn-outline-primary btn-sm me-1 btn-edit" data-id="'+val+'"><i class="bi bi-pencil"></i>编辑</button>' +
                        '<button class="btn btn-outline-danger btn-sm me-1 btn-delete" data-id="'+val+'"><i class="bi bi-trash"></i>删除</button>' +
