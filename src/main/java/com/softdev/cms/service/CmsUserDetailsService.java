@@ -23,7 +23,7 @@ public class CmsUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
         }
-        String role = ("9".equals(user.getRoleId())) ? "ADMIN" : "USER";
+        String role = (user.getRoleId() != null && user.getRoleId() == 9) ? "ADMIN" : "USER";
         return new org.springframework.security.core.userdetails.User(
                 user.getUserName(),
                 user.getPassword(),
