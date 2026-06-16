@@ -8,7 +8,8 @@
 <!-- Page Header -->
 <section class="page-header">
     <div class="container">
-        <h1>${(channel.channelName)!!}</h1>
+        <h1>${(channel.channelName)!'文章列表'}</h1>
+        <p class="mt-2 opacity-75">浏览最新发布的文章</p>
     </div>
 </section>
 
@@ -25,49 +26,71 @@
 <@ft.frontendFooter />
 <@ft.frontendScript />
 <script>
+var ctxPath = '${request.contextPath}';
 var currentPage = 1, init = 0, totalPages = 1, limit = 10;
+var channelId = '${(channel.channelId)!'0'}';
 
-function insertArticle(id, title, tab, date, description) {
-    return '<div class="article-card"><h3><a href="${request.contextPath}/page/article/' + id + '">' + title + '</a></h3>' +
-        '<div class="meta"><span class="me-3">' + tab + '</span><span>' + date + '</span></div>' +
-        '<p class="text-muted mb-0"><a href="${request.contextPath}/page/article/' + id + '" class="text-decoration-none text-muted">' + description + '</a></p></div>';
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+        var d = new Date(dateStr);
+        if (isNaN(d.getTime())) return String(dateStr).substring(0, 10);
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    } catch(e) { return String(dateStr).substring(0, 10); }
+}
+
+function insertArticle(id, title, userName, createTime, summary) {
+    var desc = summary || '';
+    if (desc.length > 120) desc = desc.substring(0, 120) + '...';
+    return '<div class="article-card">' +
+        '<h3><a href="' + ctxPath + '/page/article/' + id + '">' + title + '</a></h3>' +
+        '<div class="meta"><i class="bi bi-person me-1"></i>' + (userName || '系统') +
+        '<span class="mx-2">|</span><i class="bi bi-clock me-1"></i>' + formatDate(createTime) + '</div>' +
+        '<p class="text-muted mb-0"><a href="' + ctxPath + '/page/article/' + id + '" class="text-decoration-none text-muted">' + (desc || '点击查看详情') + '</a></p></div>';
 }
 
 function switchPage(index) {
+    if (index < 1 || index > totalPages) return;
     $('#p' + currentPage).removeClass('active');
-    $('#p' + index).addClass('active');
     currentPage = index;
+    $('#p' + currentPage).addClass('active');
     getArticleList();
 }
 
 function getArticleList() {
     $.ajax({
         type: 'POST',
-        url: '${request.contextPath}/page/article/list',
-        data: JSON.stringify({"channelId": "${(channel.channelId)!!}", "page": currentPage, "limit": limit}),
+        url: ctxPath + '/page/article/list',
+        data: JSON.stringify({"channelId": channelId, "page": currentPage, "limit": limit}),
         dataType: 'json',
         contentType: 'application/json',
         success: function(res) {
             $('#articleListDiv').html('');
-            var data = res.data, count = res.count;
+            var data = res.data || [], count = res.count || 0;
             if (count > limit && init === 0) {
                 totalPages = Math.ceil(count / limit);
                 $('#pageAreaDiv').html('');
-                $('#pageAreaDiv').append('<li class="page-item"><a class="page-link" onclick="switchPage(currentPage-1)">&laquo;</a></li>');
+                $('#pageAreaDiv').append('<li class="page-item"><a class="page-link" href="javascript:switchPage(currentPage-1)">&laquo;</a></li>');
                 for (var i = 1; i <= totalPages; i++) {
-                    $('#pageAreaDiv').append('<li class="page-item" id="p' + i + '"><a class="page-link" onclick="switchPage(' + i + ')">' + i + '</a></li>');
+                    $('#pageAreaDiv').append('<li class="page-item" id="p' + i + '"><a class="page-link" href="javascript:switchPage(' + i + ')">' + i + '</a></li>');
                 }
-                $('#pageAreaDiv').append('<li class="page-item"><a class="page-link" onclick="switchPage(currentPage+1)">&raquo;</a></li>');
+                $('#pageAreaDiv').append('<li class="page-item"><a class="page-link" href="javascript:switchPage(currentPage+1)">&raquo;</a></li>');
                 currentPage = 1;
                 init = 1;
                 $('#p1').addClass('active');
             }
             if (!data || data.length < 1) {
-                $('#articleListDiv').html('<p class="text-muted text-center">该分类下没有文章</p>');
+                $('#articleListDiv').html('<div class="text-center py-5"><i class="bi bi-inbox text-muted" style="font-size:3rem;"></i><p class="text-muted mt-3">该分类下没有文章</p></div>');
                 return;
             }
             for (var n in data) {
-                $('#articleListDiv').append(insertArticle(data[n].articleId, data[n].title, data[n].createUserName, data[n].createTime, data[n].description));
+                $('#articleListDiv').append(insertArticle(
+                    data[n].articleId,
+                    data[n].title,
+                    data[n].createUserName,
+                    data[n].createTime,
+                    data[n].summary || data[n].content || ''
+                ));
             }
         }
     });

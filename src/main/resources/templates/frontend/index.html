@@ -9,10 +9,10 @@
 <section class="hero-banner">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-7">
-                <h1 class="mb-3">${(templateMap.bannerTitle)!!}</h1>
-                <p class="lead mb-4">${(templateMap.bannerDescription)!!}</p>
-                <a href="${(templateMap.bannerUrl)!!}" class="btn btn-light btn-lg px-4">${(templateMap.bannerButton)!!}</a>
+            <div class="col-lg-8">
+                <h1 class="mb-3">${(templateMap.bannerTitle)!'专业的内容管理解决方案'}</h1>
+                <p class="lead mb-4">${(templateMap.bannerDescription)!'基于 Spring Boot + MyBatis 的现代化 CMS 系统，让您的网站建设更高效'}</p>
+                <a href="${(templateMap.bannerUrl)!'/page/channel/1'}" class="btn btn-light btn-lg px-4">${(templateMap.bannerButton)!'立即体验'}</a>
             </div>
         </div>
     </div>
@@ -22,32 +22,32 @@
 <section class="section-padding">
     <div class="container">
         <div class="text-center mb-5">
-            <h2>${(templateMap.serviceTitle)!!}</h2>
-            <p class="lead text-muted">${(templateMap.serviceDescription)!!}</p>
+            <h2>${(templateMap.serviceTitle)!'核心功能'}</h2>
+            <p class="lead text-muted">${(templateMap.serviceDescription)!'提供完整的文章管理、栏目管理、活动管理、表单管理等功能'}</p>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="service-card">
-                    <img src="${request.contextPath}/static/frontend${(templateMap.service1icon)!!}" width="64" alt="">
-                    <h5 class="mt-3">${(templateMap.service1title)!!}</h5>
-                    <p class="text-muted">${(templateMap.service1description)!!}</p>
-                    <a href="${(templateMap.service1url)!!}" class="btn btn-outline-primary">${(templateMap.readMore)!!}</a>
+                    <i class="bi ${(templateMap.service1icon)!'bi-journal-text'} text-primary" style="font-size:3rem;"></i>
+                    <h5 class="mt-3">${(templateMap.service1title)!'文章管理'}</h5>
+                    <p class="text-muted">${(templateMap.service1description)!'富文本编辑、文章分类、标签管理、SEO优化'}</p>
+                    <a href="${(templateMap.service1url)!'/page/channel/1'}" class="btn btn-outline-primary">${(templateMap.readMore)!'了解更多'}</a>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="service-card">
-                    <img src="${request.contextPath}/static/frontend${(templateMap.service2icon)!!}" width="64" alt="">
-                    <h5 class="mt-3">${(templateMap.service2title)!!}</h5>
-                    <p class="text-muted">${(templateMap.service2description)!!}</p>
-                    <a href="${(templateMap.service2url)!!}" class="btn btn-outline-primary">${(templateMap.readMore)!!}</a>
+                    <i class="bi ${(templateMap.service2icon)!'bi-diagram-3'} text-primary" style="font-size:3rem;"></i>
+                    <h5 class="mt-3">${(templateMap.service2title)!'栏目管理'}</h5>
+                    <p class="text-muted">${(templateMap.service2description)!'多级栏目、权限控制、模板配置、灵活排序'}</p>
+                    <a href="${(templateMap.service2url)!'/page/channel/1'}" class="btn btn-outline-primary">${(templateMap.readMore)!'了解更多'}</a>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="service-card">
-                    <img src="${request.contextPath}/static/frontend${(templateMap.service3icon)!!}" width="64" alt="">
-                    <h5 class="mt-3">${(templateMap.service3title)!!}</h5>
-                    <p class="text-muted">${(templateMap.service3description)!!}</p>
-                    <a href="${(templateMap.service3url)!!}" class="btn btn-outline-primary">${(templateMap.readMore)!!}</a>
+                    <i class="bi ${(templateMap.service3icon)!'bi-calendar-check'} text-primary" style="font-size:3rem;"></i>
+                    <h5 class="mt-3">${(templateMap.service3title)!'活动与表单'}</h5>
+                    <p class="text-muted">${(templateMap.service3description)!'活动发布、在线签到、自定义表单、数据收集'}</p>
+                    <a href="${(templateMap.service3url)!'/page/activity/search'}" class="btn btn-outline-primary">${(templateMap.readMore)!'了解更多'}</a>
                 </div>
             </div>
         </div>
@@ -57,9 +57,9 @@
 <!-- Solution -->
 <section class="section-padding section-bg">
     <div class="container text-center">
-        <h1 class="mb-3">${(templateMap.solutionTitle)!!}</h1>
-        <p class="lead text-muted mb-4">${(templateMap.solutionDescription)!!}</p>
-        <a href="${(templateMap.solutionUrl)!!}" class="btn btn-primary btn-lg">${(templateMap.readMore)!!}</a>
+        <h1 class="mb-3">${(templateMap.solutionTitle)!'一站式内容管理平台'}</h1>
+        <p class="lead text-muted mb-4">${(templateMap.solutionDescription)!'从文章发布到数据收集，从模板配置到用户管理，满足您的所有需求'}</p>
+        <a href="${(templateMap.solutionUrl)!'/page/channel/1'}" class="btn btn-primary btn-lg">${(templateMap.readMore)!'了解更多'}</a>
     </div>
 </section>
 
@@ -68,11 +68,11 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h5 class="mb-1">${(templateMap.quoteTitle)!!}</h5>
-                <p class="mb-0">${(templateMap.quoteDescription)!!}</p>
+                <h5 class="mb-1">${(templateMap.quoteTitle)!'开始构建您的专属网站'}</h5>
+                <p class="mb-0">${(templateMap.quoteDescription)!'专业的技术架构，灵活的扩展能力，助力您的业务发展'}</p>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <a href="${(templateMap.quoteUrl)!!}" class="btn btn-outline-light">${(templateMap.readMore)!!}</a>
+                <a href="${(templateMap.quoteUrl)!'/admin/login'}" class="btn btn-outline-light">${(templateMap.readMore)!'了解更多'}</a>
             </div>
         </div>
     </div>
@@ -83,12 +83,14 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 text-center text-md-start">
-                <h2 class="mb-3">${(templateMap.consultingTitle)!!}</h2>
-                <p class="text-muted">${(templateMap.consultingDescription)!!}</p>
-                <a href="${(templateMap.consultingUrl)!!}" class="btn btn-primary">${(templateMap.readMore)!!}</a>
+                <h2 class="mb-3">${(templateMap.consultingTitle)!'专业的技术架构'}</h2>
+                <p class="text-muted">${(templateMap.consultingDescription)!'基于 Spring Boot 3.x + MyBatis 构建，采用前后端分离架构，支持多端适配，性能稳定，易于扩展。'}</p>
+                <a href="${(templateMap.consultingUrl)!'/page/channel/1'}" class="btn btn-primary">${(templateMap.readMore)!'了解更多'}</a>
             </div>
             <div class="col-md-6 mt-4 mt-md-0">
-                <img src="${request.contextPath}/static/frontend/img/intro/team.jpg" class="img-fluid rounded" alt="">
+                <div class="d-flex justify-content-center align-items-center bg-light rounded p-5" style="height:280px;">
+                    <i class="bi bi-hdd-stack text-primary" style="font-size:6rem;"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -96,15 +98,5 @@
 
 <@ft.frontendFooter />
 <@ft.frontendScript />
-<script>
-$(function() {
-    $('a').each(function() {
-        var href = $(this).attr('href');
-        if (href && href.startsWith('#')) {
-            $(this).attr('href', href.replaceAll('#', '${request.contextPath}/page/article/'));
-        }
-    });
-});
-</script>
 </body>
 </html>

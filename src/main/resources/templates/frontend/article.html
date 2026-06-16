@@ -8,8 +8,8 @@
 <!-- Page Header -->
 <section class="page-header">
     <div class="container">
-        <h1>${(article.title)!!}</h1>
-        <p class="mt-2 opacity-75">发布者：${(article.createUserName)!!} | 时间：${(article.createTime?string('yyyy年MM月dd日'))!!}</p>
+        <h1>${(article.title)!'文章未找到'}</h1>
+        <p class="mt-2 opacity-75">发布者：${(article.createUserName)!'系统'} | 时间：<#if article?? && article.createTime??>${article.createTime?string('yyyy年MM月dd日 HH:mm')}</#if></p>
     </div>
 </section>
 
@@ -18,15 +18,27 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="article-content">
-                    ${(article.content)!!}
+                <#if article?? && article.coverImage?? && (article.coverImage?length > 0)>
+                <div class="mb-4 text-center">
+                    <img src="${article.coverImage}" alt="${article.title}" class="img-fluid rounded">
                 </div>
-                <#if (article.keyword)??>
+                </#if>
+                <div class="article-content">
+                    ${(article.content)!"<p class='text-muted'>暂无内容</p>"}
+                </div>
+                <#if article?? && article.keyword?? && (article.keyword?length > 0)>
                 <div class="mt-4">
-                    <span class="text-muted">Tags:</span>
+                    <span class="text-muted"><i class="bi bi-tags me-1"></i>标签：</span>
                     <#list article.keyword?split(",") as name>
-                    <span class="badge bg-light text-dark me-1">${name}</span>
+                        <#if name?trim?length gt 0>
+                        <span class="badge bg-light text-dark me-1 border">${name}</span>
+                        </#if>
                     </#list>
+                </div>
+                </#if>
+                <#if article?? && article.viewCount??>
+                <div class="mt-3 text-muted small">
+                    <i class="bi bi-eye me-1"></i>浏览次数：${article.viewCount}
                 </div>
                 </#if>
             </div>
@@ -38,11 +50,18 @@
 <@ft.frontendScript />
 <script>
 $(function() {
-    $('img').each(function() {
+    var ctxPath = '${request.contextPath}';
+    $('.article-content img').each(function() {
         var src = $(this).attr('src');
-        if (src && src.startsWith('@@@')) {
-            $(this).attr('src', src.replaceAll('@@@', '${request.contextPath}/file/files/'));
+        if (src) {
+            if (src.startsWith('@@@')) {
+                $(this).attr('src', src.replace('@@@', ctxPath + '/file/files/'));
+            }
+            $(this).addClass('img-fluid rounded');
         }
+    });
+    $('.article-content table').each(function() {
+        $(this).addClass('table table-bordered');
     });
 });
 </script>
