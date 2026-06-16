@@ -1,10 +1,11 @@
 package com.softdev.cms.controller;
 
-import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.softdev.cms.entity.User;
 import com.softdev.cms.mapper.UserMapper;
 import com.softdev.cms.util.Result;
+import com.wf.captcha.SpecCaptcha;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.util.Base64;
 
 @Controller
 @RequestMapping("/admin")
@@ -27,27 +25,26 @@ public class BackEndController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private DefaultKaptcha defaultKaptcha;
-
     @GetMapping("/login")
     public String loginPage() {
         return "cms/login";
     }
 
     @GetMapping("/captcha")
-    @ResponseBody
-    public Result<String> captcha(HttpServletRequest request) {
-        String captchaText = defaultKaptcha.createText();
-        HttpSession session = request.getSession();
-        session.setAttribute("captcha", captchaText);
-        BufferedImage image = defaultKaptcha.createImage(captchaText);
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "jpg", os);
-            String base64 = Base64.getEncoder().encodeToString(os.toByteArray());
-            return Result.success("data:image/jpg;base64," + base64);
+    public void captcha(HttpServletRequest request, HttpServletResponse response) {
+        response.setContentType("image/png");
+        response.setHeader("Cache-Control", "no-store");
+        try {
+            SpecCaptcha captcha = new SpecCaptcha(130, 48, 4);
+            String text = captcha.text();
+            HttpSession session = request.getSession();
+            session.setAttribute("captcha", text.toLowerCase());
+            try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+                captcha.out(os);
+                response.getOutputStream().write(os.toByteArray());
+            }
         } catch (Exception e) {
-            return Result.fail("验证码生成失败");
+            throw new RuntimeException("验证码生成失败", e);
         }
     }
 
@@ -59,7 +56,8 @@ public class BackEndController {
                                 HttpServletRequest request) {
         HttpSession session = request.getSession();
         String sessionCaptcha = (String) session.getAttribute("captcha");
-        if (StringUtils.isBlank(captcha) || !captcha.equalsIgnoreCase(sessionCaptcha)) {
+        if (StringUtils.isBlank(captcha) || StringUtils.isBlank(sessionCaptcha)
+                || !captcha.toLowerCase().equals(sessionCaptcha)) {
             return Result.fail("验证码错误");
         }
         session.removeAttribute("captcha");

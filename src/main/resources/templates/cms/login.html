@@ -32,13 +32,15 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">验证码</label>
-                <div class="captcha-row">
-                    <div class="input-group">
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="input-group flex-grow-1">
                         <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
-                        <input type="text" class="form-control" id="captcha" name="captcha" placeholder="请输入验证码" required>
+                        <input type="text" class="form-control" id="captcha" name="captcha" placeholder="请输入验证码" required maxlength="4">
                     </div>
-                    <img id="captchaPic" src="${request.contextPath}/admin/captcha" alt="验证码" title="点击刷新">
+                    <img id="captchaPic" src="${request.contextPath}/admin/captcha" alt="验证码" title="点击刷新验证码"
+                         class="captcha-img border rounded" style="cursor:pointer;height:48px;width:130px;object-fit:cover;">
                 </div>
+                <small class="text-muted d-block mt-1"><i class="bi bi-info-circle"></i> 点击图片可刷新验证码</small>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
@@ -51,48 +53,71 @@
     </div>
 </div>
 
+<!-- Toast 容器 -->
+<div id="toastContainer" class="toast-container position-fixed top-3 end-3 p-3" style="z-index:9999;">
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // 跳出iframe
     if (top.location !== self.location) top.location = self.location;
 
+    var contextPath = '${request.contextPath}';
+
+    function showToast(msg, type) {
+        var bgClass = type === 'success' ? 'bg-success' : (type === 'danger' ? 'bg-danger' : 'bg-warning text-dark');
+        var toastHtml = '<div class="toast align-items-center text-white border-0 ' + bgClass + ' show" role="alert">' +
+            '<div class="d-flex"><div class="toast-body">' + msg + '</div>' +
+            '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+            '</div></div>';
+        $('#toastContainer').html(toastHtml);
+        var toastEl = $('#toastContainer .toast')[0];
+        bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2500 }).show();
+    }
+
+    function refreshCaptcha() {
+        $('#captchaPic').css('opacity', '0.4');
+        $('#captchaPic').attr('src', contextPath + '/admin/captcha?t=' + new Date().getTime());
+        setTimeout(function() {
+            $('#captchaPic').css('opacity', '1');
+        }, 300);
+    }
+
     $(function() {
-        // 点击刷新验证码
         $('#captchaPic').on('click', function() {
-            $(this).attr('src', '${request.contextPath}/admin/captcha?t=' + new Date().getTime());
+            refreshCaptcha();
+            $('#captcha').val('').focus();
         });
 
-        // 登录表单提交
         $('#loginForm').on('submit', function(e) {
             e.preventDefault();
             var username = $('#username').val().trim();
             var password = $('#password').val().trim();
             var captcha = $('#captcha').val().trim();
 
-            if (!username) { CmsUtil.showToast('用户名不能为空', 'warning'); return; }
-            if (!password) { CmsUtil.showToast('密码不能为空', 'warning'); return; }
-            if (!captcha) { CmsUtil.showToast('验证码不能为空', 'warning'); return; }
+            if (!username) { showToast('用户名不能为空', 'warning'); return; }
+            if (!password) { showToast('密码不能为空', 'warning'); return; }
+            if (!captcha) { showToast('验证码不能为空', 'warning'); return; }
 
             $.ajax({
                 type: 'POST',
-                url: '${request.contextPath}/admin/login',
+                url: contextPath + '/admin/login',
                 data: { userName: username, password: password, captcha: captcha },
                 dataType: 'json',
                 success: function(res) {
                     if (res.code === 200) {
-                        CmsUtil.showToast('登录成功', 'success');
+                        showToast('登录成功', 'success');
                         setTimeout(function() {
-                            window.location.href = '${request.contextPath}/admin/index';
+                            window.location.href = contextPath + '/admin/index';
                         }, 500);
                     } else {
-                        CmsUtil.showToast(res.msg || '登录失败', 'danger');
-                        $('#captchaPic').attr('src', '${request.contextPath}/admin/captcha?t=' + new Date().getTime());
+                        showToast(res.msg || '登录失败', 'danger');
+                        refreshCaptcha();
                         $('#captcha').val('');
                     }
                 },
                 error: function() {
-                    CmsUtil.showToast('网络错误，请重试', 'danger');
+                    showToast('网络错误，请重试', 'danger');
                 }
             });
         });
