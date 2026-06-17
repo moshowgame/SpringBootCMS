@@ -121,7 +121,7 @@ public class FrontEndService {
         return ctx;
     }
 
-    @Cacheable(value = "cache-channel", key = "#status")
+    @Cacheable(value = "cache-channel", key = "'list-' + #status")
     public List<Channel> getChannelList(Integer status) {
         List<Channel> all = channelMapper.selectAll();
         return all.stream()
@@ -134,7 +134,7 @@ public class FrontEndService {
                 .toList();
     }
 
-    @Cacheable(value = "cache-channel", key = "#channelId")
+    @Cacheable(value = "cache-channel", key = "'id-' + #channelId")
     public Channel getChannelById(Integer channelId) {
         return channelMapper.selectById(channelId);
     }
