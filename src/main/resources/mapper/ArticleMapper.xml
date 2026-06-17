@@ -13,6 +13,28 @@
         ORDER BY is_top DESC, article_id DESC
     </select>
 
+    <select id="selectRelated" resultType="Article">
+        SELECT t0.*, t1.channel_name FROM article t0
+        LEFT JOIN channel t1 ON t0.channel_id = t1.channel_id AND t1.deleted = 0
+        WHERE t0.deleted = 0 AND t0.status = 1
+        AND t0.channel_id = #{channelId}
+        AND t0.article_id != #{articleId}
+        ORDER BY t0.article_id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectPrev" resultType="Article">
+        SELECT * FROM article
+        WHERE deleted = 0 AND status = 1 AND article_id &lt; #{articleId}
+        ORDER BY article_id DESC LIMIT 1
+    </select>
+
+    <select id="selectNext" resultType="Article">
+        SELECT * FROM article
+        WHERE deleted = 0 AND status = 1 AND article_id &gt; #{articleId}
+        ORDER BY article_id ASC LIMIT 1
+    </select>
+
     <select id="selectBySlug" resultType="Article">
         SELECT * FROM article WHERE slug = #{slug} AND deleted = 0
     </select>
@@ -20,6 +42,10 @@
     <update id="incrementViewCount">
         UPDATE article SET view_count = view_count + 1 WHERE article_id = #{articleId} AND deleted = 0
     </update>
+
+    <select id="sumViewCount" resultType="java.lang.Long">
+        SELECT COALESCE(SUM(view_count), 0) FROM article WHERE deleted = 0 AND status = 1
+    </select>
 
     <select id="pageAll" resultType="Article">
         SELECT t0.*, t1.channel_name FROM article t0

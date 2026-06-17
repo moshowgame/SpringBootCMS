@@ -47,7 +47,7 @@
                 <table class="table table-sm mb-0">
                     <tbody>
                         <tr><td class="text-muted" style="width:120px;">系统名称</td><td>SpringBootCMS</td></tr>
-                        <tr><td class="text-muted">后端框架</td><td>Spring Boot 4.0 + MyBatis 4.0</td></tr>
+                        <tr><td class="text-muted">后端框架</td><td>Spring Boot 3.5 + MyBatis 3.0</td></tr>
                         <tr><td class="text-muted">管理后台</td><td>jQuery 3.7 + Bootstrap 5.3</td></tr>
                         <tr><td class="text-muted">缓存方案</td><td>Caffeine</td></tr>
                         <tr><td class="text-muted">认证方式</td><td>Session + Spring Security</td></tr>
@@ -66,7 +66,7 @@
                 <div class="mb-3">
                     <span class="badge bg-primary me-2">最新</span>
                     <strong>v2.0 重构版</strong>
-                    <p class="text-muted mt-1 mb-2 ms-4">升级Spring Boot 4.0，替换JWT为Session认证，MyBatis-Plus迁移至原生MyBatis，UI改版为Bootstrap5</p>
+                    <p class="text-muted mt-1 mb-2 ms-4">升级Spring Boot 3.5，替换JWT为Session认证，MyBatis-Plus迁移至原生MyBatis，UI改版为Bootstrap5</p>
                 </div>
                 <div class="mb-3">
                     <span class="badge bg-secondary me-2">v1.x</span>
@@ -81,17 +81,16 @@
 <@netCommon.commonScript />
 <script>
 $(function() {
-    // 加载统计数据
-    $.get('${request.contextPath}/user/pageAll', {page:1, limit:1}, function(res) {
-        $('#statUser').text(res.count || 0);
+    // 单接口加载所有统计数据
+    $.get('${request.contextPath}/admin/dashboard/stats', function(res) {
+        var d = (res.data || {});
+        $('#statUser').text(d.userCount || 0);
+        $('#statArticle').text(d.articleCount || 0);
+        $('#statView').text(d.viewCount != null ? d.viewCount : 0);
+        $('#statForm').text(d.formCount || 0);
+    }).fail(function() {
+        $('#statUser,#statArticle,#statView,#statForm').text(0);
     });
-    $.get('${request.contextPath}/article/pageAll', {page:1, limit:1}, function(res) {
-        $('#statArticle').text(res.count || 0);
-    });
-    $.get('${request.contextPath}/form/pageAll', {page:1, limit:1}, function(res) {
-        $('#statForm').text(res.count || 0);
-    });
-    $('#statView').text('-');
 });
 </script>
 </body>

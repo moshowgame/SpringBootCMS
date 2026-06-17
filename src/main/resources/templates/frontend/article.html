@@ -5,11 +5,35 @@
 <body>
 <@ft.frontendHeader />
 
+<!-- Breadcrumb -->
+<section class="article-breadcrumb">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="${request.contextPath}/page/index">首页</a></li>
+                <#if article?? && article.channelId??>
+                <li class="breadcrumb-item"><a href="${request.contextPath}/page/channel/${article.channelId}">${(article.channelName)!'栏目'}</a></li>
+                </#if>
+                <li class="breadcrumb-item active" aria-current="page">${(article.title)!'文章'}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
 <!-- Page Header -->
 <section class="page-header">
     <div class="container">
         <h1>${(article.title)!'文章未找到'}</h1>
-        <p class="mt-2 opacity-75">发布者：${(article.createUserName)!'系统'} | 时间：<#if article?? && article.createTime??>${article.createTime?string('yyyy年MM月dd日 HH:mm')}</#if></p>
+        <p class="mt-2 mb-0 opacity-75">
+            <#if article?? && article.channelName?? && (article.channelName?length > 0)>
+            <i class="bi bi-folder2 me-1"></i>${article.channelName}
+            <span class="mx-2">|</span>
+            </#if>
+            <i class="bi bi-person me-1"></i>发布者：${(article.createUserName)!'系统'}
+            <span class="mx-2">|</span>
+            <i class="bi bi-clock me-1"></i><#if article?? && article.createTime??>${article.createTime?string('yyyy年MM月dd日 HH:mm')}</#if>
+            <#if article?? && article.viewCount??><span class="mx-2">|</span><i class="bi bi-eye me-1"></i>${article.viewCount} 次浏览</#if>
+        </p>
     </div>
 </section>
 
@@ -27,18 +51,65 @@
                     ${(article.content)!"<p class='text-muted'>暂无内容</p>"}
                 </div>
                 <#if article?? && article.keyword?? && (article.keyword?length > 0)>
-                <div class="mt-4">
+                <div class="mt-4 article-tags">
                     <span class="text-muted"><i class="bi bi-tags me-1"></i>标签：</span>
                     <#list article.keyword?split(",") as name>
                         <#if name?trim?length gt 0>
-                        <span class="badge bg-light text-dark me-1 border">${name}</span>
+                        <a href="${request.contextPath}/page/search?keyword=<#-- search page reads #searchParam input -->" class="badge bg-light text-dark me-1 border text-decoration-none" onclick="quickSearch('${name?trim?js_string}');return false;">${name?trim}</a>
                         </#if>
                     </#list>
                 </div>
                 </#if>
-                <#if article?? && article.viewCount??>
-                <div class="mt-3 text-muted small">
-                    <i class="bi bi-eye me-1"></i>浏览次数：${article.viewCount}
+
+                <!-- 上一篇 / 下一篇 -->
+                <#if articleCtx??>
+                <div class="row g-3 mt-4 article-nav">
+                    <div class="col-md-6">
+                        <#if articleCtx.prev??>
+                        <a href="${request.contextPath}/page/article/${articleCtx.prev.articleId}" class="article-nav-link text-decoration-none d-block">
+                            <span class="text-muted small"><i class="bi bi-chevron-left"></i> 上一篇</span>
+                            <span class="d-block text-truncate">${articleCtx.prev.title}</span>
+                        </a>
+                        <#else>
+                        <div class="article-nav-link text-muted">已经是第一篇</div>
+                        </#if>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <#if articleCtx.next??>
+                        <a href="${request.contextPath}/page/article/${articleCtx.next.articleId}" class="article-nav-link text-decoration-none d-block">
+                            <span class="text-muted small">下一篇 <i class="bi bi-chevron-right"></i></span>
+                            <span class="d-block text-truncate">${articleCtx.next.title}</span>
+                        </a>
+                        <#else>
+                        <div class="article-nav-link text-muted">已经是最后一篇</div>
+                        </#if>
+                    </div>
+                </div>
+                </#if>
+
+                <!-- 相关文章 -->
+                <#if articleCtx?? && articleCtx.related?? && (articleCtx.related?size > 0)>
+                <div class="related-articles mt-5">
+                    <h4 class="mb-3"><i class="bi bi-collection me-2"></i>相关文章</h4>
+                    <div class="row g-3">
+                        <#list articleCtx.related as rel>
+                        <div class="col-md-6">
+                            <a href="${request.contextPath}/page/article/${rel.articleId}" class="related-card text-decoration-none d-flex align-items-center">
+                                <div class="related-cover">
+                                    <#if rel.coverImage?? && (rel.coverImage?length > 0)>
+                                        <img src="${rel.coverImage}" alt="${rel.title}">
+                                    <#else>
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </#if>
+                                </div>
+                                <div class="related-body">
+                                    <span class="related-title text-truncate d-block">${rel.title}</span>
+                                    <span class="related-meta text-muted"><#if rel.createTime??>${rel.createTime?string('yyyy-MM-dd')}</#if></span>
+                                </div>
+                            </a>
+                        </div>
+                        </#list>
+                    </div>
                 </div>
                 </#if>
             </div>
@@ -46,15 +117,21 @@
     </div>
 </section>
 
+<!-- 返回顶部 -->
+<button id="btnBackTop" class="btn-backtop" title="返回顶部" aria-label="返回顶部">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
 <@ft.frontendFooter />
 <@ft.frontendScript />
 <script>
+var ctxPath = '${request.contextPath}';
 $(function() {
-    var ctxPath = '${request.contextPath}';
+    // 正文图片路径占位符替换（@@@ -> 真实静态地址）
     $('.article-content img').each(function() {
         var src = $(this).attr('src');
         if (src) {
-            if (src.startsWith('@@@')) {
+            if (src.indexOf('@@@') === 0) {
                 $(this).attr('src', src.replace('@@@', ctxPath + '/file/files/'));
             }
             $(this).addClass('img-fluid rounded');
@@ -63,6 +140,18 @@ $(function() {
     $('.article-content table').each(function() {
         $(this).addClass('table table-bordered');
     });
+
+    // 标签快捷搜索
+    window.quickSearch = function(keyword) {
+        window.location.href = ctxPath + '/page/search?keyword=' + encodeURIComponent(keyword);
+    };
+
+    // 返回顶部
+    var $btn = $('#btnBackTop');
+    $(window).on('scroll', function() {
+        if ($(window).scrollTop() > 300) { $btn.addClass('show'); } else { $btn.removeClass('show'); }
+    });
+    $btn.on('click', function() { $('html,body').animate({scrollTop:0}, 300); });
 });
 </script>
 </body>

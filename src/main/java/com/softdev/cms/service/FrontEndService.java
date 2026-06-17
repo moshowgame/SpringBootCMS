@@ -3,6 +3,7 @@ package com.softdev.cms.service;
 import com.softdev.cms.entity.Article;
 import com.softdev.cms.entity.Channel;
 import com.softdev.cms.entity.Template;
+import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.mapper.ArticleMapper;
 import com.softdev.cms.mapper.ChannelMapper;
 import com.softdev.cms.mapper.TemplateMapper;
@@ -98,6 +99,28 @@ public class FrontEndService {
         }
     }
 
+    /**
+     * 文章详情页上下文：上一页 / 下一页 / 相关文章，用于详情页企业级增强。
+     * key 带上 articleId 以保证缓存正确。
+     */
+    @Cacheable(value = "cache-article", key = "'ctx-' + #articleId")
+    public Map<String, Object> getArticleContext(String articleId) {
+        Map<String, Object> ctx = new LinkedHashMap<>();
+        try {
+            Integer id = Integer.valueOf(articleId);
+            Article current = articleMapper.selectById(id);
+            ctx.put("prev", articleMapper.selectPrev(id));
+            ctx.put("next", articleMapper.selectNext(id));
+            Integer channelId = (current != null && current.getChannelId() != null) ? current.getChannelId() : id;
+            ctx.put("related", articleMapper.selectRelated(channelId, id, 4));
+        } catch (NumberFormatException e) {
+            ctx.put("prev", null);
+            ctx.put("next", null);
+            ctx.put("related", java.util.Collections.emptyList());
+        }
+        return ctx;
+    }
+
     @Cacheable(value = "cache-channel", key = "#status")
     public List<Channel> getChannelList(Integer status) {
         List<Channel> all = channelMapper.selectAll();
@@ -114,5 +137,18 @@ public class FrontEndService {
     @Cacheable(value = "cache-channel", key = "#channelId")
     public Channel getChannelById(Integer channelId) {
         return channelMapper.selectById(channelId);
+    }
+
+    /**
+     * 首页最新已发布文章（默认取 6 篇），供首页动态区块展示。
+     */
+    @Cacheable(value = "cache-article", key = "'latest-' + #limit")
+    public List<Article> getLatestArticles(Integer limit) {
+        QueryParamDTO queryParamDTO = new QueryParamDTO();
+        queryParamDTO.setStatus(1);
+        queryParamDTO.setPage(1);
+        queryParamDTO.setLimit(limit == null ? 6 : limit);
+        queryParamDTO.setPageLimit(1, queryParamDTO.getLimit());
+        return articleMapper.pageAll(queryParamDTO);
     }
 }

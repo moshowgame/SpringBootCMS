@@ -70,6 +70,8 @@ $(function() {
     var $tabs = $('#cmsTabs');
     var $currentTitle = $('#currentTabTitle');
     var tabs = [];
+    // tabId -> { url, title }：关闭/切换 tab 时需要据此更新 iframe
+    var tabMeta = {};
     var activeTabId = 'home';
 
     // 侧边栏折叠
@@ -101,6 +103,7 @@ $(function() {
         }
 
         tabs.push(tabId);
+        tabMeta[tabId] = { url: url, title: title };
         $tabBar.show();
 
         // 添加tab
@@ -110,25 +113,33 @@ $(function() {
         $tabs.append(tabHtml);
 
         activateTab(tabId);
-        $mainFrame.attr('src', url);
-        $currentTitle.text(title);
     }
 
+    // 激活某个 tab：同时更新高亮样式、iframe 地址与顶部标题
     function activateTab(tabId) {
         activeTabId = tabId;
         $tabs.find('.nav-link').removeClass('active');
         $tabs.find('[data-tab="' + tabId + '"] .nav-link').addClass('active');
+        var meta = tabMeta[tabId];
+        if (meta) {
+            if ($mainFrame.attr('src') !== meta.url) {
+                $mainFrame.attr('src', meta.url);
+            }
+            $currentTitle.text(meta.title);
+        }
     }
 
     // 关闭tab
     $(document).on('click', '[data-close]', function(e) {
         e.preventDefault();
-        e.stopPropagation();
+        e.stopImmediatePropagation();
         var tabId = $(this).data('close');
         var idx = tabs.indexOf(tabId);
         if (idx < 0) return;
 
+        var wasActive = (activeTabId === tabId);
         tabs.splice(idx, 1);
+        delete tabMeta[tabId];
         $('[data-tab="' + tabId + '"]').remove();
 
         if (tabs.length === 0) {
@@ -136,7 +147,8 @@ $(function() {
             $mainFrame.attr('src', '${request.contextPath}/admin/welcome');
             $currentTitle.text('首页');
             activeTabId = 'home';
-        } else {
+        } else if (wasActive) {
+            // 关闭的是当前激活的 tab，切到相邻 tab 并刷新 iframe
             var newActive = tabs[Math.max(0, idx - 1)];
             activateTab(newActive);
         }

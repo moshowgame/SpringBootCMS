@@ -68,6 +68,7 @@ function resetAndSearch() {
 }
 
 function getArticleList() {
+    $('#articleListDiv').html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="text-muted mt-2">加载中...</p></div>');
     $.ajax({
         type: 'POST',
         url: ctxPath + '/page/article/list',
@@ -102,9 +103,17 @@ function getArticleList() {
                     data[n].summary || data[n].content || ''
                 ));
             }
+        },
+        error: function() {
+            $('#articleListDiv').html('<div class="text-center py-5"><i class="bi bi-exclamation-triangle text-danger" style="font-size:3rem;"></i><p class="text-muted mt-3">加载失败，请稍后重试</p></div>');
         }
     });
 }
+
+// 从URL读取keyword参数并填充搜索框，然后执行首次搜索
+var urlParams = new URLSearchParams(window.location.search);
+var kw = urlParams.get('keyword');
+if (kw) { $('#searchParam').val(kw); }
 getArticleList();
 </script>
 </body>

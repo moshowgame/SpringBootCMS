@@ -8,15 +8,26 @@
 <!-- Page Header -->
 <section class="page-header">
     <div class="container">
+        <nav aria-label="breadcrumb" class="mb-2">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a href="${request.contextPath}/page/index" class="text-white-50 text-decoration-none">首页</a></li>
+                <li class="breadcrumb-item text-white active" aria-current="page">${(channel.channelName)!'文章列表'}</li>
+            </ol>
+        </nav>
         <h1>${(channel.channelName)!'文章列表'}</h1>
-        <p class="mt-2 opacity-75">浏览最新发布的文章</p>
+        <p class="mt-2 mb-0 opacity-75">${(channel.description)!'浏览最新发布的文章'}</p>
     </div>
 </section>
 
 <!-- Article List -->
 <section class="section-padding">
     <div class="container">
-        <div id="articleListDiv"></div>
+        <div id="articleListDiv" class="row g-4">
+            <#-- 骨架屏占位 -->
+            <div class="col-md-6 col-lg-4 skeleton-col" style="display:none;">
+                <div class="list-card-skeleton"></div>
+            </div>
+        </div>
         <nav aria-label="文章分页">
             <ul class="pagination justify-content-center" id="pageAreaDiv"></ul>
         </nav>
@@ -27,7 +38,7 @@
 <@ft.frontendScript />
 <script>
 var ctxPath = '${request.contextPath}';
-var currentPage = 1, init = 0, totalPages = 1, limit = 10;
+var currentPage = 1, init = 0, totalPages = 1, limit = 9;
 var channelId = '${(channel.channelId)!'0'}';
 
 function formatDate(dateStr) {
@@ -39,14 +50,39 @@ function formatDate(dateStr) {
     } catch(e) { return String(dateStr).substring(0, 10); }
 }
 
-function insertArticle(id, title, userName, createTime, summary) {
+function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, function(c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+}
+
+function insertArticle(id, title, userName, createTime, summary, coverImage, channelName) {
     var desc = summary || '';
-    if (desc.length > 120) desc = desc.substring(0, 120) + '...';
-    return '<div class="article-card">' +
-        '<h3><a href="' + ctxPath + '/page/article/' + id + '">' + title + '</a></h3>' +
-        '<div class="meta"><i class="bi bi-person me-1"></i>' + (userName || '系统') +
-        '<span class="mx-2">|</span><i class="bi bi-clock me-1"></i>' + formatDate(createTime) + '</div>' +
-        '<p class="text-muted mb-0"><a href="' + ctxPath + '/page/article/' + id + '" class="text-decoration-none text-muted">' + (desc || '点击查看详情') + '</a></p></div>';
+    if (desc.length > 100) desc = desc.substring(0, 100) + '...';
+    var cover = coverImage
+        ? '<img src="' + escapeHtml(coverImage) + '" alt="' + escapeHtml(title) + '">'
+        : '<div class="list-cover-placeholder"><i class="bi bi-image"></i></div>';
+    var chTag = channelName ? '<span class="list-tag">' + escapeHtml(channelName) + '</span>' : '';
+    return '<div class="col-md-6 col-lg-4">' +
+        '<a href="' + ctxPath + '/page/article/' + id + '" class="list-card text-decoration-none d-block">' +
+            '<div class="list-cover">' + cover + '</div>' +
+            '<div class="list-body">' +
+                chTag +
+                '<h3 class="list-title">' + escapeHtml(title) + '</h3>' +
+                '<p class="list-summary text-muted">' + escapeHtml(desc || '点击查看详情') + '</p>' +
+                '<div class="list-meta"><span><i class="bi bi-person me-1"></i>' + escapeHtml(userName || '系统') + '</span>' +
+                '<span class="ms-2"><i class="bi bi-clock me-1"></i>' + formatDate(createTime) + '</span></div>' +
+            '</div>' +
+        '</a></div>';
+}
+
+function showSkeleton(n) {
+    var html = '';
+    for (var i = 0; i < n; i++) {
+        html += '<div class="col-md-6 col-lg-4 skeleton-col"><div class="list-card-skeleton"></div></div>';
+    }
+    $('#articleListDiv').html(html);
 }
 
 function switchPage(index) {
@@ -58,10 +94,11 @@ function switchPage(index) {
 }
 
 function getArticleList() {
+    showSkeleton(6);
     $.ajax({
         type: 'POST',
         url: ctxPath + '/page/article/list',
-        data: JSON.stringify({"channelId": channelId, "page": currentPage, "limit": limit}),
+        data: JSON.stringify({"channelId": Number(channelId), "page": currentPage, "limit": limit}),
         dataType: 'json',
         contentType: 'application/json',
         success: function(res) {
@@ -80,18 +117,25 @@ function getArticleList() {
                 $('#p1').addClass('active');
             }
             if (!data || data.length < 1) {
-                $('#articleListDiv').html('<div class="text-center py-5"><i class="bi bi-inbox text-muted" style="font-size:3rem;"></i><p class="text-muted mt-3">该分类下没有文章</p></div>');
+                $('#articleListDiv').html('<div class="col-12 text-center py-5"><i class="bi bi-inbox text-muted" style="font-size:3rem;"></i><p class="text-muted mt-3">该分类下没有文章</p></div>');
                 return;
             }
+            var html = '';
             for (var n in data) {
-                $('#articleListDiv').append(insertArticle(
+                html += insertArticle(
                     data[n].articleId,
                     data[n].title,
                     data[n].createUserName,
                     data[n].createTime,
-                    data[n].summary || data[n].content || ''
-                ));
+                    data[n].summary || data[n].description || '',
+                    data[n].coverImage,
+                    data[n].channelName
+                );
             }
+            $('#articleListDiv').html(html);
+        },
+        error: function() {
+            $('#articleListDiv').html('<div class="col-12 text-center py-5"><i class="bi bi-exclamation-triangle text-danger" style="font-size:3rem;"></i><p class="text-muted mt-3">加载失败，请稍后重试</p></div>');
         }
     });
 }

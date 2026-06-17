@@ -1,6 +1,10 @@
 package com.softdev.cms.controller;
 
 import com.softdev.cms.entity.User;
+import com.softdev.cms.entity.dto.QueryParamDTO;
+import com.softdev.cms.mapper.ArticleMapper;
+import com.softdev.cms.mapper.ChannelMapper;
+import com.softdev.cms.mapper.FormMapper;
 import com.softdev.cms.mapper.UserMapper;
 import com.softdev.cms.util.Result;
 import com.softdev.cms.service.CmsUserDetailsService;
@@ -19,7 +23,11 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import com.softdev.cms.entity.Channel;
+
 import java.io.ByteArrayOutputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
@@ -27,6 +35,15 @@ public class BackEndController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ArticleMapper articleMapper;
+
+    @Autowired
+    private ChannelMapper channelMapper;
+
+    @Autowired
+    private FormMapper formMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -126,5 +143,23 @@ public class BackEndController {
     @GetMapping("/welcome")
     public String welcome() {
         return "cms/welcome";
+    }
+
+    /**
+     * 仪表盘聚合统计（用户/文章/频道/浏览/表单）。单接口返回所有计数。
+     */
+    @GetMapping("/dashboard/stats")
+    @ResponseBody
+    public Result<Map<String, Object>> dashboardStats() {
+        QueryParamDTO emptyDto = new QueryParamDTO();
+        Channel emptyChannel = new Channel();
+        Long viewCount = articleMapper.sumViewCount();
+        Map<String, Object> stats = new LinkedHashMap<>();
+        stats.put("userCount", userMapper.count());
+        stats.put("articleCount", articleMapper.countAll(emptyDto));
+        stats.put("channelCount", channelMapper.countAll(emptyChannel));
+        stats.put("formCount", formMapper.countAll(emptyDto));
+        stats.put("viewCount", viewCount == null ? 0L : viewCount);
+        return Result.success(stats);
     }
 }

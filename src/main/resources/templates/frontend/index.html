@@ -54,45 +54,82 @@
     </div>
 </section>
 
-<!-- Solution -->
+<!-- Latest News（CMS 动态内容） -->
+<section class="section-padding">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="mb-1">${(templateMap.newsTitle)!'最新资讯'}</h2>
+                <p class="text-muted mb-0">${(templateMap.newsDescription)!'了解最新的动态与文章'}</p>
+            </div>
+            <a href="${request.contextPath}/page/search" class="btn btn-outline-primary btn-sm d-none d-md-inline-block">
+                查看全部 <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        <#if latestArticles?? && (latestArticles?size > 0)>
+        <div class="row g-4">
+            <#list latestArticles as article>
+            <div class="col-md-6 col-lg-4">
+                <a href="${request.contextPath}/page/article/${(article.articleId)!}" class="news-card text-decoration-none d-block">
+                    <div class="news-cover">
+                        <#if article.coverImage?? && (article.coverImage?length > 0)>
+                            <img src="${article.coverImage}" alt="${article.title}">
+                        <#else>
+                            <div class="news-cover-placeholder"><i class="bi bi-image"></i></div>
+                        </#if>
+                    </div>
+                    <div class="news-body">
+                        <#if article.channelName?? && (article.channelName?length > 0)>
+                        <span class="news-tag">${article.channelName}</span>
+                        </#if>
+                        <h5 class="news-title">${(article.title)!}</h5>
+                        <p class="news-summary text-muted">${(article.summary)!'点击查看详情'}</p>
+                        <div class="news-meta">
+                            <span><i class="bi bi-person me-1"></i>${(article.createUserName)!'系统'}</span>
+                            <span><i class="bi bi-clock ms-2 me-1"></i><#if article.createTime??>${article.createTime?string('yyyy-MM-dd')}</#if></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            </#list>
+        </div>
+        <#else>
+        <div class="text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size:3rem;"></i>
+            <p class="text-muted mt-3">暂无文章，请先在后台发布内容。</p>
+        </div>
+        </#if>
+    </div>
+</section>
+
+<!-- Channels（频道入口卡片） -->
+<#if channelList?? && (channelList?size > 0)>
 <section class="section-padding section-bg">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2>${(templateMap.channelTitle)!'内容频道'}</h2>
+            <p class="text-muted">${(templateMap.channelDescription)!'按栏目浏览感兴趣的内容'}</p>
+        </div>
+        <div class="row g-3 justify-content-center">
+            <#list channelList as ch>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="${request.contextPath}/page/channel/${ch.channelId}" class="channel-card text-decoration-none d-block">
+                    <i class="bi bi-collection"></i>
+                    <span>${ch.channelName}</span>
+                </a>
+            </div>
+            </#list>
+        </div>
+    </div>
+</section>
+</#if>
+
+<!-- Solution -->
+<section class="section-padding">
     <div class="container text-center">
         <h1 class="mb-3">${(templateMap.solutionTitle)!'一站式内容管理平台'}</h1>
         <p class="lead text-muted mb-4">${(templateMap.solutionDescription)!'从文章发布到数据收集，从模板配置到用户管理，满足您的所有需求'}</p>
-        <a href="${(templateMap.solutionUrl)!'/page/channel/1'}" class="btn btn-primary btn-lg">${(templateMap.readMore)!'了解更多'}</a>
-    </div>
-</section>
-
-<!-- CTA -->
-<section class="cta-banner">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h5 class="mb-1">${(templateMap.quoteTitle)!'开始构建您的专属网站'}</h5>
-                <p class="mb-0">${(templateMap.quoteDescription)!'专业的技术架构，灵活的扩展能力，助力您的业务发展'}</p>
-            </div>
-            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <a href="${(templateMap.quoteUrl)!'/admin/login'}" class="btn btn-outline-light">${(templateMap.readMore)!'了解更多'}</a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Consulting -->
-<section class="section-padding">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-start">
-                <h2 class="mb-3">${(templateMap.consultingTitle)!'专业的技术架构'}</h2>
-                <p class="text-muted">${(templateMap.consultingDescription)!'基于 Spring Boot 3.x + MyBatis 构建，采用前后端分离架构，支持多端适配，性能稳定，易于扩展。'}</p>
-                <a href="${(templateMap.consultingUrl)!'/page/channel/1'}" class="btn btn-primary">${(templateMap.readMore)!'了解更多'}</a>
-            </div>
-            <div class="col-md-6 mt-4 mt-md-0">
-                <div class="d-flex justify-content-center align-items-center bg-light rounded p-5" style="height:280px;">
-                    <i class="bi bi-hdd-stack text-primary" style="font-size:6rem;"></i>
-                </div>
-            </div>
-        </div>
+        <a href="${(templateMap.solutionUrl)!'/page/search'}" class="btn btn-primary btn-lg">${(templateMap.readMore)!'了解更多'}</a>
     </div>
 </section>
 

@@ -52,6 +52,7 @@ public class FrontEndController {
     public ModelAndView indexPage() {
         return new ModelAndView("frontend/index")
                 .addObject("channelList", frontEndService.getChannelList(1))
+                .addObject("latestArticles", frontEndService.getLatestArticles(6))
                 .addObject("templateMap", frontEndService.getTemplateMap("index"));
     }
 
@@ -69,7 +70,8 @@ public class FrontEndController {
         return new ModelAndView("frontend/article")
                 .addObject("channelList", frontEndService.getChannelList(1))
                 .addObject("templateMap", frontEndService.getTemplateMap("article"))
-                .addObject("article", frontEndService.getArticle(articleId));
+                .addObject("article", frontEndService.getArticle(articleId))
+                .addObject("articleCtx", frontEndService.getArticleContext(articleId));
     }
 
     @PostMapping("article/list")

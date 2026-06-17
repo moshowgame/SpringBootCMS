@@ -14,9 +14,31 @@ public interface ArticleMapper {
 
     List<Article> selectByChannelId(@Param("channelId") Integer channelId);
 
+    /**
+     * 同频道已发布的相关文章（排除当前文章），用于详情页"相关推荐"。
+     */
+    List<Article> selectRelated(@Param("channelId") Integer channelId,
+                                @Param("articleId") Integer articleId,
+                                @Param("limit") Integer limit);
+
+    /**
+     * 上一篇（article_id 更小的相邻已发布文章）
+     */
+    Article selectPrev(@Param("articleId") Integer articleId);
+
+    /**
+     * 下一篇（article_id 更大的相邻已发布文章）
+     */
+    Article selectNext(@Param("articleId") Integer articleId);
+
     Article selectBySlug(@Param("slug") String slug);
 
     int incrementViewCount(@Param("articleId") Integer articleId);
+
+    /**
+     * 已发布文章的总浏览量（仪表盘统计）
+     */
+    Long sumViewCount();
 
     List<Article> pageAll(QueryParamDTO queryParamDTO);
 

@@ -33,7 +33,16 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">内容 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <textarea name="content" id="content" class="form-control" rows="15" placeholder="请输入文章内容"><#if article?? && article.content??>${article.content?replace('@@@',request.contextPath+'/file/files/')}</#if></textarea>
+                    <#-- 隐藏的真实内容字段，由 wangEditor 同步 -->
+                    <textarea name="content" id="content" class="d-none"><#if article?? && article.content??>${article.content?replace('@@@',request.contextPath+'/file/files/')}</#if></textarea>
+                    <#-- wangEditor 渲染容器 -->
+                    <div id="editorContent" style="border:1px solid #e9ecef;border-radius:8px;overflow:hidden;">
+                        <div id="editorToolbar"></div>
+                        <div id="editorBody"></div>
+                    </div>
+                    <div id="editorFallback" class="form-text text-muted d-none mt-1">
+                        <i class="bi bi-info-circle"></i> 富文本编辑器加载失败，已切换为纯文本模式。
+                    </div>
                 </div>
             </div>
 
@@ -79,8 +88,75 @@
 </div>
 
 <@netCommon.commonScript />
+<#-- wangEditor v4 富文本编辑器（本地自托管） -->
+<link rel="stylesheet" href="${request.contextPath}/static/js/lay-module/wangEditor/wangEditor.min.css">
+<script src="${request.contextPath}/static/js/lay-module/wangEditor/wangEditor.min.js"></script>
 <script>
 $(function() {
+    var ctxPath = '${request.contextPath}';
+    var editor = null;
+
+    // 初始化 wangEditor（v4 API：window.wangEditor）
+    function initEditor() {
+        if (typeof window.wangEditor === 'undefined') {
+            $('#editorFallback').removeClass('d-none');
+            $('#content').removeClass('d-none').addClass('form-control').attr('rows', 15);
+            return;
+        }
+        var E = window.wangEditor;
+        editor = new E('#editorToolbar', '#editorBody');
+
+        // 编辑器区域高度
+        editor.config.height = 420;
+        editor.config.placeholder = '请输入文章内容，支持图文混排';
+        editor.config.zIndex = 100;
+        // 调试信息走 toast，不弹原生 alert
+        editor.config.customAlert = function(info) {
+            CmsUtil.showToast(info, 'info');
+        };
+
+        // 图片上传：复用 /file/layuiUpload（返回 {code:200, data:{src,title}}）
+        editor.config.uploadImgServer = ctxPath + '/file/layuiUpload';
+        editor.config.uploadFileName = 'file';
+        editor.config.uploadImgMaxSize = 5 * 1024 * 1024; // 5MB
+        editor.config.uploadImgAccept = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        editor.config.uploadImgMaxLength = 5;
+        // 适配后端 Result 结构：把 data.src 注入回编辑器
+        editor.config.uploadImgHooks = {
+            customInsert: function(insertImg, result, editor) {
+                if (result && result.code === 200 && result.data && result.data.src) {
+                    insertImg(result.data.src);
+                } else {
+                    CmsUtil.showToast((result && result.msg) || '图片上传失败', 'danger');
+                }
+            }
+        };
+
+        // 将已有内容载入编辑器
+        var existing = $('#content').val();
+        if (existing) {
+            editor.txt.html(existing);
+        }
+
+        try {
+            editor.create();
+        } catch (e) {
+            console && console.warn('wangEditor init failed', e);
+            $('#editorFallback').removeClass('d-none');
+            $('#content').removeClass('d-none').addClass('form-control').attr('rows', 15);
+            editor = null;
+        }
+    }
+
+    // 同步编辑器内容到隐藏 textarea
+    function syncContent() {
+        if (editor) {
+            $('#content').val(editor.txt.html());
+        }
+    }
+
+    initEditor();
+
     // 加载频道列表
     $.post('${request.contextPath}/channel/list', {searchParams: '{"parentChannelId":"0"}', page: 1, limit: 99}, function(res) {
         if (res.code === 200 && res.data) {
@@ -96,12 +172,17 @@ $(function() {
     // 保存
     $('#articleForm').on('submit', function(e) {
         e.preventDefault();
+        syncContent();
         var formData = {};
         $(this).serializeArray().forEach(function(item) {
             formData[item.name] = item.value;
         });
-        // 替换图片路径
-        formData.content = formData.content.replaceAll('${request.contextPath}/file/files/', '@@@');
+        // 替换图片路径（正文内绝对地址转存占位符 @@@）
+        formData.content = (formData.content || '').split(ctxPath + '/file/files/').join('@@@');
+
+        // 标题/摘要/内容基础校验
+        if (!formData.title) { CmsUtil.showToast('请输入文章标题', 'warning'); return; }
+        if (!formData.content) { CmsUtil.showToast('请输入文章内容', 'warning'); return; }
 
         $.ajax({
             type: 'POST',
@@ -120,21 +201,23 @@ $(function() {
         });
     });
 
-    // 网络图片转存
+    // 网络图片转存（兼容编辑器 HTML / 纯 textarea）
     $('#btnUploadNetImg').on('click', function() {
-        var content = $('#content').val();
+        var content = editor ? editor.txt.html() : $('#content').val();
         var imgRegex = /src="(http[^"]*?)"/g;
         var match;
         var count = 0;
         while ((match = imgRegex.exec(content)) !== null) {
             var imgUrl = match[1];
-            if (imgUrl.indexOf('${request.contextPath}') === -1) {
+            if (imgUrl.indexOf(ctxPath) === -1) {
                 count++;
                 $.post('${request.contextPath}/file/saveNetworkImg', {imgUrl: imgUrl}, function(res) {
                     if (res.data && res.data.src) {
-                        var oldSrc = imgUrl;
-                        var newContent = $('#content').val().replace(oldSrc, res.data.src);
-                        $('#content').val(newContent);
+                        if (editor) {
+                            editor.txt.html(editor.txt.html().split(imgUrl).join(res.data.src));
+                        } else {
+                            $('#content').val($('#content').val().split(imgUrl).join(res.data.src));
+                        }
                     }
                 });
             }
