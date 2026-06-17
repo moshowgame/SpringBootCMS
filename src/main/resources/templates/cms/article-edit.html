@@ -66,11 +66,11 @@
                 <label class="col-sm-2 col-form-label">是否置顶</label>
                 <div class="col-sm-10">
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="isTop" id="isTop1" value="1" <#if (article.isTop)?? && article.isTop == 1>checked</#if>>
+                        <input class="form-check-input" type="radio" name="isTop" id="isTop1" value="1" <#if article?? && article.isTop?? && article.isTop == "1">checked</#if>>
                         <label class="form-check-label" for="isTop1">是</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="isTop" id="isTop0" value="0" <#if (article.isTop)?? && article.isTop == 0>checked<#elseif !article??>checked</#if>>
+                        <input class="form-check-input" type="radio" name="isTop" id="isTop0" value="0" <#if article?? && article.isTop?? && article.isTop == "0">checked<#elseif !article??>checked</#if>>
                         <label class="form-check-label" for="isTop0">否</label>
                     </div>
                 </div>
@@ -96,7 +96,7 @@ $(function() {
     var ctxPath = '${request.contextPath}';
     var editor = null;
 
-    // 初始化 wangEditor（v4 API：window.wangEditor）
+    // 初始化 wangEditor（v3 API：window.wangEditor，配置通过 customConfig 设置）
     function initEditor() {
         if (typeof window.wangEditor === 'undefined') {
             $('#editorFallback').removeClass('d-none');
@@ -106,40 +106,40 @@ $(function() {
         var E = window.wangEditor;
         editor = new E('#editorToolbar', '#editorBody');
 
-        // 编辑器区域高度
-        editor.config.height = 420;
-        editor.config.placeholder = '请输入文章内容，支持图文混排';
-        editor.config.zIndex = 100;
-        // 调试信息走 toast，不弹原生 alert
-        editor.config.customAlert = function(info) {
-            CmsUtil.showToast(info, 'info');
-        };
-
-        // 图片上传：复用 /file/layuiUpload（返回 {code:200, data:{src,title}}）
-        editor.config.uploadImgServer = ctxPath + '/file/layuiUpload';
-        editor.config.uploadFileName = 'file';
-        editor.config.uploadImgMaxSize = 5 * 1024 * 1024; // 5MB
-        editor.config.uploadImgAccept = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
-        editor.config.uploadImgMaxLength = 5;
-        // 适配后端 Result 结构：把 data.src 注入回编辑器
-        editor.config.uploadImgHooks = {
-            customInsert: function(insertImg, result, editor) {
-                if (result && result.code === 200 && result.data && result.data.src) {
-                    insertImg(result.data.src);
-                } else {
-                    CmsUtil.showToast((result && result.msg) || '图片上传失败', 'danger');
+        // v3：配置通过 customConfig 设置（editor.config 在 create 后才生成）
+        editor.customConfig = {
+            height: 420,
+            placeholder: '请输入文章内容，支持图文混排',
+            zIndex: 100,
+            customAlert: function(info) {
+                CmsUtil.showToast(info, 'info');
+            },
+            // 图片上传：复用 /file/layuiUpload（返回 {code:200, data:{src,title}}）
+            uploadImgServer: ctxPath + '/file/layuiUpload',
+            uploadFileName: 'file',
+            uploadImgMaxSize: 5 * 1024 * 1024, // 5MB
+            uploadImgAccept: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'],
+            uploadImgMaxLength: 5,
+            // 适配后端 Result 结构：把 data.src 注入回编辑器
+            uploadImgHooks: {
+                customInsert: function(insertImg, result, editor) {
+                    if (result && result.code === 200 && result.data && result.data.src) {
+                        insertImg(result.data.src);
+                    } else {
+                        CmsUtil.showToast((result && result.msg) || '图片上传失败', 'danger');
+                    }
                 }
             }
         };
 
-        // 将已有内容载入编辑器
+        // 将已有内容载入编辑器（需在 create 之后调用）
         var existing = $('#content').val();
-        if (existing) {
-            editor.txt.html(existing);
-        }
 
         try {
             editor.create();
+            if (existing) {
+                editor.txt.html(existing);
+            }
         } catch (e) {
             console && console.warn('wangEditor init failed', e);
             $('#editorFallback').removeClass('d-none');
