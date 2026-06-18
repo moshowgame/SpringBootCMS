@@ -41,7 +41,7 @@ spring:
       max-request-size: 10MB
   file:
     winPath: D:\temp\java\
-    linuxPath: /dev/fileupload/
+    linuxPath: /home/moshow/upload-files/
   cache:
     type: caffeine
     cache-names:

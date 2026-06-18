@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import com.softdev.cms.entity.exception.StorageException;
 import com.softdev.cms.entity.exception.StorageFileNotFoundException;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -126,6 +127,7 @@ public class StorageServiceImpl implements StorageService {
 	}
 
 	@Override
+	@PostConstruct
 	public void init() {
 		try {
 			Files.createDirectories(getPath());

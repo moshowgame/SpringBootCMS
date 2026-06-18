@@ -33,15 +33,9 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">内容 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <#-- 隐藏的真实内容字段，由 wangEditor 同步 -->
-                    <textarea name="content" id="content" class="d-none"><#if article?? && article.content??>${article.content?replace('@@@',request.contextPath+'/file/files/')}</#if></textarea>
-                    <#-- wangEditor 渲染容器 -->
-                    <div id="editorContent" style="border:1px solid #e9ecef;border-radius:8px;overflow:hidden;">
-                        <div id="editorToolbar"></div>
-                        <div id="editorBody"></div>
-                    </div>
+                    <textarea id="editorBody" name="content" class="d-none"><#if article?? && article.content??>${article.content?replace('@@@',request.contextPath+'/file/files/')}</#if></textarea>
                     <div id="editorFallback" class="form-text text-muted d-none mt-1">
-                        <i class="bi bi-info-circle"></i> 富文本编辑器加载失败，已切换为纯文本模式。
+                        <i class="bi bi-info-circle"></i> 富文本编辑器加载失败，请检查网络连接。
                     </div>
                 </div>
             </div>
@@ -88,77 +82,147 @@
 </div>
 
 <@netCommon.commonScript />
-<#-- wangEditor v4 富文本编辑器（本地自托管） -->
-<link rel="stylesheet" href="${request.contextPath}/static/js/lay-module/wangEditor/wangEditor.min.css">
-<script src="${request.contextPath}/static/js/lay-module/wangEditor/wangEditor.min.js"></script>
+<#-- TinyMCE 8 富文本编辑器（自托管） -->
+<script src="${request.contextPath}/static/lib/tinymce/tinymce.min.js"></script>
 <script>
 $(function() {
     var ctxPath = '${request.contextPath}';
-    var editor = null;
 
-    // 初始化 wangEditor（v3 API：window.wangEditor，配置通过 customConfig 设置）
+    // ==================== TinyMCE 初始化 ====================
     function initEditor() {
-        if (typeof window.wangEditor === 'undefined') {
+        if (typeof tinymce === 'undefined') {
             $('#editorFallback').removeClass('d-none');
-            $('#content').removeClass('d-none').addClass('form-control').attr('rows', 15);
             return;
         }
-        var E = window.wangEditor;
-        editor = new E('#editorToolbar', '#editorBody');
 
-        // v3：配置通过 customConfig 设置（editor.config 在 create 后才生成）
-        editor.customConfig = {
-            height: 420,
-            placeholder: '请输入文章内容，支持图文混排',
-            zIndex: 100,
-            customAlert: function(info) {
-                CmsUtil.showToast(info, 'info');
+        tinymce.init({
+            // 自托管社区版（GPLv2 开源许可）
+            license_key: 'gpl',
+            // 挂载到 textarea
+            selector: '#editorBody',
+            // 编辑器高度
+            height: 500,
+            // 中文界面
+            language: 'zh_CN',
+            // 插件（免费版可用）
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+            // 工具栏
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image link media table | code fullscreen help',
+            // 图片设置
+            image_advtab: true,
+            // ========== 粘贴图片自动上传 ==========
+            automatic_uploads: true,
+            paste_data_images: true,
+            file_picker_types: 'image',
+            // ========== 自定义图片上传处理 ==========
+            images_upload_handler: function(blobInfo, progress) {
+                return new Promise(function(resolve, reject) {
+                    var formData = new FormData();
+                    formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                    $.ajax({
+                        url: ctxPath + '/file/editorUpload',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(res) {
+                            if (res && res.url) {
+                                resolve(res.url);
+                            } else {
+                                reject((res && res.error && res.error.message) || '图片上传失败');
+                            }
+                        },
+                        error: function(jqXHR) {
+                            reject('上传失败: ' + (jqXHR.responseText || '网络错误'));
+                        }
+                    });
+                });
             },
-            // 图片上传：复用 /file/layuiUpload（返回 {code:200, data:{src,title}}）
-            uploadImgServer: ctxPath + '/file/layuiUpload',
-            uploadFileName: 'file',
-            uploadImgMaxSize: 5 * 1024 * 1024, // 5MB
-            uploadImgAccept: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'],
-            uploadImgMaxLength: 5,
-            // 适配后端 Result 结构：把 data.src 注入回编辑器
-            uploadImgHooks: {
-                customInsert: function(insertImg, result, editor) {
-                    if (result && result.code === 200 && result.data && result.data.src) {
-                        insertImg(result.data.src);
-                    } else {
-                        CmsUtil.showToast((result && result.msg) || '图片上传失败', 'danger');
+            // ========== 编辑器事件 ==========
+            setup: function(editor) {
+                // 加载已有内容
+                var existing = $('#editorBody').val();
+                if (existing) {
+                    editor.on('init', function() {
+                        editor.setContent(existing);
+                    });
+                }
+
+                // 内容变化时自动处理残留的 base64 图片
+                editor.on('Change', function() {
+                    autoUploadBase64Images(editor);
+                });
+            }
+        });
+    }
+
+    // ==================== 自动上传编辑器中的 base64 图片 ====================
+    var base64UploadPending = false;
+
+    function autoUploadBase64Images(editor) {
+        if (base64UploadPending) return;
+        base64UploadPending = true;
+
+        setTimeout(function() {
+            base64UploadPending = false;
+            var content = editor.getContent();
+            // 匹配 data:image/ 开头的 base64 图片
+            var base64Regex = /<img[^>]+src="(data:image\/([^";]+);base64,([^"]+))"[^>]*>/g;
+            var matches = [];
+            var match;
+
+            while ((match = base64Regex.exec(content)) !== null) {
+                matches.push({
+                    fullTag: match[0],
+                    base64String: match[1],
+                    ext: match[2]
+                });
+            }
+
+            if (matches.length === 0) return;
+
+            // 逐个上传 base64 图片
+            (async function() {
+                for (var i = 0; i < matches.length; i++) {
+                    var item = matches[i];
+                    try {
+                        var res = await $.ajax({
+                            url: ctxPath + '/file/base64upload',
+                            type: 'POST',
+                            data: {
+                                base64String: item.base64String,
+                                ext: item.ext
+                            }
+                        });
+                        if (res.code === 200 && res.data && res.data.src) {
+                            var currentContent = editor.getContent();
+                            // 只替换第一个匹配（防止同一图片被多次替换）
+                            editor.setContent(currentContent.replace(item.base64String, res.data.src));
+                        }
+                    } catch (e) {
+                        console.warn('base64 图片上传失败', e);
                     }
                 }
-            }
-        };
-
-        // 将已有内容载入编辑器（需在 create 之后调用）
-        var existing = $('#content').val();
-
-        try {
-            editor.create();
-            if (existing) {
-                editor.txt.html(existing);
-            }
-        } catch (e) {
-            console && console.warn('wangEditor init failed', e);
-            $('#editorFallback').removeClass('d-none');
-            $('#content').removeClass('d-none').addClass('form-control').attr('rows', 15);
-            editor = null;
-        }
+            })();
+        }, 2000); // 内容变化后 2 秒再检查，避免频繁处理
     }
 
-    // 同步编辑器内容到隐藏 textarea
+    // ==================== 同步编辑器内容到 textarea ====================
     function syncContent() {
+        var editor = tinymce.get('editorBody');
         if (editor) {
-            $('#content').val(editor.txt.html());
+            // TinyMCE 会自动同步到 textarea，这里显式同步确保准确性
+            editor.save();
         }
     }
 
-    initEditor();
-
-    // 加载频道列表
-    $.post('${request.contextPath}/channel/list', {searchParams: '{"parentChannelId":"0"}', page: 1, limit: 99}, function(res) {
+    // ==================== 加载频道列表 ====================
+    $.post('${request.contextPath}/channel/list', {
+        searchParams: '{"parentChannelId":"0"}',
+        page: 1,
+        limit: 99
+    }, function(res) {
         if (res.code === 200 && res.data) {
             var html = '<option value="">请选择频道</option>';
             res.data.forEach(function(ch) {
@@ -169,14 +233,32 @@ $(function() {
         }
     });
 
-    // 保存
-    $('#articleForm').on('submit', function(e) {
+    // ==================== 初始化编辑器 ====================
+    initEditor();
+
+    // ==================== 表单提交 ====================
+    $('#articleForm').on('submit', async function(e) {
         e.preventDefault();
+
+        // 等待 TinyMCE 所有待上传图片完成
+        var editor = tinymce.get('editorBody');
+        if (editor) {
+            try {
+                await editor.uploadImages();
+            } catch (e) {
+                // 图片上传失败不影响保存
+                console.warn('uploadImages warning:', e);
+            }
+        }
+
+        // 同步编辑器内容到隐藏 textarea
         syncContent();
+
         var formData = {};
         $(this).serializeArray().forEach(function(item) {
             formData[item.name] = item.value;
         });
+
         // 替换图片路径（正文内绝对地址转存占位符 @@@）
         formData.content = (formData.content || '').split(ctxPath + '/file/files/').join('@@@');
 
@@ -201,32 +283,53 @@ $(function() {
         });
     });
 
-    // 网络图片转存（兼容编辑器 HTML / 纯 textarea）
-    $('#btnUploadNetImg').on('click', function() {
-        var content = editor ? editor.txt.html() : $('#content').val();
-        var imgRegex = /src="(http[^"]*?)"/g;
+    // ==================== 网络图片转存本地 ====================
+    $('#btnUploadNetImg').on('click', async function() {
+        var editor = tinymce.get('editorBody');
+        if (!editor) {
+            CmsUtil.showToast('编辑器尚未初始化', 'warning');
+            return;
+        }
+
+        var content = editor.getContent();
+        var imgRegex = /<img[^>]+src="(http[^"]*?)"/g;
+        var matches = [];
         var match;
-        var count = 0;
+
         while ((match = imgRegex.exec(content)) !== null) {
             var imgUrl = match[1];
             if (imgUrl.indexOf(ctxPath) === -1) {
-                count++;
-                $.post('${request.contextPath}/file/saveNetworkImg', {imgUrl: imgUrl}, function(res) {
-                    if (res.data && res.data.src) {
-                        if (editor) {
-                            editor.txt.html(editor.txt.html().split(imgUrl).join(res.data.src));
-                        } else {
-                            $('#content').val($('#content').val().split(imgUrl).join(res.data.src));
-                        }
-                    }
-                });
+                matches.push(imgUrl);
             }
         }
-        if (count === 0) {
+
+        if (matches.length === 0) {
             CmsUtil.showToast('未发现需要转存的网络图片', 'info');
-        } else {
-            CmsUtil.showToast('正在转存 ' + count + ' 张图片...', 'info');
+            return;
         }
+
+        CmsUtil.showToast('正在转存 ' + matches.length + ' 张图片...', 'info');
+
+        // 顺序处理（async/await 修复竞态问题）
+        for (var i = 0; i < matches.length; i++) {
+            var imgUrl = matches[i];
+            try {
+                var res = await $.ajax({
+                    url: ctxPath + '/file/saveNetworkImg',
+                    type: 'POST',
+                    data: { imgUrl: imgUrl }
+                });
+
+                if (res.data && res.data.src) {
+                    var currentContent = editor.getContent();
+                    editor.setContent(currentContent.split(imgUrl).join(res.data.src));
+                }
+            } catch (e) {
+                console.warn('转存失败: ' + imgUrl, e);
+            }
+        }
+
+        CmsUtil.showToast('转存完成', 'success');
     });
 });
 </script>
