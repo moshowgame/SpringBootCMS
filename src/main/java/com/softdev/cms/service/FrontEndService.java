@@ -7,6 +7,7 @@ import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.mapper.ArticleMapper;
 import com.softdev.cms.mapper.ChannelMapper;
 import com.softdev.cms.mapper.TemplateMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class FrontEndService {
 
     @Autowired
@@ -95,6 +97,7 @@ public class FrontEndService {
             Integer id = Integer.valueOf(articleId);
             return articleMapper.selectById(id);
         } catch (NumberFormatException e) {
+            log.warn("Invalid articleId format in getArticle: {}", articleId, e);
             return null;
         }
     }
@@ -114,6 +117,7 @@ public class FrontEndService {
             Integer channelId = (current != null && current.getChannelId() != null) ? current.getChannelId() : id;
             ctx.put("related", articleMapper.selectRelated(channelId, id, 4));
         } catch (NumberFormatException e) {
+            log.warn("Invalid articleId format in getArticleContext: {}", articleId, e);
             ctx.put("prev", null);
             ctx.put("next", null);
             ctx.put("related", java.util.Collections.emptyList());

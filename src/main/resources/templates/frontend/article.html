@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <#import "common-import.html" as ft>
-<@ft.frontendHead />
+<@ft.frontendHead title="${(article.title)!'文章未找到'} - ${(templateMap.companyName)!'SpringBootCMS'}" keywords="${(article.keyword)!''}" description="${(article.summary)!(article.title)!'SpringBootCMS 文章详情'}" />
 <body>
 <@ft.frontendHeader />
 

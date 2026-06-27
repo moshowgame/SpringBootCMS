@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <#import "common-import.html" as ft>
-<@ft.frontendHead />
+<@ft.frontendHead title="${(channel.channelName)!'文章列表'} - ${(templateMap.companyName)!'SpringBootCMS'}" description="${(channel.description)!'浏览最新发布的文章'}" />
 <body>
 <@ft.frontendHeader />
 
@@ -24,7 +24,7 @@
     <div class="container">
         <div id="articleListDiv" class="row g-4">
             <#-- 骨架屏占位 -->
-            <div class="col-md-6 col-lg-4 skeleton-col" style="display:none;">
+            <div class="col-md-6 col-lg-4 skeleton-col">
                 <div class="list-card-skeleton"></div>
             </div>
         </div>

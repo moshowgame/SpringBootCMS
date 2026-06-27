@@ -67,6 +67,12 @@ public class FrontEndController {
 
     @GetMapping("article/{articleId}")
     public ModelAndView articlePage(@PathVariable String articleId) {
+        // 增加浏览量
+        try {
+            articleMapper.incrementViewCount(Integer.valueOf(articleId));
+        } catch (NumberFormatException e) {
+            log.warn("Invalid articleId format: {}", articleId, e);
+        }
         return new ModelAndView("frontend/article")
                 .addObject("channelList", frontEndService.getChannelList(1))
                 .addObject("templateMap", frontEndService.getTemplateMap("article"))
