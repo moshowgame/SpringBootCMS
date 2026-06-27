@@ -12,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -34,12 +35,23 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            // CSRF 保护：后台启用，前台公开接口豁免
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers(
+                    "/page/**",           // 前台页面
+                    "/file/files/*",      // 公开文件访问
+                    "/api/public/**",     // 公开API
+                    "/admin/login",       // 登录接口（已通过验证码保护）
+                    "/admin/captcha"      // 验证码接口
+                )
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            )
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionFixation().migrateSession()  // Session 固定防护：登录后迁移Session
                 .maximumSessions(1)
             )
             .authorizeHttpRequests(auth -> auth
@@ -66,7 +78,7 @@ public class WebSecurityConfig {
                 .logoutUrl("/admin/logout")
                 .logoutSuccessUrl("/admin/login")
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
+                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
             );
 
         return http.build();

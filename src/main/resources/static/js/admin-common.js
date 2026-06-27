@@ -3,16 +3,33 @@
  * jQuery3 + Bootstrap5
  */
 
-// 通用API请求封装
+// CSRF Token 获取（从Cookie读取）
+const CmsCsrf = {
+    getToken: function() {
+        const name = 'XSRF-TOKEN';
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                return decodeURIComponent(cookie.substring(name.length + 1));
+            }
+        }
+        return null;
+    }
+};
+
+// 通用API请求封装（自动携带CSRF Token）
 const CmsApi = {
     contextPath: '',
 
     post: function(url, data, callback) {
+        const csrfToken = CmsCsrf.getToken();
         $.ajax({
             url: this.contextPath + url,
             type: 'POST',
             data: data,
             dataType: 'json',
+            headers: csrfToken ? { 'X-XSRF-TOKEN': csrfToken } : {},
             success: function(res) {
                 if (typeof callback === 'function') callback(res);
             },
@@ -23,12 +40,14 @@ const CmsApi = {
     },
 
     postJson: function(url, data, callback) {
+        const csrfToken = CmsCsrf.getToken();
         $.ajax({
             url: this.contextPath + url,
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
             dataType: 'json',
+            headers: csrfToken ? { 'X-XSRF-TOKEN': csrfToken } : {},
             success: function(res) {
                 if (typeof callback === 'function') callback(res);
             },

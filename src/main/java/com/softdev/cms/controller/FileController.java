@@ -1,8 +1,10 @@
 package com.softdev.cms.controller;
 
 import com.softdev.cms.entity.Media;
+import com.softdev.cms.entity.SiteConfig;
 import com.softdev.cms.entity.exception.StorageFileNotFoundException;
 import com.softdev.cms.mapper.MediaMapper;
+import com.softdev.cms.mapper.SiteConfigMapper;
 import com.softdev.cms.service.StorageService;
 import com.softdev.cms.util.Result;
 import jakarta.servlet.http.HttpSession;
@@ -38,11 +40,17 @@ public class FileController {
     @Autowired
     private MediaMapper mediaMapper;
 
+    @Autowired
+    private SiteConfigMapper siteConfigMapper;
+
     @Value("${server.servlet.context-path:/cms}")
     private String contextPath;
 
-    /** 允许上传的图片扩展名 */
-    private static final Set<String> ALLOWED_IMG_EXT = Set.of("jpg", "jpeg", "png", "gif", "bmp", "webp", "svg");
+    /** 默认允许上传的图片扩展名（当未从 site_config 读取时使用） */
+    private static final Set<String> DEFAULT_ALLOWED_IMG_EXT = Set.of("jpg", "jpeg", "png", "gif", "bmp", "webp", "svg");
+
+    /** 默认最大文件大小 10MB */
+    private static final long DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024;
 
     /** 允许上传的图片 MIME 类型前缀 */
     private static final List<String> ALLOWED_IMG_MIME = List.of("image/");
@@ -78,8 +86,17 @@ public class FileController {
 
     @PostMapping("/files")
     public Result<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
-        String ext = getExtension(Objects.requireNonNull(file.getOriginalFilename()));
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        // 1. 校验文件
+        String validationError = validateImageFile(file);
+        if (validationError != null) {
+            return Result.fail(validationError);
+        }
+
+        // 2. 生成安全文件名（UUID + 扩展名）
+        String originalFilename = file.getOriginalFilename();
+        String fileName = generateSafeFileName(originalFilename != null ? originalFilename : "upload.png");
+
+        // 3. 保存文件
         storageService.store(file, fileName);
         return Result.success(fileName);
     }
@@ -106,19 +123,16 @@ public class FileController {
             // 2. 确保存储目录存在
             ensureUploadDirExists();
 
-            // 3. 确定扩展名和文件名
+            // 3. 确定扩展名并生成安全文件名（UUID + 扩展名）
             String originalFilename = file.getOriginalFilename();
             String ext;
-            String baseName;
             if (originalFilename != null && !originalFilename.isBlank() && getExtension(originalFilename).length() > 0) {
                 ext = getExtension(originalFilename);
-                baseName = originalFilename;
             } else {
                 // 无扩展名时从 MIME 推断
                 ext = getExtensionFromMime(file.getContentType());
-                baseName = "pasted_image." + ext;
             }
-            String fileName = System.currentTimeMillis() + "_" + baseName;
+            String fileName = UUID.randomUUID().toString() + (ext.isEmpty() ? "" : "." + ext);
 
             // 4. 保存文件
             storageService.store(file, fileName);
@@ -140,12 +154,22 @@ public class FileController {
     @PostMapping("/layuiUpload")
     public Result<Map<String, String>> layuiUpload(@RequestParam("file") MultipartFile file,
                                                     HttpSession session) {
-        String ext = getExtension(Objects.requireNonNull(file.getOriginalFilename()));
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        // 1. 校验文件
+        String validationError = validateImageFile(file);
+        if (validationError != null) {
+            return Result.fail(validationError);
+        }
+
+        // 2. 生成安全文件名（UUID + 扩展名）
+        String originalFilename = file.getOriginalFilename();
+        String ext = getExtension(originalFilename != null ? originalFilename : "upload.png");
+        String fileName = UUID.randomUUID().toString() + (ext.isEmpty() ? "" : "." + ext);
+
+        // 3. 保存文件
         storageService.store(file, fileName);
         String fileUrl = contextPath + "/file/files/" + fileName;
 
-        // 注册到 Media 表
+        // 4. 注册到 Media 表
         saveMediaRecord(file, fileName, fileUrl, ext, session);
 
         Map<String, String> returnMap = new HashMap<>();
@@ -160,12 +184,14 @@ public class FileController {
     public Result<Map<String, String>> base64upload(@RequestParam String base64String,
                                                      @RequestParam(defaultValue = "png") String ext,
                                                      HttpSession session) {
-        // 校验扩展名
-        if (!ALLOWED_IMG_EXT.contains(ext.toLowerCase())) {
-            return Result.fail("不支持的图片格式: " + ext);
+        // 校验扩展名（从 site_config 动态读取）
+        Set<String> allowedExt = getAllowedExtensions();
+        if (!allowedExt.contains(ext.toLowerCase())) {
+            return Result.fail("不支持的图片格式: " + ext + "，允许: " + String.join(", ", allowedExt));
         }
 
-        String fileName = System.currentTimeMillis() + "_img_upload." + ext;
+        // 文件名使用 UUID + 扩展名
+        String fileName = UUID.randomUUID().toString() + "." + ext;
         // 去掉 data:image/xxx;base64, 前缀（兼容带前缀和不带前缀的情况）
         String imageData = base64String;
         if (base64String.contains(",")) {
@@ -232,11 +258,13 @@ public class FileController {
             }
             // 也可以通过 URL 路径扩展名判断
             String pathExt = getExtension(imgUrl);
-            if (ALLOWED_IMG_EXT.contains(pathExt)) {
+            Set<String> allowedExt = getAllowedExtensions();
+            if (allowedExt.contains(pathExt)) {
                 ext = pathExt;
             }
 
-            String fileName = System.currentTimeMillis() + "_img_upload." + ext;
+            // 文件名使用 UUID + 扩展名
+            String fileName = UUID.randomUUID().toString() + "." + ext;
             downloadPicture(url, storageService.getPathString() + fileName);
 
             String fileUrl = contextPath + "/file/files/" + fileName;
@@ -265,16 +293,64 @@ public class FileController {
     // ==================== 内部方法 ====================
 
     /**
+     * 从 site_config 读取允许上传的文件类型
+     */
+    private Set<String> getAllowedExtensions() {
+        SiteConfig config = siteConfigMapper.selectByKey("upload_allowed_types");
+        if (config != null && config.getConfigValue() != null && !config.getConfigValue().isBlank()) {
+            Set<String> exts = new HashSet<>();
+            for (String ext : config.getConfigValue().split(",")) {
+                exts.add(ext.trim().toLowerCase());
+            }
+            return exts;
+        }
+        return DEFAULT_ALLOWED_IMG_EXT;
+    }
+
+    /**
+     * 从 site_config 读取最大文件大小（字节）
+     */
+    private long getMaxFileSize() {
+        SiteConfig config = siteConfigMapper.selectByKey("upload_max_size");
+        if (config != null && config.getConfigValue() != null) {
+            try {
+                return Long.parseLong(config.getConfigValue());
+            } catch (NumberFormatException e) {
+                log.warn("upload_max_size 配置值无效: {}", config.getConfigValue());
+            }
+        }
+        return DEFAULT_MAX_FILE_SIZE;
+    }
+
+    /**
+     * 生成安全的文件名：UUID + 原扩展名
+     */
+    private String generateSafeFileName(String originalFilename) {
+        String ext = getExtension(originalFilename);
+        return UUID.randomUUID().toString() + (ext.isEmpty() ? "" : "." + ext);
+    }
+
+    /**
      * 校验上传的图片文件
      *
      * @return 校验失败时的错误信息，成功返回 null
      */
     private String validateImageFile(MultipartFile file) {
+        // 1. 文件空校验
         if (file.isEmpty()) {
             return "上传文件为空";
         }
 
+        // 2. 文件大小校验
+        long maxSize = getMaxFileSize();
+        if (file.getSize() > maxSize) {
+            return "文件大小超过限制: 最大 " + (maxSize / 1024 / 1024) + "MB";
+        }
+
+        // 3. 文件名和扩展名校验
         String originalFilename = file.getOriginalFilename();
+        Set<String> allowedExt = getAllowedExtensions();
+
         if (originalFilename == null || originalFilename.isBlank()) {
             // 没有文件名时尝试从 MIME 类型推断
             String contentType = file.getContentType();
@@ -286,15 +362,15 @@ public class FileController {
 
         // 扩展名校验 —— 如果无扩展名但 MIME 是图片类型，也通过
         String ext = getExtension(originalFilename);
-        if (!ALLOWED_IMG_EXT.contains(ext)) {
+        if (!allowedExt.contains(ext)) {
             String contentType = file.getContentType();
             if (contentType != null && contentType.startsWith("image/")) {
                 return null; // 无扩展名但 MIME 是图片，通过校验
             }
-            return "不支持的文件类型: " + ext + "，允许: " + String.join(", ", ALLOWED_IMG_EXT);
+            return "不支持的文件类型: " + ext + "，允许: " + String.join(", ", allowedExt);
         }
 
-        // MIME 类型校验
+        // 4. MIME 类型校验
         String contentType = file.getContentType();
         if (contentType != null && !contentType.isBlank()) {
             boolean mimeAllowed = ALLOWED_IMG_MIME.stream().anyMatch(contentType::startsWith);
@@ -303,7 +379,7 @@ public class FileController {
             }
         }
 
-        // 校验文件名安全
+        // 5. 校验文件名安全（防止路径遍历攻击）
         if (originalFilename.contains("..") || originalFilename.contains("/") || originalFilename.contains("\\")) {
             return "文件名包含非法字符";
         }
