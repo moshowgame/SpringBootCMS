@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <#import "common-import.html" as ft>
+<#-- 模板辅助函数：确保URL带有contextPath -->
+<#function absPath(path, defaultPath)>
+    <#assign p = (path)!defaultPath>
+    <#if p?has_content && p?starts_with('/')>
+        <#return request.contextPath + p>
+    <#elseif p?has_content>
+        <#return p>
+    <#else>
+        <#return request.contextPath + defaultPath>
+    </#if>
+</#function>
 <@ft.frontendHead title="${(templateMap.companyName)!'SpringBootCMS'}" keywords="${(templateMap.siteKeywords)!'CMS,SpringBoot,内容管理'}" description="${(templateMap.siteDescription)!'基于SpringBoot的内容管理系统'}" />
 <script type="application/ld+json">
 {
@@ -27,7 +38,7 @@
                 <h1 class="mb-3">${(templateMap.bannerTitle)!'专业的内容管理解决方案'}</h1>
                 <p class="lead mb-4">${(templateMap.bannerDescription)!'基于 Spring Boot 3 + MyBatis 的现代化 CMS 系统，让您的网站建设更高效'}</p>
                 <div class="d-flex gap-3 flex-wrap">
-                    <a href="${(templateMap.bannerUrl)!'/page/channel/1'}" class="btn btn-light btn-lg px-4">${(templateMap.bannerButton)!'立即体验'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <a href="${absPath(templateMap.bannerUrl, '/page/channel/1')}" class="btn btn-light btn-lg px-4">${(templateMap.bannerButton)!'立即体验'} <i class="bi bi-arrow-right ms-1"></i></a>
                     <a href="${request.contextPath}/admin/login" class="btn btn-outline-light btn-lg px-4">${(templateMap.adminButton)!'管理后台'}</a>
                 </div>
             </div>
@@ -80,7 +91,7 @@
                     <div class="service-icon"><i class="bi bi-journal-text"></i></div>
                     <h5>${(templateMap.service1title)!'文章管理'}</h5>
                     <p>${(templateMap.service1description)!'富文本编辑、Markdown支持、SEO优化、专题管理'}</p>
-                    <a href="${(templateMap.service1url)!'/page/channel/1'}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <a href="${absPath(templateMap.service1url, '/page/channel/1')}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -88,7 +99,7 @@
                     <div class="service-icon"><i class="bi bi-diagram-3"></i></div>
                     <h5>${(templateMap.service2title)!'栏目管理'}</h5>
                     <p>${(templateMap.service2description)!'多级栏目、权限控制、模板配置、灵活排序'}</p>
-                    <a href="${(templateMap.service2url)!'/page/channel/2'}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <a href="${absPath(templateMap.service2url, '/page/channel/2')}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -96,7 +107,7 @@
                     <div class="service-icon"><i class="bi bi-calendar-check"></i></div>
                     <h5>${(templateMap.service3title)!'活动管理'}</h5>
                     <p>${(templateMap.service3description)!'活动发布、在线签到、签到统计、导出报表'}</p>
-                    <a href="${(templateMap.service3url)!'/page/activity/search'}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <a href="${absPath(templateMap.service3url, '/page/activity/search')}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -104,7 +115,7 @@
                     <div class="service-icon"><i class="bi bi-ui-checks"></i></div>
                     <h5>${(templateMap.service4title)!'表单管理'}</h5>
                     <p>${(templateMap.service4description)!'自定义表单、表单设计、数据收集、在线审批'}</p>
-                    <a href="${(templateMap.service4url)!'/page/form/search'}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <a href="${absPath(templateMap.service4url, '/page/form/search')}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
