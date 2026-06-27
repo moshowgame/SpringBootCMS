@@ -1,7 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <#import "common-import.html" as ft>
-<@ft.frontendHead />
+<@ft.frontendHead title="${(templateMap.companyName)!'SpringBootCMS'}" keywords="${(templateMap.siteKeywords)!'CMS,SpringBoot,内容管理'}" description="${(templateMap.siteDescription)!'基于SpringBoot的内容管理系统'}" />
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "${(templateMap.companyName)!'SpringBootCMS'}",
+    "url": "${request.contextPath}/page/index",
+    "description": "${(templateMap.siteDescription)!'基于SpringBoot的内容管理系统'}",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": "${request.contextPath}/page/search?keyword={search_term_string}",
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
 <body>
 <@ft.frontendHeader />
 
@@ -9,10 +23,45 @@
 <section class="hero-banner">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-8">
+            <div class="col-lg-7">
                 <h1 class="mb-3">${(templateMap.bannerTitle)!'专业的内容管理解决方案'}</h1>
-                <p class="lead mb-4">${(templateMap.bannerDescription)!'基于 Spring Boot + MyBatis 的现代化 CMS 系统，让您的网站建设更高效'}</p>
-                <a href="${(templateMap.bannerUrl)!'/page/channel/1'}" class="btn btn-light btn-lg px-4">${(templateMap.bannerButton)!'立即体验'}</a>
+                <p class="lead mb-4">${(templateMap.bannerDescription)!'基于 Spring Boot 3 + MyBatis 的现代化 CMS 系统，让您的网站建设更高效'}</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="${(templateMap.bannerUrl)!'/page/channel/1'}" class="btn btn-light btn-lg px-4">${(templateMap.bannerButton)!'立即体验'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <a href="${request.contextPath}/admin/login" class="btn btn-outline-light btn-lg px-4">${(templateMap.adminButton)!'管理后台'}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Counter -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <div class="stats-item">
+                    <span class="stats-number" data-count="100">0</span>
+                    <span class="stats-label"><i class="bi bi-building me-1"></i>企业用户</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stats-item">
+                    <span class="stats-number" data-count="1000">0</span>
+                    <span class="stats-label"><i class="bi bi-file-text me-1"></i>发布文章</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stats-item">
+                    <span class="stats-number" data-count="50000">0</span>
+                    <span class="stats-label"><i class="bi bi-eye me-1"></i>累计访问</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stats-item">
+                    <span class="stats-number" data-count="99">0</span>
+                    <span class="stats-label"><i class="bi bi-shield-check me-1"></i>% 可用性</span>
+                </div>
             </div>
         </div>
     </div>
@@ -22,32 +71,56 @@
 <section class="section-padding">
     <div class="container">
         <div class="text-center mb-5">
-            <h2>${(templateMap.serviceTitle)!'核心功能'}</h2>
-            <p class="lead text-muted">${(templateMap.serviceDescription)!'提供完整的文章管理、栏目管理、活动管理、表单管理等功能'}</p>
+            <h2 class="section-title">${(templateMap.serviceTitle)!'核心功能'}</h2>
+            <p class="section-subtitle">${(templateMap.serviceDescription)!'提供完整的文章管理、栏目管理、活动管理、表单管理等功能'}</p>
         </div>
         <div class="row g-4">
-            <div class="col-md-4">
+            <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <i class="bi ${(templateMap.service1icon)!'bi-journal-text'} text-primary" style="font-size:3rem;"></i>
-                    <h5 class="mt-3">${(templateMap.service1title)!'文章管理'}</h5>
-                    <p class="text-muted">${(templateMap.service1description)!'富文本编辑、文章分类、标签管理、SEO优化'}</p>
-                    <a href="${(templateMap.service1url)!'/page/channel/1'}" class="btn btn-outline-primary">${(templateMap.readMore)!'了解更多'}</a>
+                    <div class="service-icon"><i class="bi bi-journal-text"></i></div>
+                    <h5>${(templateMap.service1title)!'文章管理'}</h5>
+                    <p>${(templateMap.service1description)!'富文本编辑、Markdown支持、SEO优化、专题管理'}</p>
+                    <a href="${(templateMap.service1url)!'/page/channel/1'}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <i class="bi ${(templateMap.service2icon)!'bi-diagram-3'} text-primary" style="font-size:3rem;"></i>
-                    <h5 class="mt-3">${(templateMap.service2title)!'栏目管理'}</h5>
-                    <p class="text-muted">${(templateMap.service2description)!'多级栏目、权限控制、模板配置、灵活排序'}</p>
-                    <a href="${(templateMap.service2url)!'/page/channel/1'}" class="btn btn-outline-primary">${(templateMap.readMore)!'了解更多'}</a>
+                    <div class="service-icon"><i class="bi bi-diagram-3"></i></div>
+                    <h5>${(templateMap.service2title)!'栏目管理'}</h5>
+                    <p>${(templateMap.service2description)!'多级栏目、权限控制、模板配置、灵活排序'}</p>
+                    <a href="${(templateMap.service2url)!'/page/channel/2'}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <i class="bi ${(templateMap.service3icon)!'bi-calendar-check'} text-primary" style="font-size:3rem;"></i>
-                    <h5 class="mt-3">${(templateMap.service3title)!'活动与表单'}</h5>
-                    <p class="text-muted">${(templateMap.service3description)!'活动发布、在线签到、自定义表单、数据收集'}</p>
-                    <a href="${(templateMap.service3url)!'/page/activity/search'}" class="btn btn-outline-primary">${(templateMap.readMore)!'了解更多'}</a>
+                    <div class="service-icon"><i class="bi bi-calendar-check"></i></div>
+                    <h5>${(templateMap.service3title)!'活动管理'}</h5>
+                    <p>${(templateMap.service3description)!'活动发布、在线签到、签到统计、导出报表'}</p>
+                    <a href="${(templateMap.service3url)!'/page/activity/search'}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon"><i class="bi bi-ui-checks"></i></div>
+                    <h5>${(templateMap.service4title)!'表单管理'}</h5>
+                    <p>${(templateMap.service4description)!'自定义表单、表单设计、数据收集、在线审批'}</p>
+                    <a href="${(templateMap.service4url)!'/page/form/search'}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon"><i class="bi bi-shield-lock"></i></div>
+                    <h5>${(templateMap.service5title)!'安全可靠'}</h5>
+                    <p>${(templateMap.service5description)!'Spring Security、BCrypt加密、CSRF防护、XSS过滤'}</p>
+                    <a href="${request.contextPath}/page/article/1" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon"><i class="bi bi-lightning"></i></div>
+                    <h5>${(templateMap.service6title)!'高性能'}</h5>
+                    <p>${(templateMap.service6description)!'Caffeine缓存、懒加载、CDN加速、数据库优化'}</p>
+                    <a href="${request.contextPath}/page/article/1" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
@@ -55,12 +128,12 @@
 </section>
 
 <!-- Latest News（CMS 动态内容） -->
-<section class="section-padding">
+<section class="section-padding section-bg">
     <div class="container">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
-                <h2 class="mb-1">${(templateMap.newsTitle)!'最新资讯'}</h2>
-                <p class="text-muted mb-0">${(templateMap.newsDescription)!'了解最新的动态与文章'}</p>
+                <h2 class="section-title mb-1">${(templateMap.newsTitle)!'最新资讯'}</h2>
+                <p class="section-subtitle mb-0">${(templateMap.newsDescription)!'了解最新的动态与文章'}</p>
             </div>
             <a href="${request.contextPath}/page/search" class="btn btn-outline-primary btn-sm d-none d-md-inline-block">
                 查看全部 <i class="bi bi-arrow-right ms-1"></i>
@@ -73,7 +146,7 @@
                 <a href="${request.contextPath}/page/article/${(article.articleId)!}" class="news-card text-decoration-none d-block">
                     <div class="news-cover">
                         <#if article.coverImage?? && (article.coverImage?length > 0)>
-                            <img src="${article.coverImage}" alt="${article.title}">
+                            <img src="${article.coverImage}" alt="${article.title}" loading="lazy">
                         <#else>
                             <div class="news-cover-placeholder"><i class="bi bi-image"></i></div>
                         </#if>
@@ -87,6 +160,7 @@
                         <div class="news-meta">
                             <span><i class="bi bi-person me-1"></i>${(article.createUserName)!'系统'}</span>
                             <span><i class="bi bi-clock ms-2 me-1"></i><#if article.createTime??>${article.createTime?string('yyyy-MM-dd')}</#if></span>
+                            <span class="ms-auto"><i class="bi bi-eye me-1"></i>${(article.viewCount)!0}</span>
                         </div>
                     </div>
                 </a>
@@ -97,43 +171,59 @@
         <div class="text-center py-5">
             <i class="bi bi-inbox text-muted" style="font-size:3rem;"></i>
             <p class="text-muted mt-3">暂无文章，请先在后台发布内容。</p>
+            <a href="${request.contextPath}/admin/login" class="btn btn-primary mt-2">进入后台发布</a>
         </div>
         </#if>
     </div>
 </section>
 
-<!-- Channels（频道入口卡片） -->
-<#if channelList?? && (channelList?size > 0)>
-<section class="section-padding section-bg">
-    <div class="container">
-        <div class="text-center mb-4">
-            <h2>${(templateMap.channelTitle)!'内容频道'}</h2>
-            <p class="text-muted">${(templateMap.channelDescription)!'按栏目浏览感兴趣的内容'}</p>
-        </div>
-        <div class="row g-3 justify-content-center">
-            <#list channelList as ch>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a href="${request.contextPath}/page/channel/${ch.channelId}" class="channel-card text-decoration-none d-block">
-                    <i class="bi bi-collection"></i>
-                    <span>${ch.channelName}</span>
-                </a>
-            </div>
-            </#list>
-        </div>
-    </div>
-</section>
-</#if>
-
 <!-- Solution -->
 <section class="section-padding">
     <div class="container text-center">
-        <h1 class="mb-3">${(templateMap.solutionTitle)!'一站式内容管理平台'}</h1>
-        <p class="lead text-muted mb-4">${(templateMap.solutionDescription)!'从文章发布到数据收集，从模板配置到用户管理，满足您的所有需求'}</p>
-        <a href="${(templateMap.solutionUrl)!'/page/search'}" class="btn btn-primary btn-lg">${(templateMap.readMore)!'了解更多'}</a>
+        <h2 class="section-title">${(templateMap.solutionTitle)!'一站式内容管理平台'}</h2>
+        <p class="section-subtitle mx-auto" style="max-width:600px;">${(templateMap.solutionDescription)!'从文章发布到数据收集，从模板配置到用户管理，满足您的所有需求'}</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap mt-4">
+            <a href="${request.contextPath}/page/search" class="btn btn-primary btn-lg px-4">浏览文章 <i class="bi bi-arrow-right ms-1"></i></a>
+            <a href="${request.contextPath}/admin/login" class="btn btn-outline-primary btn-lg px-4">免费试用</a>
+        </div>
     </div>
 </section>
 
 <@ft.frontendFooter />
 <@ft.frontendScript />
+<script>
+// 数字动画效果
+function animateCounters() {
+    const counters = document.querySelectorAll('.stats-number[data-count]');
+    counters.forEach(counter => {
+        const target = parseInt(counter.dataset.count);
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= target) {
+                counter.textContent = target.toLocaleString() + (counter.dataset.count >= 100 ? '+' : '');
+                clearInterval(timer);
+            } else {
+                counter.textContent = Math.floor(current).toLocaleString();
+            }
+        }, 16);
+    });
+}
+
+// 滚动到视口时触发动画
+const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateCounters();
+            statsObserver.disconnect();
+        }
+    });
+}, { threshold: 0.5 });
+
+const statsSection = document.querySelector('.stats-section');
+if (statsSection) statsObserver.observe(statsSection);
+</script>
 </body>
 </html>

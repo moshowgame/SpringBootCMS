@@ -446,7 +446,7 @@ role ──1:N── menu (role_id, 逗号分隔)
 1. ~~**Spring Boot 3 升级**~~ ✅ 已完成：javax→jakarta迁移已完成
 2. ~~**MyBatis-Plus→MyBatis**~~ ✅ 已完成：所有Mapper已重写
 3. **富文本编辑器** 🔄：LayEdit内容格式可能与新编辑器不兼容，需提供内容迁移方案
-4. **数据迁移**：旧数据库需要执行 `springbootcms_v2.sql` 重建，旧数据需编写迁移脚本
+4. **数据迁移**：旧数据库需要执行 `sql/ddl/schema.sql` 重建，旧数据需编写迁移脚本
 5. **前端模板** 🔄：所有 `templates/cms/*.html` 需要从Layui迁移到Bootstrap5
 
 ---

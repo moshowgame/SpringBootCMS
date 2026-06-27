@@ -373,6 +373,10 @@ INSERT INTO `site_config` VALUES
 (8, 'smtp_host', '', 'email', 'SMTP服务器', 1, 0, NOW(), NOW()),
 (9, 'smtp_port', '465', 'email', 'SMTP端口', 2, 0, NOW(), NOW()),
 (10, 'smtp_username', '', 'email', 'SMTP用户名', 3, 0, NOW(), NOW()),
-(11, 'smtp_password', '', 'email', 'SMTP密码', 4, 0, NOW(), NOW());
+(11, 'smtp_password', '', 'email', 'SMTP密码', 4, 0, NOW(), NOW()),
+(12, 'company_name', 'SpringBootCMS', 'general', '公司/网站名称', 4, 0, NOW(), NOW()),
+(13, 'location', '中国 · 上海', 'general', '公司地址', 5, 0, NOW(), NOW()),
+(14, 'phone', '400-888-8888', 'general', '联系电话', 6, 0, NOW(), NOW()),
+(15, 'email', 'info@springbootcms.com', 'general', '联系邮箱', 7, 0, NOW(), NOW());
 
 SET FOREIGN_KEY_CHECKS = 1;

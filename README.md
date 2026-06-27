@@ -93,7 +93,8 @@
    ```
 
 3. **导入表结构**
-   - 使用 `src/main/resources/sql/springbootcms_v2.sql` 创建表和初始数据
+   - 表结构：`src/main/resources/sql/ddl/schema.sql`
+   - 示例数据（可选）：`src/main/resources/sql/data/sample-data.sql`
 
 4. **修改配置**
    - 编辑 `src/main/resources/application-dev.yml`，修改数据库连接信息

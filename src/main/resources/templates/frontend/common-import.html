@@ -3,11 +3,14 @@
     <meta charset="UTF-8">
     <title>${title!'SpringBootCMS'}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="keywords" content="${keywords!(templateMap.companyName)!'SpringBootCMS'}">
-    <meta name="description" content="${description!(templateMap.companyName)!'SpringBootCMS 内容管理系统'}">
+    <meta name="keywords" content="${keywords!(templateMap.siteKeywords)!'SpringBootCMS'}">
+    <meta name="description" content="${description!(templateMap.siteDescription)!'SpringBootCMS 内容管理系统'}">
+    <meta name="author" content="${(templateMap.companyName)!'SpringBootCMS'}">
     <meta property="og:title" content="${title!'SpringBootCMS'}">
-    <meta property="og:description" content="${description!(templateMap.companyName)!'SpringBootCMS 内容管理系统'}">
+    <meta property="og:description" content="${description!(templateMap.siteDescription)!'SpringBootCMS 内容管理系统'}">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="${(templateMap.companyName)!'SpringBootCMS'}">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="${request.contextPath}/static/images/favicon.ico">
     <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico">
     <link href="${request.contextPath}/static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -54,16 +57,56 @@
 <#macro frontendFooter>
 <footer class="site-footer">
     <div class="container">
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <h5 class="mb-3"><i class="bi bi-geo-alt me-2"></i>联系我们</h5>
-                <p><i class="bi bi-geo-alt me-2"></i>${(templateMap.location)!'中国 · 上海'}</p>
-                <p><i class="bi bi-telephone me-2"></i>${(templateMap.phone)!'400-888-8888'}</p>
-                <p><i class="bi bi-envelope me-2"></i>${(templateMap.email)!'info@springbootcms.com'}</p>
+        <div class="row g-4">
+            <!-- 关于我们 -->
+            <div class="col-lg-4">
+                <h5><i class="bi bi-building me-2"></i>${(templateMap.companyName)!'SpringBootCMS'}</h5>
+                <p class="small">${(templateMap.siteDescription)!'基于 Spring Boot 3 的现代化内容管理系统，让您的网站建设更高效。'}</p>
+                <div class="social-links mt-3">
+                    <a href="#" title="微信"><i class="bi bi-wechat"></i></a>
+                    <a href="#" title="微博"><i class="bi bi-sina-weibo"></i></a>
+                    <a href="#" title="邮箱"><i class="bi bi-envelope"></i></a>
+                    <a href="#" title="GitHub"><i class="bi bi-github"></i></a>
+                </div>
+            </div>
+            <!-- 快速链接 -->
+            <div class="col-6 col-lg-2">
+                <h5>快速链接</h5>
+                <ul class="footer-links">
+                    <li><a href="${request.contextPath}/page/index">首页</a></li>
+                    <li><a href="${request.contextPath}/page/search">文章列表</a></li>
+                    <li><a href="${request.contextPath}/page/activity/search">活动中心</a></li>
+                    <li><a href="${request.contextPath}/page/form/search">在线表单</a></li>
+                </ul>
+            </div>
+            <!-- 产品服务 -->
+            <div class="col-6 col-lg-2">
+                <h5>产品服务</h5>
+                <ul class="footer-links">
+                    <li><a href="${request.contextPath}/page/channel/1">产品动态</a></li>
+                    <li><a href="${request.contextPath}/page/channel/2">技术文档</a></li>
+                    <li><a href="${request.contextPath}/page/channel/3">解决方案</a></li>
+                    <li><a href="${request.contextPath}/admin/login">管理后台</a></li>
+                </ul>
+            </div>
+            <!-- 联系我们 -->
+            <div class="col-lg-4">
+                <h5>联系我们</h5>
+                <p class="small mb-2"><i class="bi bi-geo-alt me-2"></i>${(templateMap.location)!'中国 · 上海'}</p>
+                <p class="small mb-2"><i class="bi bi-telephone me-2"></i>${(templateMap.phone)!'400-888-8888'}</p>
+                <p class="small mb-2"><i class="bi bi-envelope me-2"></i>${(templateMap.email)!'info@springbootcms.com'}</p>
+                <p class="small mb-0"><i class="bi bi-clock me-2"></i>工作时间：周一至周五 9:00-18:00</p>
             </div>
         </div>
-        <hr class="border-secondary">
-        <p class="text-center mb-0">&copy; ${(templateMap.companyName)!'SpringBootCMS'} All Rights Reserved</p>
+        <hr class="border-secondary my-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="small mb-0">&copy; ${.now?string('yyyy')} ${(templateMap.companyName)!'SpringBootCMS'}. All Rights Reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="small mb-0">${(templateMap.siteCopyright)!'基于 Spring Boot 3 + MyBatis 构建'}</p>
+            </div>
+        </div>
     </div>
 </footer>
 </#macro>

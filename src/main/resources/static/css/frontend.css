@@ -41,7 +41,29 @@ body {
     filter: brightness(0) invert(1);
 }
 
-/* Hero Banner */
+/* Stats Counter */
+.stats-section {
+    background: linear-gradient(135deg, var(--ft-primary) 0%, #6c5ce7 100%);
+    color: #fff;
+    padding: 3rem 0;
+}
+.stats-item {
+    text-align: center;
+    padding: 1rem;
+}
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    display: block;
+    line-height: 1.2;
+}
+.stats-label {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* Hero Banner Enhanced */
 .hero-banner {
     background: linear-gradient(135deg, var(--ft-dark) 0%, var(--ft-primary) 100%);
     color: #fff;
@@ -49,13 +71,45 @@ body {
     position: relative;
     overflow: hidden;
 }
+.hero-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.hero-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.hero-banner .container { position: relative; z-index: 1; }
 .hero-banner h1 {
     font-weight: 800;
     font-size: 3rem;
+    line-height: 1.2;
 }
 .hero-banner .lead {
     font-size: 1.25rem;
     opacity: 0.9;
+}
+.hero-banner .btn-light {
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hero-banner .btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
 /* Page Header */
@@ -76,8 +130,16 @@ body {
 .section-bg {
     background: var(--ft-section-bg);
 }
+.section-title {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.section-subtitle {
+    color: var(--ft-text-muted);
+    margin-bottom: 2.5rem;
+}
 
-/* Service Card */
+/* Service Card Enhanced */
 .service-card {
     background: #fff;
     border: 1px solid #e9ecef;
@@ -91,7 +153,27 @@ body {
     transform: translateY(-4px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
-.service-card img {
+.service-card .service-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(67,97,238,0.1), rgba(108,92,231,0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+.service-card .service-icon i {
+    font-size: 1.75rem;
+    color: var(--ft-primary);
+}
+.service-card h5 {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+.service-card p {
+    font-size: 0.9rem;
+    color: var(--ft-text-muted);
     margin-bottom: 1rem;
 }
 
@@ -227,17 +309,58 @@ body {
     padding: 2.5rem 0;
 }
 
-/* Footer */
+/* Footer Enhanced */
 .site-footer {
     background: var(--ft-dark);
-    color: rgba(255,255,255,0.8);
-    padding: 3rem 0 1.5rem;
+    color: rgba(255,255,255,0.75);
+    padding: 4rem 0 2rem;
 }
 .site-footer h5 {
     color: #fff;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+}
+.site-footer .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.site-footer .footer-links li {
+    margin-bottom: 0.5rem;
+}
+.site-footer .footer-links a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.site-footer .footer-links a:hover {
+    color: #fff;
+}
+.site-footer .social-links {
+    display: flex;
+    gap: 1rem;
+}
+.site-footer .social-links a {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+}
+.site-footer .social-links a:hover {
+    background: var(--ft-primary);
+    transform: translateY(-2px);
 }
 .site-footer p {
     margin-bottom: 0.5rem;
+}
+.site-footer hr.border-secondary {
+    border-color: rgba(255,255,255,0.1) !important;
 }
 
 /* Form Styles */
