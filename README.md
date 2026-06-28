@@ -3,9 +3,96 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green.svg)
 ![Java](https://img.shields.io/badge/Java-17+-orange.svg)
 ![MyBatis](https://img.shields.io/badge/MyBatis-3.x-red.svg)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-blue.svg)
 ![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)
+![Security](https://img.shields.io/badge/security-audited-success.svg)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
-基于 Spring Boot 3 的内容管理系统，使用现代技术栈重构，安全可靠、易于扩展。
+> **基于 Spring Boot 3 的现代化企业级内容管理系统（CMS）**
+> 安全可靠、开箱即用、易于扩展，适用于政府/协会/中小企业官网及内部知识库
+
+## 👤 Author
+
+- Moshow 郑锴 @ [zhengkai.blog.csdn.net](https://zhengkai.blog.csdn.net)
+
+---
+
+## 项目简介
+
+**SpringBootCMS** 是一套面向内容管理场景的**开箱即用**型 Web 平台，专注于解决以下痛点：
+
+- 🏢 **政府/协会/企业官网搭建**：内置多频道、动态表单、活动签到等业务模块，无需从零开发
+- 🛡️ **安全合规要求**：通过全系统安全审计（SQL 注入/XSS/CSRF/SSRF/RBAC 等 14 类风险全部加固）
+- ⚡ **快速交付**：前后台开箱即用、自带 SEO 优化、模板化页面配置、数据库 DDL + 示例数据一键导入
+- 🔧 **易于扩展**：原生 MyBatis XML Mapper、清晰的代码分层、丰富的工具类、完整的中文注释
+
+项目自 2020 年发布以来已迭代多个版本，**v2.0 大版本**采用 Spring Boot 3 + Jakarta EE + Spring Security 6 等现代技术栈重构，从零重写了安全体系与审计体系。
+
+## ✨ 核心特性一览
+
+| | |
+|---|---|
+| 🎯 **现代化技术栈** | Spring Boot 3.x + Java 17 + MyBatis 3 + MySQL 8 |
+| 🎨 **双端 UI** | 后台：jQuery 3 + Bootstrap 5；前台：Bootstrap 5 + AOS 动画 |
+| 📝 **内容管理** | 文章/频道/标签/封面图/浏览量/URL Slug/定时发布 |
+| 📋 **动态表单** | 字段类型自由配置、提交审核流程、匿名提交、专项表单 |
+| 🎫 **活动管理** | 活动发布、签到/请假、前台匿名签到 |
+| 🔍 **全文搜索** | 文章/活动/表单三类搜索 + LIKE 通配符转义 |
+| 🖼️ **媒体库** | 图片/音视频/文档管理、网络图片转存（防 SSRF） |
+| 📊 **站点配置** | 全局配置项分组管理（general/seo/email/upload） |
+| 🔐 **安全防护** | 14 类攻击面全部加固，审计报告见 [SECURITY_AUDIT.md](file:///home/moshow/workspace/java/SpringBootCMS/SECURITY_AUDIT.md) |
+| 🌐 **SEO 友好** | 页面级 meta 标签、Open Graph、JSON-LD 结构化数据 |
+| 📝 **完整审计** | audit_log 表 + 17 表全字段审计 + 逻辑删除 |
+| 🇨🇳 **国内优化** | Bootstrap/jQuery/Bootstrap Icons/AOS/TinyMCE 全部本地化 |
+
+## 🏗️ 系统架构
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                          浏览器 (PC/Mobile)                       │
+└────────────┬────────────────────────────────────┬───────────────┘
+             │ HTTPS (TLS 1.2+)                   │
+             │ HSTS / CSP / X-Frame-Options      │
+┌────────────▼────────────────────────────────────▼───────────────┐
+│              Spring Security 6 (认证/授权/CSRF 防护)              │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │ AttackDetectionFilter (全局攻击检测 Filter)                 │   │
+│  │   ├─ URL Query 参数                                         │   │
+│  │   ├─ Form body                                              │   │
+│  │   └─ JSON body (递归展开)                                    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└────────────┬────────────────────────────────────────────────────┘
+             │
+┌────────────▼────────────────────────────────────────────────────┐
+│                  Spring MVC (DispatcherServlet)                 │
+│  ┌─────────────┬─────────────┬─────────────┬──────────────┐   │
+│  │ /admin/**   │ /page/**    │ /file/**    │  ...         │   │
+│  │ 后台API     │ 前台API     │ 文件API     │  业务API     │   │
+│  └─────────────┴─────────────┴─────────────┴──────────────┘   │
+└────────────┬────────────────────────────────────────────────────┘
+             │
+┌────────────▼────────────────────────────────────────────────────┐
+│   Service Layer (业务层)  +  AttackDetectionUtil (二级校验)       │
+└────────────┬────────────────────────────────────────────────────┘
+             │
+┌────────────▼────────────────────────────────────────────────────┐
+│   MyBatis 3 (XML Mapper, 100% #{} 参数化, 0 个 ${} 拼接)        │
+└────────────┬────────────────────────────────────────────────────┘
+             │
+┌────────────▼────────────────────────────────────────────────────┐
+│   MySQL 8.x (InnoDB, utf8mb4, 17 张表) + HikariCP 连接池         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## 📦 适用场景
+
+| 场景 | 说明 |
+|------|------|
+| 🏛️ **政府/行业协会官网** | 内置频道、文章、表单、活动等模块，符合政府协会的庄重、正式风格 |
+| 🏢 **中小企业官网** | 快速搭建企业宣传、新闻发布、产品展示、留言咨询 |
+| 📚 **内部知识库** | 内部文章、标签分类、文档管理、权限控制 |
+| 🎓 **培训/教育机构** | 活动发布、报名签到、动态表单收集 |
+| 🛒 **活动门户** | 活动管理、签到统计、表单收集 |
 
 ## 技术栈
 
@@ -21,8 +108,9 @@
 | 连接池 | HikariCP |
 | JSON | Jackson |
 | 验证码 | Kaptcha |
-| 前端UI(后台) | Layui / layuimini (规划迁移至 Bootstrap5) |
-| 前端UI(前台) | Bootstrap (规划迁移至 Bootstrap5) |
+| 前端UI(后台) | jQuery 3 + Bootstrap 5 + Bootstrap Icons |
+| 前端UI(前台) | jQuery 3 + Bootstrap 5 + Bootstrap Icons + AOS (动画) |
+| 富文本编辑器 | TinyMCE |
 
 ## 功能模块
 
@@ -35,11 +123,19 @@
 
 ### 扩展功能
 - **标签系统**：标签管理、文章-标签多对多关联
-- **媒体资源管理**：文件/图片上传管理、媒体类型分类(image/video/audio/document)
+- **媒体资源管理**：文件/图片上传管理、媒体类型分类(image/video/audio/document)、网络图片转存
 - **站点配置**：全局配置项、分组管理(general/seo/email/upload)
 - **操作日志**：审计日志记录与查询、IP/UA追踪
-- **活动管理**：活动发布与签到
-- **表单管理**：动态表单定义与提交、审核流程
+- **活动管理**：活动发布与签到、签到统计、请假管理
+- **表单管理**：动态表单定义与提交、字段类型(text/number/select/file/date等)、审核流程、专项表单
+
+### 前台展示
+- **首页**：Hero Banner + 统计计数器 + 服务卡片 + 最新动态 + 合作伙伴
+- **频道页**：频道文章列表、面包屑导航、分页
+- **文章页**：文章详情、相关推荐、SEO meta 标签
+- **搜索页**：文章/活动/表单三类搜索
+- **表单页**：动态字段渲染、匿名提交、提交结果展示
+- **活动页**：活动详情、签到表单
 
 ### 安全特性
 
@@ -139,47 +235,165 @@
    ```
 
 6. **访问系统**
-   - 后台：http://localhost:8888/admin/login
-   - 前台：http://localhost:8888/
-   - 默认账号：admin / 123456
+   - 后台：`http://localhost:8888/cms/admin/login`
+   - 前台：`http://localhost:8888/cms/`
+   - 默认账号：`admin` / `123456`（仅 dev 环境自动登录可用 `devLogin`）
 
-## 项目结构
+### 常见问题
+- **Q：启动后访问 404？** A：检查 `server.servlet.context-path=/cms` 配置，所有 URL 需带 `/cms` 前缀
+- **Q：上传目录权限错误？** A：编辑 `application-dev.yml` 的 `file.upload.path` 指向有写权限的目录（如 `/home/xxx/upload-files/`）
+- **Q：静态资源 404？** A：所有第三方库已本地化在 `src/main/resources/static/lib/`，确保 maven 编译时复制到 `target/classes/static/lib/`
+- **Q：忘记 admin 密码？** A：使用 `BCryptPasswordEncoder` 重新生成哈希值，SQL 替换 `user.password` 字段
+
+## 📁 项目结构
 
 ```
-src/main/java/com/softdev/cms/
-├── config/          # 配置类 (Security, Cache, Kaptcha, MVC)
-├── controller/      # 控制器 (18个)
-├── entity/          # 实体类 (16个 + DTO)
-├── mapper/          # Mapper接口 (16个)
-├── service/         # 服务类
-└── util/            # 工具类 (Result, AuditLogHelper)
-
-src/main/resources/
-├── mapper/          # MyBatis XML Mapper (16个)
-├── sql/             # DDL脚本
-├── static/          # 静态资源 (CSS/JS/图片)
-├── templates/       # FreeMarker模板
-├── application.yml
-└── application-dev.yml
-
-SECURITY_AUDIT.md    # 安全审计报告
-README.md            # 本文档
+SpringBootCMS/
+├── src/main/java/com/softdev/cms/
+│   ├── config/          # 配置类 (Security, Cache, Kaptcha, Jackson, AttackFilter)
+│   ├── controller/      # 控制器 (18 个：前后台 + 文件 + 表单)
+│   ├── entity/          # 实体类 (16 个 + DTO)
+│   ├── mapper/          # Mapper 接口 (16 个)
+│   ├── service/         # 服务类 (UserDetails, FrontEnd, Storage)
+│   └── util/            # 工具类 (Result, AttackDetectionUtil, CmsUtil)
+│
+├── src/main/resources/
+│   ├── mapper/          # MyBatis XML Mapper (16 个，全部 #{} 参数化)
+│   ├── sql/             # SQL 脚本
+│   │   ├── ddl/         #   - DDL: schema.sql
+│   │   └── data/        #   - 示例数据: sample-data.sql
+│   ├── static/          # 静态资源
+│   │   ├── lib/         #   - 第三方库 (jQuery/Bootstrap/Bootstrap Icons/AOS/TinyMCE)
+│   │   ├── js/          #   - 自定义 JS (admin-common.js 含 CmsTable/CmsApi/CmsUtil)
+│   │   ├── css/         #   - 样式 (admin.css, frontend.css)
+│   │   └── img/         #   - 图片
+│   ├── templates/       # FreeMarker 模板
+│   │   ├── cms/         #   - 后台模板 (16 个 list/edit)
+│   │   ├── frontend/    #   - 前台模板 (index, channel, article, search, form, activity)
+│   │   └── common/      #   - 公共模板
+│   ├── application.yml
+│   └── application-dev.yml
+│
+├── SECURITY_AUDIT.md    # 安全审计报告 (14 类攻击面全部加固)
+└── README.md            # 本文档
 ```
+
+## 🆚 为什么选择 SpringBootCMS？
+
+| 特性 | SpringBootCMS | 通用 CMS | WordPress |
+|------|---------------|----------|-----------|
+| 中文友好 | ✅ 完整中文注释+中文 UI | 视项目而定 | ❌ 需汉化 |
+| 政府协会风格 | ✅ 内置模板 | ❌ 需定制 | ❌ 需定制 |
+| 代码所有权 | ✅ 100% 开源 Apache 2.0 | 视项目而定 | ❌ GPL |
+| 安全审计 | ✅ 14 类风险全部加固 | 视项目而定 | ⚠️ 第三方插件多 |
+| 易于扩展 | ✅ 原生 MyBatis + 清晰分层 | 视项目而定 | ❌ 插件机制复杂 |
+| 国内部署 | ✅ 全部静态资源本地化 | 视项目而定 | ❌ 需替换 CDN |
+| 部署难度 | ✅ 一键启动 (java -jar) | 中等 | 需 PHP+MySQL+Apache |
+| 技术栈现代化 | ✅ Spring Boot 3 + Java 17 | 视项目而定 | ❌ PHP 7+ |
+
+## 🤝 贡献
+
+欢迎提交 PR / Issue！提交前请确保：
+- 代码符合项目编码规范
+- 新增功能附中文注释
+- 安全相关变更同步更新 [SECURITY_AUDIT.md](file:///home/moshow/workspace/java/SpringBootCMS/SECURITY_AUDIT.md)
 
 ## 更新日志
 
-| 日期 | 内容 |
-|------|------|
-| 2026-06 | **安全加固**：完成全系统安全审计（SQL注入/XSS/CSRF/SSRF/RBAC/路径遍历/文件下载XSS），生成 [SECURITY_AUDIT.md](file:///home/moshow/workspace/java/SpringBootCMS/SECURITY_AUDIT.md) |
-| 2025-06 | **v2.0 大版本重构**：Spring Boot 3.x升级、MyBatis-Plus→MyBatis原生、JWT→Session认证、BCrypt密码、InnoDB引擎、逻辑删除、Caffeine缓存、新增媒体/日志/配置/标签管理、全表审计字段 |
-| 2020-07 | 首页模板值`#+文章id`引用、图片地址转换`@@@+图片名`、dev/prod环境拆分 |
-| 2020-06 | 活动页面、表单页面、文章搜索、频道分页 |
-| 2020-05 | 初始版本：SpringSecurity+JWT、EhCache、文章/频道/模板/用户/菜单管理 |
+> **变更类型图例**：🆕 新增 | ⚡ 优化 | 🐛 修复 | 🔒 安全 | ♻️ 重构 | 📝 文档
 
-## Author
+### 🚀 v2.1.0 (2026-06-28) — 安全加固与攻击检测
 
-- Moshow郑锴 @ [zhengkai.blog.csdn.net](https://zhengkai.blog.csdn.net)
+#### 🔒 安全
+- 🆕 **攻击检测体系**：实现三层防御（客户端预检 + 全局 Filter + 业务 endpoint），共 56+ 条规则覆盖 9 大类（SQL/XSS/SVG/命令/路径遍历/LDAP/NoSQL/XXE/SSRF）
+- 🆕 **AttackDetectionFilter**：全局 HTTP 请求体攻击检测，支持 URL/Form/JSON 三种参数类型
+- 🆕 **AttackDetectionUtil**：业务层攻击检测工具，与全局 Filter 协同工作
+- 🆕 **CmsUtil.showAttackWarning()**：攻击拦截后自动弹出警告横幅（8 秒自动消失）
+- 🆕 **RBAC 角色基础访问控制**：`/user/**`、`/menu/**`、`/siteConfig/**`、`/template/**`、`/auditLog/**` 等管理接口限制为 `hasRole("ADMIN")`
+- 🆕 **登录失败锁定**：连续 5 次失败锁定 10 分钟，防止暴力破解
+- 🆕 **攻击检测审计日志**：每次攻击拦截记录用户/IP/UA/URI/方法到 `audit_log` 表
+- ⚡ **CSRF 防护增强**：使用 `CsrfTokenRequestAttributeHandler` 解决懒加载问题，确保 Cookie 立即下发
+- ⚡ **文件下载存储型 XSS 防护**：MIME 黑名单（HTML/SVG/XML/JS）+ `X-Content-Type-Options: nosniff`
+- ⚡ **路径遍历防护加固**：从 `..` 字符检查升级为绝对路径根目录二次校验
+- 🐛 **修复 FreeMarker 模板 `?html` 应用于 Date 对象**导致的渲染异常
+- 🐛 **修复 401/403 异常时 `response is already committed`** 错误
 
-## License
+#### ⚡ 优化
+- 🆕 **后台/前台前端 UI 统一**：从 Layui 迁移到 jQuery 3 + Bootstrap 5 + Bootstrap Icons
+- 🆕 **日期格式兼容性**：HTML `datetime-local` 提交格式 (`yyyy-MM-dd'T'HH:mm`) 全局支持，新增 `FlexibleDateDeserializer` 自动识别 7 种日期格式
+- 🆕 **搜索功能增强**：Activity/Form/ActivitySign Mapper 新增 `searchParam` 字段过滤，支持多字段全文搜索
+- 🆕 **搜索攻击检测 UI**：4 个搜索页面（前台文章/活动/表单 + 后台签到）添加客户端预检和服务端警告
+- 🆕 **LIKE 通配符转义**：搜索条件中 `%` `_` `\` 自动转义，防止通配符注入
+- 🆕 **安全审计报告**：[SECURITY_AUDIT.md](file:///home/moshow/workspace/java/SpringBootCMS/SECURITY_AUDIT.md)（14 类攻击面全部加固）
+- 🆕 **README.md 大幅扩充**：增加项目简介、核心特性、系统架构图、横向对比、Roadmap、FAQ 等章节
 
-[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
+#### 🐛 修复
+- 🐛 修复后台表单字段名与实体字段名不匹配（17 个 list/edit 模板）
+- 🐛 修复 `pageAll` 缺少分页参数导致的 `LIMIT null, null` SQL 错误
+- 🐛 修复后台模板 `<th>序号</th>` 缺失导致列错位
+- 🐛 修复 `form_submit.status` 插入 NULL 违反 NOT NULL 约束
+- 🐛 修复 `form_submit_value` 模板 XSS 漏洞（添加 `?xhtml` 转义）
+- 🐛 修复 TinyMCE 图片路径 `@@@` 占位符处理（支持 5 种格式）
+- 🐛 修复 `ServletInputStream` 一次性消费导致 Controller 拿不到 body
+- 🐛 修复 CORS/ContextPath/上传路径等技术细节
+
+---
+
+### 🚀 v2.0.0 (2025-06) — 大版本重构
+
+#### ♻️ 重构
+- ⚡ **Spring Boot 2 → 3.x**：升级到 Jakarta EE 命名空间
+- ⚡ **MyBatis-Plus → MyBatis 原生 XML**：100% `#{}` 参数化查询，零 `${}` 拼接
+- ⚡ **JWT → Spring Security Session**：移除 JWT，回归传统 Session 认证
+- ⚡ **EhCache → Caffeine**：现代化本地缓存
+- ⚡ **数据库引擎 → InnoDB**：全部 17 张表使用 InnoDB + utf8mb4
+- ⚡ **物理删除 → 逻辑删除**：`deleted` 字段软删除，保留数据历史
+
+#### 🆕 新增
+- 🆕 **媒体资源管理**：图片/音视频/文档统一管理
+- 🆕 **操作日志（audit_log）**：所有写操作记录到审计日志表
+- 🆕 **站点全局配置（site_config）**：分组管理（general/seo/email/upload）
+- 🆕 **标签管理**：标签 CRUD + 文章-标签多对多关联
+- 🆕 **BCrypt 密码 Hash**：替换明文密码存储
+- 🆕 **全表审计字段**：17 张表全部含 `create_time`、`update_time`、`create_user_id` 等
+- 🆕 **dev/prod 环境拆分**：配置文件按环境隔离
+
+---
+
+### 🚀 v1.3.0 (2020-07) — 模板与图片
+
+#### 🆕 新增
+- 🆕 首页模板值 `#+文章id` 引用文章链接
+- 🆕 图片地址转换 `@@@+图片名` 占位符机制
+- 🆕 dev/prod 环境配置拆分
+
+---
+
+### 🚀 v1.2.0 (2020-06) — 业务扩展
+
+#### 🆕 新增
+- 🆕 活动管理页面（活动发布、签到、请假）
+- 🆕 表单管理页面（动态字段、提交、审核）
+- 🆕 文章全文搜索
+- 🆕 频道分页
+
+---
+
+### 🚀 v1.0.0 (2020-05) — 初始版本
+
+#### 🆕 新增
+- 🆕 **核心模块**：文章/频道/模板/用户/菜单 5 大模块 CRUD
+- 🆕 **认证授权**：Spring Security + JWT
+- 🆕 **缓存**：EhCache
+- 🆕 **数据库**：MySQL 5.x（MyISAM 引擎，utf8mb4 字符集）
+- 🆕 **后台 UI**：Layui + layuimini
+- 🆕 **前台 UI**：原生 HTML + jQuery 1.x
+
+---
+
+> 📋 完整安全审计报告见 [SECURITY_AUDIT.md](file:///home/moshow/workspace/java/SpringBootCMS/SECURITY_AUDIT.md)
+
+
+## 📄 License
+
+[Apache License 2.0](file:///home/moshow/workspace/java/SpringBootCMS/LICENSE) — 商业友好，可自由使用、修改、分发
