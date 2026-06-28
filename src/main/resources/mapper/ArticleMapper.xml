@@ -53,6 +53,14 @@
         WHERE t0.deleted = 0
         <if test="articleId != null"> AND t0.article_id = #{articleId} </if>
         <if test="title != null and title != ''"> AND t0.title LIKE CONCAT('%', #{title}, '%') </if>
+        <if test="searchParam != null and searchParam != ''">
+            AND (
+                t0.title LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.summary LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.content LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.keyword LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+            )
+        </if>
         <if test="createUserId != null"> AND t0.create_user_id = #{createUserId} </if>
         <if test="channelId != null"> AND t0.channel_id = #{channelId} </if>
         <if test="status != null"> AND t0.status = #{status} </if>
@@ -65,6 +73,14 @@
         WHERE t0.deleted = 0
         <if test="articleId != null"> AND t0.article_id = #{articleId} </if>
         <if test="title != null and title != ''"> AND t0.title LIKE CONCAT('%', #{title}, '%') </if>
+        <if test="searchParam != null and searchParam != ''">
+            AND (
+                t0.title LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.summary LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.content LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.keyword LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+            )
+        </if>
         <if test="createUserId != null"> AND t0.create_user_id = #{createUserId} </if>
         <if test="channelId != null"> AND t0.channel_id = #{channelId} </if>
         <if test="status != null"> AND t0.status = #{status} </if>
