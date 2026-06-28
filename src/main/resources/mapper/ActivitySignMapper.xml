@@ -31,6 +31,14 @@
         <if test="showName != null and showName != ''"> AND t0.show_name LIKE CONCAT('%', #{showName}, '%') </if>
         <if test="userName != null and userName != ''"> AND t0.user_name = #{userName} </if>
         <if test="activityId != null"> AND t0.activity_id = #{activityId} </if>
+        <if test="searchParam != null and searchParam != ''">
+            AND (
+                t0.show_name LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.phone LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.company LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.user_name LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+            )
+        </if>
         ORDER BY t0.sign_id DESC
         LIMIT #{page}, #{limit}
     </select>
@@ -42,6 +50,14 @@
         <if test="showName != null and showName != ''"> AND t0.show_name LIKE CONCAT('%', #{showName}, '%') </if>
         <if test="userName != null and userName != ''"> AND t0.user_name = #{userName} </if>
         <if test="activityId != null"> AND t0.activity_id = #{activityId} </if>
+        <if test="searchParam != null and searchParam != ''">
+            AND (
+                t0.show_name LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.phone LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.company LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR t0.user_name LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+            )
+        </if>
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="signId">

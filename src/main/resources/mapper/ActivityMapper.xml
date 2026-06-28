@@ -10,6 +10,12 @@
         SELECT * FROM activity WHERE deleted = 0
         <if test="activityId != null"> AND activity_id = #{activityId} </if>
         <if test="activityName != null and activityName != ''"> AND activity_name LIKE CONCAT('%', #{activityName}, '%') </if>
+        <if test="searchParam != null and searchParam != ''">
+            AND (
+                activity_name LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR activity_desc LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+            )
+        </if>
         <if test="createUserId != null"> AND create_user_id = #{createUserId} </if>
         <if test="status != null"> AND status = #{status} </if>
         ORDER BY activity_id DESC
@@ -20,6 +26,12 @@
         SELECT COUNT(1) FROM activity WHERE deleted = 0
         <if test="activityId != null"> AND activity_id = #{activityId} </if>
         <if test="activityName != null and activityName != ''"> AND activity_name LIKE CONCAT('%', #{activityName}, '%') </if>
+        <if test="searchParam != null and searchParam != ''">
+            AND (
+                activity_name LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR activity_desc LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+            )
+        </if>
         <if test="createUserId != null"> AND create_user_id = #{createUserId} </if>
         <if test="status != null"> AND status = #{status} </if>
     </select>

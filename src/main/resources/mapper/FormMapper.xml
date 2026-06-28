@@ -10,6 +10,12 @@
         SELECT * FROM form WHERE deleted = 0
         <if test="formId != null"> AND form_id = #{formId} </if>
         <if test="formName != null and formName != ''"> AND form_name LIKE CONCAT('%', #{formName}, '%') </if>
+        <if test="searchParam != null and searchParam != ''">
+            AND (
+                form_name LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR form_desc LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+            )
+        </if>
         <if test="createUserId != null"> AND create_user_id = #{createUserId} </if>
         <if test="status != null"> AND status = #{status} </if>
         ORDER BY form_id DESC
@@ -20,6 +26,12 @@
         SELECT COUNT(1) FROM form WHERE deleted = 0
         <if test="formId != null"> AND form_id = #{formId} </if>
         <if test="formName != null and formName != ''"> AND form_name LIKE CONCAT('%', #{formName}, '%') </if>
+        <if test="searchParam != null and searchParam != ''">
+            AND (
+                form_name LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+                OR form_desc LIKE CONCAT('%', REPLACE(REPLACE(REPLACE(#{searchParam}, '\\', '\\\\'), '%', '\\%'), '_', '\\_'), '%') ESCAPE '\\'
+            )
+        </if>
         <if test="createUserId != null"> AND create_user_id = #{createUserId} </if>
         <if test="status != null"> AND status = #{status} </if>
     </select>

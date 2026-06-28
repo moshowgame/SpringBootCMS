@@ -140,6 +140,38 @@ const CmsUtil = {
         }
     },
 
+    /**
+     * 显示攻击检测警告横幅
+     * 用于服务端 AttackDetectionFilter / 业务层检测到的攻击拦截
+     * @param {string} message 服务端返回的拦截消息
+     */
+    showAttackWarning: function(message) {
+        // 提取攻击类型关键字（在括号前）
+        let safeMessage = CmsUtil.escapeHtml(message || '检测到可疑输入');
+        let container = $('.cms-attack-warning');
+        if (container.length === 0) {
+            container = $('<div class="cms-attack-warning" style="position:fixed;top:80px;right:20px;z-index:9999;max-width:480px;"></div>');
+            $('body').append(container);
+        }
+        const alert = $(`
+            <div class="alert alert-danger alert-dismissible fade show shadow" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-shield-exclamation me-2" style="font-size:1.5rem;"></i>
+                    <div class="flex-grow-1">
+                        <strong>输入已被拦截</strong>
+                        <p class="mb-0 small">${safeMessage}</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        `);
+        container.empty().append(alert);
+        // 8 秒后自动消失
+        setTimeout(function() {
+            alert.fadeOut(500, function() { $(this).remove(); });
+        }, 8000);
+    },
+
     // HTML 转义工具：用于在 JS 中安全拼接用户可控字符串
     escapeHtml: function(s) {
         if (s == null) return '';
@@ -223,7 +255,12 @@ class CmsTable {
                 self.render(res.data || []);
                 self.renderPagination(res.count || 0);
             } else {
-                CmsUtil.showToast(res.msg || '加载失败', 'danger');
+                // 服务端攻击检测拦截 → 显示警告横幅
+                if (res.msg && res.msg.indexOf('攻击已拦截') !== -1) {
+                    CmsUtil.showAttackWarning(res.msg);
+                } else {
+                    CmsUtil.showToast(res.msg || '加载失败', 'danger');
+                }
             }
         });
     }

@@ -14,6 +14,7 @@
             <input type="text" class="form-control form-control-sm" id="searchName" placeholder="报名人姓名">
             <button class="btn btn-cms-primary btn-sm" id="btnSearch"><i class="bi bi-search me-1"></i>搜索</button>
         </div>
+        <div id="searchWarning"></div>
         <div class="table-responsive">
             <table class="cms-table">
                 <thead>
@@ -64,10 +65,45 @@ $(function() {
 
     $('#btnSearch').on('click', function() {
         var name = $('#searchName').val().trim();
+        // 客户端预检测
+        var localCheck = adminAttackCheck(name);
+        if (localCheck.detected) {
+            showAdminWarning(localCheck);
+            return;
+        }
         var params = {activityId: activityId};
-        if (name) params.signUserName = name;
+        if (name) params.searchParam = name;
         table.search(params);
     });
+
+    /**
+     * 管理员端攻击检测 + 警告显示
+     */
+    function adminAttackCheck(value) {
+        if (!value) return { detected: false };
+        var rules = [
+            { type: 'SQL_INJECTION', typeDescription: 'SQL 注入', pattern: /(\bunion\b[\s\/*]+select\b|\bor\s+1\s*=\s*1|--|\/\*)/i, keyword: 'SQL 关键字' },
+            { type: 'XSS', typeDescription: 'XSS 跨站脚本', pattern: /(<\s*script\b|<\s*iframe\b|javascript\s*:|on(error|load|click)\s*=)/i, keyword: 'XSS 标签/事件' },
+            { type: 'SVG_INJECTION', typeDescription: 'SVG 注入', pattern: /(<\s*svg\b|<\s*use\b|xlink\s*:\s*href)/i, keyword: 'SVG 标签' },
+            { type: 'PATH_TRAVERSAL', typeDescription: '路径遍历', pattern: /(\.\.\/|\.\.\\)/, keyword: '../ 路径遍历' }
+        ];
+        for (var i = 0; i < rules.length; i++) {
+            if (rules[i].pattern.test(value)) {
+                return { detected: true, typeDescription: rules[i].typeDescription, keyword: rules[i].keyword };
+            }
+        }
+        return { detected: false };
+    }
+
+    function showAdminWarning(check) {
+        var html = '<div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">' +
+            '<i class="bi bi-shield-exclamation me-2"></i>' +
+            '<strong>输入已被拦截：</strong>检测到 <code>' + check.typeDescription + '</code> 攻击特征 ' +
+            '（关键字：<code>' + check.keyword + '</code>）' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+            '</div>';
+        $('#searchWarning').html(html);
+    }
 });
 </script>
 </body>
