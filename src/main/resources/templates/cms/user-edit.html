@@ -10,19 +10,19 @@
     </div>
     <div class="card-body">
         <form id="userForm" class="cms-form">
-            <input type="hidden" name="userId" value="${(user.userId)!!}">
+            <input type="hidden" name="userId" value="${(user.userId)!!?html}">
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">用户名 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="userName" value="${(user.userName)!!}" placeholder="请输入用户名" required>
+                    <input type="text" class="form-control" name="userName" value="${(user.userName)!!?html}" placeholder="请输入用户名" required>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">昵称</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="nickName" value="${(user.nickName)!!}" placeholder="请输入昵称">
+                    <input type="text" class="form-control" name="nickName" value="${(user.nickName)!!?html}" placeholder="请输入昵称">
                 </div>
             </div>
 
@@ -36,14 +36,14 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">邮箱</label>
                 <div class="col-sm-10">
-                    <input type="email" class="form-control" name="email" value="${(user.email)!!}" placeholder="请输入邮箱">
+                    <input type="email" class="form-control" name="email" value="${(user.email)!!?html}" placeholder="请输入邮箱">
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">手机号</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="phone" value="${(user.phone)!!}" placeholder="请输入手机号">
+                    <input type="text" class="form-control" name="phone" value="${(user.phone)!!?html}" placeholder="请输入手机号">
                 </div>
             </div>
 

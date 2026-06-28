@@ -6,6 +6,18 @@
         SELECT * FROM activity_sign WHERE sign_id = #{signId} AND deleted = 0
     </select>
 
+    <select id="selectByActivityAndUserName" resultType="ActivitySign">
+        SELECT * FROM activity_sign
+        WHERE activity_id = #{activityId} AND user_name = #{userName} AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectByActivityAndPhone" resultType="ActivitySign">
+        SELECT * FROM activity_sign
+        WHERE activity_id = #{activityId} AND phone = #{phone} AND deleted = 0
+        LIMIT 1
+    </select>
+
     <select id="validSignTotal" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM activity_sign t
         INNER JOIN user t2 ON t2.user_name = t.user_name AND t2.deleted = 0

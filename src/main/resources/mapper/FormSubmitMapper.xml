@@ -6,6 +6,18 @@
         SELECT * FROM form_submit WHERE submit_id = #{submitId} AND deleted = 0
     </select>
 
+    <select id="selectByFormIdAndUserId" resultType="FormSubmit">
+        SELECT * FROM form_submit
+        WHERE form_id = #{formId} AND user_id = #{userId} AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectByFormIdAndPhone" resultType="FormSubmit">
+        SELECT * FROM form_submit
+        WHERE form_id = #{formId} AND phone = #{phone} AND deleted = 0
+        LIMIT 1
+    </select>
+
     <select id="pageAll" resultType="FormSubmit">
         SELECT t0.*, t2.form_name FROM form_submit t0
         LEFT JOIN user t1 ON t1.user_id = t0.user_id AND t1.deleted = 0
@@ -33,8 +45,8 @@
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="submitId">
-        INSERT INTO form_submit (form_id, user_id, user_name, show_name, phone, company, status)
-        VALUES (#{formId}, #{userId}, #{userName}, #{showName}, #{phone}, #{company}, #{status})
+        INSERT INTO form_submit (form_id, user_id, user_name, show_name, phone, company<if test="status != null">, status</if><if test="auditUserId != null">, audit_user_id</if><if test="auditUserName != null">, audit_user_name</if>)
+        VALUES (#{formId}, #{userId}, #{userName}, #{showName}, #{phone}, #{company}<if test="status != null">, #{status}</if><if test="auditUserId != null">, #{auditUserId}</if><if test="auditUserName != null">, #{auditUserName}</if>)
     </insert>
 
     <update id="updateById">

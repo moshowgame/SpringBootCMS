@@ -10,40 +10,40 @@
     </div>
     <div class="card-body">
         <form id="configForm" class="cms-form">
-            <input type="hidden" name="configId" value="${(siteConfig.configId)!!}">
+            <input type="hidden" name="configId" value="${(siteConfig.configId)!!?html}">
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">配置键 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="configKey" value="${(siteConfig.configKey)!!}" placeholder="请输入配置键，如 site_name" required>
+                    <input type="text" class="form-control" name="configKey" value="${(siteConfig.configKey)!!?html}" placeholder="请输入配置键，如 site_name" required>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">配置值</label>
                 <div class="col-sm-10">
-                    <textarea class="form-control" name="configValue" rows="5" placeholder="请输入配置值">${(siteConfig.configValue)!!}</textarea>
+                    <textarea class="form-control" name="configValue" rows="5" placeholder="请输入配置值">${(siteConfig.configValue)!!?html}</textarea>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">分组</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="configGroup" value="${(siteConfig.configGroup)!!}" placeholder="请输入分组，如 base、index">
+                    <input type="text" class="form-control" name="configGroup" value="${(siteConfig.configGroup)!!?html}" placeholder="请输入分组，如 base、index">
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">描述</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="description" value="${(siteConfig.description)!!}" placeholder="请输入配置描述">
+                    <input type="text" class="form-control" name="description" value="${(siteConfig.description)!!?html}" placeholder="请输入配置描述">
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">排序</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control" name="sort" value="${(siteConfig.sort)!'0'}" placeholder="排序值">
+                    <input type="number" class="form-control" name="sort" value="${(siteConfig.sort)!'0'?html}" placeholder="排序值">
                 </div>
             </div>
 

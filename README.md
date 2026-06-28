@@ -42,11 +42,45 @@
 - **表单管理**：动态表单定义与提交、审核流程
 
 ### 安全特性
-- Spring Security + Session 认证
-- BCrypt 密码 Hash 存储与校验
-- 逻辑删除（deleted字段软删除，保留数据历史）
-- SQL参数化（`#{}` 防注入）
-- 验证码（Kaptcha）
+
+#### 认证与授权
+- **Spring Security + Session 认证**（已迁移自 JWT）
+- **BCrypt** 密码 Hash 存储与校验
+- **RBAC 角色基础访问控制**：管理员专属接口（`/user/**`、`/menu/**`、`/siteConfig/**`、`/template/**`、`/auditLog/**`）限制 `hasRole("ADMIN")`
+- **登录失败锁定**：连续 5 次失败锁定 10 分钟
+- **图形验证码**（Kaptcha）防爆破
+- **会话固定防护**：登录后 `migrateSession()` 重新生成 Session ID
+- **单点登录**：`maximumSessions(1)`
+
+#### 注入攻击防护
+- **SQL 注入**：MyBatis 全量参数化（`#{}`），16 个 Mapper 零 `${}` 拼接
+- **XSS（存储型）**：所有 FreeMarker `value=""` / `<textarea>` 动态值使用 `?html` 转义
+- **XSS（反射型 JS）**：`CmsUtil.escapeHtml()` / `CmsUtil.escapeAttr()` 统一转义用户可控字段
+- **SSRF 四层防护**：内网 host 校验 + DNS IP 校验 + 重定向目标校验 + 超时控制
+
+#### CSRF
+- **CookieCsrfTokenRepository**（前端 JS 可读，自动附加 `X-XSRF-TOKEN`）
+- 公开接口（`/page/**`、`/file/files/*`、`/formSubmitValue/submit`、`/activitySign/save` 等）已豁免
+
+#### 文件上传/下载
+- **五层防护**（上传）：扩展名白名单 + MIME 校验 + 文件魔数 + 大小限制 + UUID 命名
+- **路径遍历防护**（下载）：拒绝 `..` 等非法字符 + 解析后绝对路径根目录二次校验
+- **MIME 黑名单**（下载）：禁止 HTML/SVG/XML/JS 可执行类型
+- **`X-Content-Type-Options: nosniff`** 响应头防浏览器嗅探
+
+#### 安全响应头
+- `Content-Security-Policy`（CSP）
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: SAMEORIGIN`（防 clickjacking）
+- `Strict-Transport-Security`（HSTS，HTTPS 环境生效）
+- **401/403 JSON 响应**：自定义 `AuthenticationEntryPoint` 和 `AccessDeniedHandler`，AJAX 请求不重定向
+
+#### 审计与日志
+- **审计日志表**（`audit_log`）只增不删，记录用户/IP/UA/操作
+- 17 张业务表全部含审计字段（`create_time`、`update_time`、`create_user_id` 等）
+- **逻辑删除**（`deleted` 字段软删除，保留数据历史）
+
+> 📋 详细审计报告见 [SECURITY_AUDIT.md](file:///home/moshow/workspace/java/SpringBootCMS/SECURITY_AUDIT.md)
 
 ## 数据库表结构 (v2.0)
 
@@ -127,12 +161,16 @@ src/main/resources/
 ├── templates/       # FreeMarker模板
 ├── application.yml
 └── application-dev.yml
+
+SECURITY_AUDIT.md    # 安全审计报告
+README.md            # 本文档
 ```
 
 ## 更新日志
 
 | 日期 | 内容 |
 |------|------|
+| 2026-06 | **安全加固**：完成全系统安全审计（SQL注入/XSS/CSRF/SSRF/RBAC/路径遍历/文件下载XSS），生成 [SECURITY_AUDIT.md](file:///home/moshow/workspace/java/SpringBootCMS/SECURITY_AUDIT.md) |
 | 2025-06 | **v2.0 大版本重构**：Spring Boot 3.x升级、MyBatis-Plus→MyBatis原生、JWT→Session认证、BCrypt密码、InnoDB引擎、逻辑删除、Caffeine缓存、新增媒体/日志/配置/标签管理、全表审计字段 |
 | 2020-07 | 首页模板值`#+文章id`引用、图片地址转换`@@@+图片名`、dev/prod环境拆分 |
 | 2020-06 | 活动页面、表单页面、文章搜索、频道分页 |

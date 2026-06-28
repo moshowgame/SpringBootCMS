@@ -50,16 +50,17 @@ $(function() {
                 res.data.forEach(function(item) {
                     var val = item.configValue || '';
                     if (val.length > 50) val = val.substring(0, 50) + '...';
+                    // XSS 防护：所有用户可控字段（configKey/configValue/configGroup/description）需 HTML 转义
                     html += '<tr>' +
-                        '<td>' + item.configId + '</td>' +
-                        '<td><code>' + item.configKey + '</code></td>' +
-                        '<td>' + val + '</td>' +
-                        '<td><span class="badge bg-secondary">' + (item.configGroup || 'default') + '</span></td>' +
-                        '<td>' + (item.description || '-') + '</td>' +
-                        '<td>' + (item.sort || 0) + '</td>' +
+                        '<td>' + CmsUtil.escapeHtml(item.configId) + '</td>' +
+                        '<td><code>' + CmsUtil.escapeHtml(item.configKey) + '</code></td>' +
+                        '<td>' + CmsUtil.escapeHtml(val) + '</td>' +
+                        '<td><span class="badge bg-secondary">' + CmsUtil.escapeHtml(item.configGroup || 'default') + '</span></td>' +
+                        '<td>' + CmsUtil.escapeHtml(item.description || '-') + '</td>' +
+                        '<td>' + CmsUtil.escapeHtml(item.sort || 0) + '</td>' +
                         '<td>' +
-                            '<button class="btn btn-outline-primary btn-sm btn-edit me-1" data-id="' + item.configId + '"><i class="bi bi-pencil"></i>编辑</button>' +
-                            '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="' + item.configId + '"><i class="bi bi-trash"></i>删除</button>' +
+                            '<button class="btn btn-outline-primary btn-sm btn-edit me-1" data-id="' + CmsUtil.escapeAttr(item.configId) + '"><i class="bi bi-pencil"></i>编辑</button>' +
+                            '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="' + CmsUtil.escapeAttr(item.configId) + '"><i class="bi bi-trash"></i>删除</button>' +
                         '</td>' +
                     '</tr>';
                 });
@@ -74,7 +75,7 @@ $(function() {
                 var currentGroup = $('#searchGroup').val();
                 var groupHtml = '<option value="">全部分组</option>';
                 groups.forEach(function(g) {
-                    groupHtml += '<option value="' + g + '"' + (g === currentGroup ? ' selected' : '') + '>' + g + '</option>';
+                    groupHtml += '<option value="' + CmsUtil.escapeAttr(g) + '"' + (g === currentGroup ? ' selected' : '') + '>' + CmsUtil.escapeHtml(g) + '</option>';
                 });
                 $('#searchGroup').html(groupHtml);
             }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <#import "common-import.html" as ft>
-<@ft.frontendHead title="${(channel.channelName)!'文章列表'} - ${(templateMap.companyName)!'SpringBootCMS'}" description="${(channel.description)!'浏览最新发布的文章'}" />
+<@ft.frontendHead title="${(channel.channelName)!''?xhtml} - ${(templateMap.companyName)!''?xhtml}" description="${(channel.description)!''?xhtml}" />
 <body>
 <@ft.frontendHeader />
 
@@ -11,11 +11,11 @@
         <nav aria-label="breadcrumb" class="mb-2">
             <ol class="breadcrumb justify-content-center mb-0">
                 <li class="breadcrumb-item"><a href="${request.contextPath}/page/index" class="text-white-50 text-decoration-none">首页</a></li>
-                <li class="breadcrumb-item text-white active" aria-current="page">${(channel.channelName)!'文章列表'}</li>
+                <li class="breadcrumb-item text-white active" aria-current="page">${(channel.channelName)!''?xhtml}</li>
             </ol>
         </nav>
-        <h1>${(channel.channelName)!'文章列表'}</h1>
-        <p class="mt-2 mb-0 opacity-75">${(channel.description)!'浏览最新发布的文章'}</p>
+        <h1>${(channel.channelName)!''?xhtml}</h1>
+        <p class="mt-2 mb-0 opacity-75">${(channel.description)!''?xhtml}</p>
     </div>
 </section>
 
@@ -39,7 +39,7 @@
 <script>
 var ctxPath = '${request.contextPath}';
 var currentPage = 1, init = 0, totalPages = 1, limit = 9;
-var channelId = '${(channel.channelId)!'0'}';
+var channelId = '${(channel.channelId)!0?c}';
 
 function formatDate(dateStr) {
     if (!dateStr) return '';

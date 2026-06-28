@@ -169,25 +169,29 @@ $(function() {
                 if (group.child && group.child.length > 0) {
                     group.child.forEach(function(menu) {
                         if (menu.child && menu.child.length > 0) {
-                            html += '<div class="nav-section">' + menu.title + '</div>';
+                            // XSS 防护：菜单 title 来自数据库，需要 HTML 转义
+                            html += '<div class="nav-section">' + CmsUtil.escapeHtml(menu.title) + '</div>';
                             menu.child.forEach(function(child) {
                                 var url = child.href || '';
                                 // 去掉可能的 contextPath 前缀，避免重复
                                 if (url.indexOf('${request.contextPath}') === 0) {
                                     url = url.substring('${request.contextPath}'.length);
                                 }
-                                html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + url + '" data-title="' + child.title + '">' +
+                                // XSS 防护：data-title 和可见文本均转义；icon 限制为 bi-* 类名（服务端校验）；url 限制以 / 或 # 开头
+                                var safeUrl = (typeof url === 'string' && /^[#/][^"']*$/.test(url)) ? url : '#';
+                                html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + safeUrl + '" data-title="' + CmsUtil.escapeAttr(child.title) + '">' +
                                     '<i class="bi ' + (child.icon || 'bi-folder') + '"></i>' +
-                                    '<span>' + child.title + '</span></a>';
+                                    '<span>' + CmsUtil.escapeHtml(child.title) + '</span></a>';
                             });
                         } else {
                             var url = menu.href || '';
                             if (url.indexOf('${request.contextPath}') === 0) {
                                 url = url.substring('${request.contextPath}'.length);
                             }
-                            html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + url + '" data-title="' + menu.title + '">' +
+                            var safeUrl = (typeof url === 'string' && /^[#/][^"']*$/.test(url)) ? url : '#';
+                            html += '<a href="javascript:;" class="nav-link" data-url="${request.contextPath}' + safeUrl + '" data-title="' + CmsUtil.escapeAttr(menu.title) + '">' +
                                 '<i class="bi ' + (menu.icon || 'bi-folder') + '"></i>' +
-                                '<span>' + menu.title + '</span></a>';
+                                '<span>' + CmsUtil.escapeHtml(menu.title) + '</span></a>';
                         }
                     });
                 }

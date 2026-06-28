@@ -12,12 +12,12 @@
         <#if formSubmitValueList??>
             <#list formSubmitValueList as item>
             <div class="row mb-3">
-                <label class="col-sm-3 col-form-label text-muted">${item.itemName!''}</label>
+                <label class="col-sm-3 col-form-label text-muted">${item.itemName!?xhtml}</label>
                 <div class="col-sm-9">
                     <#if item.itemType == 'file'>
-                        <a href="${request.contextPath}/file/files/${item.itemValue!''}" target="_blank">${item.itemValue!'-'}</a>
+                        <a href="${request.contextPath}/file/files/${item.itemValue!?xhtml}" target="_blank">${item.itemValue!?xhtml}</a>
                     <#else>
-                        <p class="form-control-plaintext">${item.itemValue!'-'}</p>
+                        <p class="form-control-plaintext">${item.itemValue!?xhtml}</p>
                     </#if>
                 </div>
             </div>

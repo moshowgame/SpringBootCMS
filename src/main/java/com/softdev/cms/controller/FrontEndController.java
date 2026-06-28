@@ -149,13 +149,13 @@ public class FrontEndController {
         if (activity == null || activity.getStatus() < 1) {
             return Result.fail("活动无效");
         }
-        // 判断是否已经签到
-        QueryParamDTO checkDto = new QueryParamDTO();
-        checkDto.setActivityId(activitySign.getActivityId());
-        checkDto.setUserName(activitySign.getPhone());
-        List<ActivitySign> existing = activitySignMapper.pageAll(checkDto);
-        if (!existing.isEmpty()) {
-            return Result.fail("已签到，请勿重复签到");
+        // 判断是否已经签到（前台匿名签到，按 activityId + phone 去重，避免 pageAll 缺少分页参数报错）
+        if (StringUtils.isNotBlank(activitySign.getPhone())) {
+            ActivitySign existing = activitySignMapper.selectByActivityAndPhone(
+                    activitySign.getActivityId(), activitySign.getPhone());
+            if (existing != null) {
+                return Result.fail("该手机号已签到，请勿重复签到");
+            }
         }
         // 判断是否在时间范围内
         Date now = new Date();
@@ -212,13 +212,11 @@ public class FrontEndController {
             String showName = baseInfoMap.get("showName");
             Form form = formMapper.selectById(formId);
 
-            // 根据手机号和表单来判断重复
-            QueryParamDTO checkDto = new QueryParamDTO();
-            checkDto.setFormId(formId);
-            List<FormSubmit> existingSubmits = formSubmitMapper.pageAll(checkDto);
-            FormSubmit formSubmit = existingSubmits.stream()
-                    .filter(fs -> phone != null && phone.equals(fs.getPhone()))
-                    .findFirst().orElse(null);
+            // 根据手机号和表单来判断重复（使用专用方法，避免 pageAll 缺少分页参数报错）
+            FormSubmit formSubmit = null;
+            if (StringUtils.isNotBlank(phone)) {
+                formSubmit = formSubmitMapper.selectByFormIdAndPhone(formId, phone);
+            }
 
             String msg;
             if (formSubmit != null) {
@@ -232,6 +230,8 @@ public class FrontEndController {
                 msg = "已更新该手机号绑定的提交信息，编号:" + formSubmit.getSubmitId();
             } else {
                 formSubmit = new FormSubmit(formId, showName, phone, company);
+                // 显式设置状态为 1（待审核），避免依赖 DB 默认值
+                formSubmit.setStatus(1);
                 formSubmitMapper.insert(formSubmit);
                 msg = "提交成功，编号:" + formSubmit.getSubmitId();
             }

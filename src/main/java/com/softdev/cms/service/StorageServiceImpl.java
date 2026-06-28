@@ -105,7 +105,14 @@ public class StorageServiceImpl implements StorageService {
 	@Override
 	public Resource loadAsResource(String filename) {
 		try {
+			// 路径遍历防护：解析后的绝对路径必须仍在上传根目录内
 			Path file = load(filename);
+			Path resolved = file.toAbsolutePath().normalize();
+			Path root = getPath().toAbsolutePath().normalize();
+			if (!resolved.startsWith(root)) {
+				throw new StorageFileNotFoundException(
+						"非法路径，文件超出上传根目录: " + filename);
+			}
 			Resource resource = new UrlResource(file.toUri());
 			if (resource.exists() || resource.isReadable()) {
 				return resource;

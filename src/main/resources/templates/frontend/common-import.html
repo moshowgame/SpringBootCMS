@@ -1,15 +1,15 @@
 <#macro frontendHead title="" keywords="" description="">
 <head>
     <meta charset="UTF-8">
-    <title>${title!'SpringBootCMS'}</title>
+    <title>${title!'SpringBootCMS'?xhtml}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="keywords" content="${keywords!(templateMap.siteKeywords)!'SpringBootCMS'}">
-    <meta name="description" content="${description!(templateMap.siteDescription)!'SpringBootCMS 内容管理系统'}">
-    <meta name="author" content="${(templateMap.companyName)!'SpringBootCMS'}">
-    <meta property="og:title" content="${title!'SpringBootCMS'}">
-    <meta property="og:description" content="${description!(templateMap.siteDescription)!'SpringBootCMS 内容管理系统'}">
+    <meta name="keywords" content="${keywords!(templateMap.siteKeywords)!'SpringBootCMS'?xhtml}">
+    <meta name="description" content="${description!(templateMap.siteDescription)!'SpringBootCMS 内容管理系统'?xhtml}">
+    <meta name="author" content="${(templateMap.companyName)!'SpringBootCMS'?xhtml}">
+    <meta property="og:title" content="${title!'SpringBootCMS'?xhtml}">
+    <meta property="og:description" content="${description!(templateMap.siteDescription)!'SpringBootCMS 内容管理系统'?xhtml}">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="${(templateMap.companyName)!'SpringBootCMS'}">
+    <meta property="og:site_name" content="${(templateMap.companyName)!'SpringBootCMS'?xhtml}">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="${request.contextPath}/static/images/favicon.ico">
     <link rel="shortcut icon" href="${request.contextPath}/static/images/favicon.ico">
@@ -24,7 +24,7 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand fw-bold" href="${request.contextPath}/page/index">
-                ${(templateMap.companyName)!'SpringBootCMS'}
+                ${(templateMap.companyName)!'SpringBootCMS'?xhtml}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
@@ -34,7 +34,7 @@
                     <#if channelList?? && (channelList?size > 0)>
                     <#list channelList as item>
                     <li class="nav-item">
-                        <a class="nav-link" href="${request.contextPath}/page/channel/${item.channelId}">${item.channelName}</a>
+                        <a class="nav-link" href="${request.contextPath}/page/channel/${item.channelId?c}">${item.channelName?xhtml}</a>
                     </li>
                     </#list>
                     </#if>
@@ -60,8 +60,8 @@
         <div class="row g-4">
             <!-- 关于我们 -->
             <div class="col-lg-4">
-                <h5><i class="bi bi-building me-2"></i>${(templateMap.companyName)!'SpringBootCMS'}</h5>
-                <p class="small">${(templateMap.siteDescription)!'基于 Spring Boot 3 的现代化内容管理系统，让您的网站建设更高效。'}</p>
+                <h5><i class="bi bi-building me-2"></i>${(templateMap.companyName)!'SpringBootCMS'?xhtml}</h5>
+                <p class="small">${(templateMap.siteDescription)!'基于 Spring Boot 3 的现代化内容管理系统，让您的网站建设更高效。'?xhtml}</p>
                 <div class="social-links mt-3">
                     <a href="#" title="微信"><i class="bi bi-wechat"></i></a>
                     <a href="#" title="微博"><i class="bi bi-sina-weibo"></i></a>
@@ -92,19 +92,19 @@
             <!-- 联系我们 -->
             <div class="col-lg-4">
                 <h5>联系我们</h5>
-                <p class="small mb-2"><i class="bi bi-geo-alt me-2"></i>${(templateMap.location)!'中国 · 上海'}</p>
-                <p class="small mb-2"><i class="bi bi-telephone me-2"></i>${(templateMap.phone)!'400-888-8888'}</p>
-                <p class="small mb-2"><i class="bi bi-envelope me-2"></i>${(templateMap.email)!'info@springbootcms.com'}</p>
+                <p class="small mb-2"><i class="bi bi-geo-alt me-2"></i>${(templateMap.location)!'中国 · 上海'?xhtml}</p>
+                <p class="small mb-2"><i class="bi bi-telephone me-2"></i>${(templateMap.phone)!'400-888-8888'?xhtml}</p>
+                <p class="small mb-2"><i class="bi bi-envelope me-2"></i>${(templateMap.email)!'info@springbootcms.com'?xhtml}</p>
                 <p class="small mb-0"><i class="bi bi-clock me-2"></i>工作时间：周一至周五 9:00-18:00</p>
             </div>
         </div>
         <hr class="border-secondary my-4">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <p class="small mb-0">&copy; ${.now?string('yyyy')} ${(templateMap.companyName)!'SpringBootCMS'}. All Rights Reserved.</p>
+                <p class="small mb-0">&copy; ${.now?string('yyyy')} ${(templateMap.companyName)!'SpringBootCMS'?xhtml}. All Rights Reserved.</p>
             </div>
             <div class="col-md-6 text-md-end">
-                <p class="small mb-0">${(templateMap.siteCopyright)!'基于 Spring Boot 3 + MyBatis 构建'}</p>
+                <p class="small mb-0">${(templateMap.siteCopyright)!'基于 Spring Boot 3 + MyBatis 构建'?xhtml}</p>
             </div>
         </div>
     </div>

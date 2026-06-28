@@ -10,13 +10,13 @@
     </div>
     <div class="card-body">
         <form id="formItemForm" class="cms-form">
-            <input type="hidden" name="itemId" value="${(formItem.itemId)!!}">
-            <input type="hidden" name="formId" value="${(formId)!!}">
+            <input type="hidden" name="itemId" value="${(formItem.itemId)!!?html}">
+            <input type="hidden" name="formId" value="${(formId)!!?html}">
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">字段名称 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="itemName" value="${(formItem.itemName)!!}" placeholder="请输入字段名称" required>
+                    <input type="text" class="form-control" name="itemName" value="${(formItem.itemName)!!?html}" placeholder="请输入字段名称" required>
                 </div>
             </div>
 
@@ -38,7 +38,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">选项值</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="itemOptions" value="${(formItem.itemOptions)!!}" placeholder="下拉/单选/多选的选项，逗号分隔">
+                    <input type="text" class="form-control" name="itemOptions" value="${(formItem.itemOptions)!!?html}" placeholder="下拉/单选/多选的选项，逗号分隔">
                 </div>
             </div>
 
@@ -55,7 +55,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">排序</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control" name="sort" value="${(formItem.sort)!'0'}" placeholder="排序值">
+                    <input type="number" class="form-control" name="sort" value="${(formItem.sort)!'0'?html}" placeholder="排序值">
                 </div>
             </div>
 

@@ -18,6 +18,21 @@ const CmsCsrf = {
     }
 };
 
+// 全局 jQuery AJAX 拦截器：为所有 POST/PUT/DELETE/PATCH 请求自动携带 CSRF Token
+if (typeof $ !== 'undefined' && $.ajaxSetup) {
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            const method = (settings.type || 'GET').toUpperCase();
+            if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+                const token = CmsCsrf.getToken();
+                if (token) {
+                    xhr.setRequestHeader('X-XSRF-TOKEN', token);
+                }
+            }
+        }
+    });
+}
+
 // 通用API请求封装（自动携带CSRF Token）
 const CmsApi = {
     contextPath: (typeof window.CMS_CONTEXT_PATH === 'string') ? window.CMS_CONTEXT_PATH : '',
@@ -125,6 +140,20 @@ const CmsUtil = {
         }
     },
 
+    // HTML 转义工具：用于在 JS 中安全拼接用户可控字符串
+    escapeHtml: function(s) {
+        if (s == null) return '';
+        if (typeof s !== 'string') s = String(s);
+        return s.replace(/[&<>"']/g, function(c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    },
+
+    // HTML 属性转义（同 escapeHtml，但语义化表示用于 HTML 属性）
+    escapeAttr: function(s) {
+        return CmsUtil.escapeHtml(s);
+    },
+
     // 格式化日期
     formatDate: function(dateStr) {
         if (!dateStr) return '-';
@@ -211,7 +240,11 @@ class CmsTable {
                 self.columns.forEach(function(col) {
                     let val = row[col.field];
                     if (col.render) {
+                        // 开发者自定义渲染（已明确控制输出，信任返回的 HTML 片段）
                         val = col.render(val, row);
+                    } else {
+                        // 默认渲染：必须对原始值进行 HTML 转义，防止存储型 XSS
+                        val = CmsUtil.escapeHtml(val);
                     }
                     html += `<td>${val !== null && val !== undefined ? val : '-'}</td>`;
                 });

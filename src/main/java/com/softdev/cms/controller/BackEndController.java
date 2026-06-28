@@ -126,16 +126,27 @@ public class BackEndController {
                                 HttpServletRequest request,
                                 HttpServletResponse response) {
         HttpSession session = request.getSession();
+
+        // 1) 登录失败次数校验（防爆破：连续5次失败锁定10分钟）
+        Integer failCount = (Integer) session.getAttribute("loginFailCount");
+        Long lockUntil = (Long) session.getAttribute("loginLockUntil");
+        long now = System.currentTimeMillis();
+        if (lockUntil != null && now < lockUntil) {
+            long remaining = (lockUntil - now) / 1000 + 1;
+            return Result.fail("登录失败次数过多，请 " + remaining + " 秒后再试");
+        }
+
+        // 2) 验证码校验
         String sessionCaptcha = (String) session.getAttribute("captcha");
         if (StringUtils.isBlank(captcha) || StringUtils.isBlank(sessionCaptcha)
                 || !captcha.toLowerCase().equals(sessionCaptcha)) {
-            return Result.fail("验证码错误");
+            return incrementFailCount(session, "验证码错误");
         }
         session.removeAttribute("captcha");
 
         User user = userMapper.selectByUserName(userName);
         if (user == null) {
-            return Result.fail("用户名或密码错误");
+            return incrementFailCount(session, "用户名或密码错误");
         }
 
         // 兼容 BCrypt 哈希和明文密码 (便于初始化数据)
@@ -147,7 +158,7 @@ public class BackEndController {
             passwordOk = password.equals(dbPassword);
         }
         if (!passwordOk) {
-            return Result.fail("用户名或密码错误");
+            return incrementFailCount(session, "用户名或密码错误");
         }
 
         // 通过 Spring Security 建立认证 (解决 403 问题)
@@ -164,7 +175,30 @@ public class BackEndController {
         session.setAttribute("showName", user.getShowName());
         session.setAttribute("roleId", user.getRoleId());
 
+        // 登录成功：清空失败计数
+        session.removeAttribute("loginFailCount");
+        session.removeAttribute("loginLockUntil");
+
         return Result.success("登录成功");
+    }
+
+    /**
+     * 登录失败计数（防爆破：连续5次失败锁定10分钟）
+     */
+    private Result<String> incrementFailCount(HttpSession session, String message) {
+        Integer failCount = (Integer) session.getAttribute("loginFailCount");
+        if (failCount == null) {
+            failCount = 0;
+        }
+        failCount++;
+        session.setAttribute("loginFailCount", failCount);
+
+        if (failCount >= 5) {
+            long lockUntil = System.currentTimeMillis() + 10 * 60 * 1000L; // 10分钟
+            session.setAttribute("loginLockUntil", lockUntil);
+            return Result.fail("登录失败次数过多，已锁定 10 分钟");
+        }
+        return Result.fail(message + "（还有 " + (5 - failCount) + " 次机会）");
     }
 
     @GetMapping("/logout")

@@ -10,12 +10,12 @@
     </div>
     <div class="card-body">
         <form id="channelForm" class="cms-form">
-            <input type="hidden" name="channelId" value="${(channel.channelId)!!}">
+            <input type="hidden" name="channelId" value="${(channel.channelId)!!?html}">
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">频道名称 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="channelName" value="${(channel.channelName)!!}" placeholder="请输入频道名称" required>
+                    <input type="text" class="form-control" name="channelName" value="${(channel.channelName)!!?html}" placeholder="请输入频道名称" required>
                 </div>
             </div>
 
@@ -31,7 +31,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">排序</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control" name="sort" value="${(channel.sort)!'0'}" placeholder="排序值">
+                    <input type="number" class="form-control" name="sort" value="${(channel.sort)!'0'?html}" placeholder="排序值">
                 </div>
             </div>
 
@@ -54,7 +54,8 @@ $(function() {
             var html = '<option value="0">顶级频道</option>';
             res.data.forEach(function(ch) {
                 var selected = ch.channelId == '${(channel.parentChannelId)!"0"}' ? ' selected' : '';
-                html += '<option value="' + ch.channelId + '"' + selected + '>' + ch.channelName + '</option>';
+                // XSS 防护：channelName 来自数据库
+                html += '<option value="' + CmsUtil.escapeHtml(ch.channelId) + '"' + selected + '>' + CmsUtil.escapeHtml(ch.channelName) + '</option>';
             });
             $('#parentChannelId').html(html);
         }

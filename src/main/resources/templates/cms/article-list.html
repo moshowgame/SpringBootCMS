@@ -124,7 +124,8 @@ $(function() {
         if (res.code === 200 && res.data) {
             var html = '<option value="">全部频道</option>';
             res.data.forEach(function(ch) {
-                html += '<option value="' + ch.channelId + '">' + ch.channelName + '</option>';
+                // XSS 防护：对用户可控字段（channelName）进行 HTML 转义
+                html += '<option value="' + CmsUtil.escapeHtml(ch.channelId) + '">' + CmsUtil.escapeHtml(ch.channelName) + '</option>';
             });
             $('#searchChannelId').html(html);
         }

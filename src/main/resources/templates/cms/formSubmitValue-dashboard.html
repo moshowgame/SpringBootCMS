@@ -23,9 +23,10 @@ $(function() {
             if (res.code === 200 && res.data) {
                 var html = '<div class="row g-3">';
                 res.data.forEach(function(item) {
+                    // XSS 防护：itemName/itemValue 来自用户提交，必须 HTML 转义
                     html += '<div class="col-md-4"><div class="cms-card p-3">' +
-                        '<h6 class="text-muted">' + item.itemName + '</h6>' +
-                        '<p class="mb-0 fs-5 fw-bold">' + (item.itemValue || '-') + '</p></div></div>';
+                        '<h6 class="text-muted">' + CmsUtil.escapeHtml(item.itemName) + '</h6>' +
+                        '<p class="mb-0 fs-5 fw-bold">' + CmsUtil.escapeHtml(item.itemValue || '-') + '</p></div></div>';
                 });
                 html += '</div>';
                 $('#dashboardContent').html(html);

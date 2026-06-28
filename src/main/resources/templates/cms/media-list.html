@@ -82,9 +82,10 @@ $(function() {
             { field: 'mediaId', render: function(val, row) {
                 var html = '';
                 if (row.filePath) {
-                    html += '<button class="btn btn-outline-secondary btn-sm btn-copy me-1" data-url="' + row.filePath + '"><i class="bi bi-clipboard"></i>复制</button>';
+                    // XSS 防护：filePath 可能被管理员改写，必须属性转义
+                    html += '<button class="btn btn-outline-secondary btn-sm btn-copy me-1" data-url="' + CmsUtil.escapeAttr(row.filePath) + '"><i class="bi bi-clipboard"></i>复制</button>';
                 }
-                html += '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="' + val + '"><i class="bi bi-trash"></i>删除</button>';
+                html += '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="' + CmsUtil.escapeAttr(val) + '"><i class="bi bi-trash"></i>删除</button>';
                 return html;
             }}
         ]

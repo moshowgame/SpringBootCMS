@@ -44,12 +44,10 @@ public class ActivitySignController {
         if (oldActivitySign != null) {
             activitySignMapper.updateById(activitySign);
         } else {
-            // 判断是否已经签到 - 通过activityId和userName查询
-            QueryParamDTO checkDto = new QueryParamDTO();
-            checkDto.setActivityId(activitySign.getActivityId());
-            checkDto.setUserName(activitySign.getUserName());
-            List<ActivitySign> existing = activitySignMapper.pageAll(checkDto);
-            if (!existing.isEmpty()) {
+            // 判断是否已经签到 - 通过activityId和userName查询（使用专用方法，避免 pageAll 缺少分页参数报错）
+            ActivitySign existing = activitySignMapper.selectByActivityAndUserName(
+                    activitySign.getActivityId(), activitySign.getUserName());
+            if (existing != null) {
                 return Result.fail("已签到，请勿重复签到");
             }
             // 判断是否在时间范围内
@@ -86,14 +84,9 @@ public class ActivitySignController {
         if (id != null) {
             activitySign = activitySignMapper.selectById(id);
         }
-        if (activityId != null && userName != null) {
-            QueryParamDTO dto = new QueryParamDTO();
-            dto.setActivityId(activityId);
-            dto.setUserName(userName);
-            List<ActivitySign> list = activitySignMapper.pageAll(dto);
-            if (!list.isEmpty()) {
-                activitySign = list.get(0);
-            }
+        if (activitySign == null && activityId != null && userName != null) {
+            // 使用专用查询方法（避免 pageAll 缺少分页参数报错）
+            activitySign = activitySignMapper.selectByActivityAndUserName(activityId, userName);
         }
         if (activitySign != null) {
             return Result.success(activitySign);

@@ -12,7 +12,7 @@
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="${request.contextPath}/page/index">首页</a></li>
                 <#if article?? && article.channelId??>
-                <li class="breadcrumb-item"><a href="${request.contextPath}/page/channel/${article.channelId}">${(article.channelName)!'栏目'}</a></li>
+                <li class="breadcrumb-item"><a href="${request.contextPath}/page/channel/${article.channelId?c}">${(article.channelName)!''?xhtml}</a></li>
                 </#if>
                 <li class="breadcrumb-item active" aria-current="page">${(article.title)!'文章'}</li>
             </ol>
@@ -26,7 +26,7 @@
         <h1>${(article.title)!'文章未找到'}</h1>
         <p class="mt-2 mb-0 opacity-75">
             <#if article?? && article.channelName?? && (article.channelName?length > 0)>
-            <i class="bi bi-folder2 me-1"></i>${article.channelName}
+            <i class="bi bi-folder2 me-1"></i>${article.channelName?xhtml}
             <span class="mx-2">|</span>
             </#if>
             <i class="bi bi-person me-1"></i>发布者：${(article.createUserName)!'系统'}
@@ -66,9 +66,9 @@
                 <div class="row g-3 mt-4 article-nav">
                     <div class="col-md-6">
                         <#if articleCtx.prev??>
-                        <a href="${request.contextPath}/page/article/${articleCtx.prev.articleId}" class="article-nav-link text-decoration-none d-block">
+                        <a href="${request.contextPath}/page/article/${articleCtx.prev.articleId?c}" class="article-nav-link text-decoration-none d-block">
                             <span class="text-muted small"><i class="bi bi-chevron-left"></i> 上一篇</span>
-                            <span class="d-block text-truncate">${articleCtx.prev.title}</span>
+                            <span class="d-block text-truncate">${articleCtx.prev.title?xhtml}</span>
                         </a>
                         <#else>
                         <div class="article-nav-link text-muted">已经是第一篇</div>
@@ -76,9 +76,9 @@
                     </div>
                     <div class="col-md-6 text-md-end">
                         <#if articleCtx.next??>
-                        <a href="${request.contextPath}/page/article/${articleCtx.next.articleId}" class="article-nav-link text-decoration-none d-block">
+                        <a href="${request.contextPath}/page/article/${articleCtx.next.articleId?c}" class="article-nav-link text-decoration-none d-block">
                             <span class="text-muted small">下一篇 <i class="bi bi-chevron-right"></i></span>
-                            <span class="d-block text-truncate">${articleCtx.next.title}</span>
+                            <span class="d-block text-truncate">${articleCtx.next.title?xhtml}</span>
                         </a>
                         <#else>
                         <div class="article-nav-link text-muted">已经是最后一篇</div>
@@ -94,16 +94,16 @@
                     <div class="row g-3">
                         <#list articleCtx.related as rel>
                         <div class="col-md-6">
-                            <a href="${request.contextPath}/page/article/${rel.articleId}" class="related-card text-decoration-none d-flex align-items-center">
+                            <a href="${request.contextPath}/page/article/${rel.articleId?c}" class="related-card text-decoration-none d-flex align-items-center">
                                 <div class="related-cover">
                                     <#if rel.coverImage?? && (rel.coverImage?length > 0)>
-                                        <img src="${rel.coverImage}" alt="${rel.title}">
+                                        <img src="${rel.coverImage}" alt="${rel.title?xhtml}">
                                     <#else>
                                         <i class="bi bi-file-earmark-text"></i>
                                     </#if>
                                 </div>
                                 <div class="related-body">
-                                    <span class="related-title text-truncate d-block">${rel.title}</span>
+                                    <span class="related-title text-truncate d-block">${rel.title?xhtml}</span>
                                     <span class="related-meta text-muted"><#if rel.createTime??>${rel.createTime?string('yyyy-MM-dd')}</#if></span>
                                 </div>
                             </a>

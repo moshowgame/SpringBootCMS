@@ -62,6 +62,20 @@ var ctxPath = '${request.contextPath}';
 var submitted = 0;
 var fileUploadList = [];
 
+function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, function(c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+}
+
+function escapeAttr(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&"']/g, function(c) {
+        return {'&':'&amp;','"':'&quot;',"'":'&#39;'}[c];
+    });
+}
+
 function submitForm() {
     if (!$('#phone').val() || !$('#showName').val() || !$('#company').val()) {
         $('#resultMsg').html('<div class="alert alert-warning mt-3"><i class="bi bi-exclamation-triangle me-2"></i>姓名/手机/公司不能为空</div>');
@@ -77,9 +91,9 @@ function submitForm() {
             success: function(res) {
                 if (res.code === 200) {
                     submitted = 1;
-                    $('#resultMsg').html('<div class="alert alert-success mt-3"><i class="bi bi-check-circle me-2"></i>' + res.msg + '</div>');
+                    $('#resultMsg').html('<div class="alert alert-success mt-3"><i class="bi bi-check-circle me-2"></i>' + escapeHtml(res.msg) + '</div>');
                 } else {
-                    $('#resultMsg').html('<div class="alert alert-danger mt-3"><i class="bi bi-x-circle me-2"></i>' + res.msg + '</div>');
+                    $('#resultMsg').html('<div class="alert alert-danger mt-3"><i class="bi bi-x-circle me-2"></i>' + escapeHtml(res.msg) + '</div>');
                 }
             },
             error: function() {
@@ -94,22 +108,22 @@ function submitForm() {
 function getOptionListHtml(typeStr, nameStr, valueStr, titleStr, defaultValueStr) {
     if (valueStr === undefined) valueStr = '';
     if (typeStr === 'input') {
-        return '<input type="text" name="' + nameStr + '" placeholder="请输入' + titleStr + '" value="' + valueStr + '" class="form-control">';
+        return '<input type="text" name="' + escapeAttr(nameStr) + '" placeholder="请输入' + escapeHtml(titleStr) + '" value="' + escapeAttr(valueStr) + '" class="form-control">';
     } else if (typeStr === 'textarea') {
-        return '<textarea name="' + nameStr + '" class="form-control" rows="3">' + valueStr + '</textarea>';
+        return '<textarea name="' + escapeAttr(nameStr) + '" class="form-control" rows="3">' + escapeHtml(valueStr) + '</textarea>';
     } else if (typeStr === 'fileupload') {
         fileUploadList.push(nameStr);
         var downloadBtn = '';
         if (valueStr) {
-            downloadBtn = '<div class="form-text"><a href="' + ctxPath + '/file/files/' + valueStr + '">点击下载附件</a></div>';
+            downloadBtn = '<div class="form-text"><a href="' + ctxPath + '/file/files/' + encodeURIComponent(valueStr) + '">点击下载附件</a></div>';
         }
-        return '<input type="text" readonly name="' + nameStr + '" id="' + nameStr + '" placeholder="点击上传文件" value="' + valueStr + '" class="form-control">' + downloadBtn;
+        return '<input type="text" readonly name="' + escapeAttr(nameStr) + '" id="' + escapeAttr(nameStr) + '" placeholder="点击上传文件" value="' + escapeAttr(valueStr) + '" class="form-control">' + downloadBtn;
     } else if (typeStr === 'select') {
-        var selectStr = '<select name="' + nameStr + '" class="form-select">';
+        var selectStr = '<select name="' + escapeAttr(nameStr) + '" class="form-select">';
         var valueList = defaultValueStr ? defaultValueStr.split(';') : [];
         for (var i = 0; i < valueList.length; i++) {
             var selected = (valueList[i] === valueStr) ? ' selected' : '';
-            selectStr += '<option value="' + valueList[i] + '"' + selected + '>' + valueList[i] + '</option>';
+            selectStr += '<option value="' + escapeAttr(valueList[i]) + '"' + selected + '>' + escapeHtml(valueList[i]) + '</option>';
         }
         selectStr += '</select>';
         return selectStr;
@@ -128,7 +142,7 @@ function init() {
             nowItemId = data[n].itemId;
             nowItemName = data[n].itemName;
         } else {
-            $('#itemArea').append('<div class="mb-3"><label class="form-label fw-bold">' + nowItemName + '</label>' + optionListHtml + '</div>');
+            $('#itemArea').append('<div class="mb-3"><label class="form-label fw-bold">' + escapeHtml(nowItemName) + '</label>' + optionListHtml + '</div>');
             nowItemId = data[n].itemId;
             nowItemName = data[n].itemName;
             optionListHtml = '';
@@ -137,7 +151,7 @@ function init() {
     }
     // last item
     if (nowItemId) {
-        $('#itemArea').append('<div class="mb-3"><label class="form-label fw-bold">' + nowItemName + '</label>' + optionListHtml + '</div>');
+        $('#itemArea').append('<div class="mb-3"><label class="form-label fw-bold">' + escapeHtml(nowItemName) + '</label>' + optionListHtml + '</div>');
     }
 }
 init();

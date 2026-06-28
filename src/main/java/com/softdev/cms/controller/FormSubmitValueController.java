@@ -116,11 +116,9 @@ public class FormSubmitValueController {
         }
         // 专项表单检查
         if (submitId == 0 && user != null && form != null && form.getFormType() == 2) {
-            QueryParamDTO checkDto = new QueryParamDTO();
-            checkDto.setFormId(formId);
-            checkDto.setUserId(user.getUserId());
-            List<FormSubmit> existing = formSubmitMapper.pageAll(checkDto);
-            if (!existing.isEmpty()) {
+            // 使用专用查询方法（避免 pageAll 缺少分页参数报错）
+            FormSubmit existing = formSubmitMapper.selectByFormIdAndUserId(formId, user.getUserId());
+            if (existing != null) {
                 return new ModelAndView("cms/error", "msg", "专项表单只能提交一次");
             }
         }

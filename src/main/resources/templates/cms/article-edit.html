@@ -10,23 +10,23 @@
     </div>
     <div class="card-body">
         <form id="articleForm" class="cms-form">
-            <input type="hidden" name="articleId" value="${(article.articleId)!!}">
+            <input type="hidden" name="articleId" value="${(article.articleId)!!?html}">
             <#if !article??>
-            <input type="hidden" name="createUserId" value="${(loginUser.userId)!!}">
-            <input type="hidden" name="createUserName" value="${(loginUser.showName)!!}">
+            <input type="hidden" name="createUserId" value="${(loginUser.userId)!!?html}">
+            <input type="hidden" name="createUserName" value="${(loginUser.showName)!!?html}">
             </#if>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">文章标题 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="title" value="${(article.title)!!}" placeholder="请输入文章标题" required>
+                    <input type="text" class="form-control" name="title" value="${(article.title)!!?html}" placeholder="请输入文章标题" required>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">摘要 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <textarea class="form-control" name="description" rows="2" placeholder="请输入摘要，250字以内" required>${(article.description)!!}</textarea>
+                    <textarea class="form-control" name="description" rows="2" placeholder="请输入摘要，250字以内" required>${(article.description)!!?html}</textarea>
                 </div>
             </div>
 
@@ -52,7 +52,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">关键字</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="keyword" value="${(article.keyword)!!}" placeholder="关键字，逗号分隔">
+                    <input type="text" class="form-control" name="keyword" value="${(article.keyword)!!?html}" placeholder="关键字，逗号分隔">
                 </div>
             </div>
 
@@ -227,7 +227,8 @@ $(function() {
             var html = '<option value="">请选择频道</option>';
             res.data.forEach(function(ch) {
                 var selected = ch.channelId == '${(article.channelId)!"0"}' ? ' selected' : '';
-                html += '<option value="' + ch.channelId + '"' + selected + '>' + ch.channelName + '</option>';
+                // XSS 防护：channelName 来自数据库，必须 HTML 转义
+                html += '<option value="' + CmsUtil.escapeHtml(ch.channelId) + '"' + selected + '>' + CmsUtil.escapeHtml(ch.channelName) + '</option>';
             });
             $('#channelId').html(html);
         }

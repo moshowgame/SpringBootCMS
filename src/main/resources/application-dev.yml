@@ -21,6 +21,8 @@ spring:
     template-loader-path: classpath:/templates/
     settings:
       number_format: 0.##
+      # 启用 FreeMarker URL 转义
+      url_escaping_charset: UTF-8
   mvc:
     static-path-pattern: /static/**
   datasource:

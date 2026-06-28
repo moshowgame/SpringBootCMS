@@ -225,20 +225,20 @@
         <div class="row g-4">
             <#list latestArticles as article>
             <div class="col-md-6 col-lg-4">
-                <a href="${request.contextPath}/page/article/${(article.articleId)!}" class="news-card text-decoration-none d-block">
+                <a href="${request.contextPath}/page/article/${(article.articleId)!0?c}" class="news-card text-decoration-none d-block">
                     <div class="news-cover">
                         <#if article.coverImage?? && (article.coverImage?length > 0)>
-                            <img src="${article.coverImage}" alt="${article.title}" loading="lazy">
+                            <img src="${article.coverImage}" alt="${(article.title)!''?xhtml}" loading="lazy">
                         <#else>
                             <div class="news-cover-placeholder"><i class="bi bi-newspaper"></i></div>
                         </#if>
                     </div>
                     <div class="news-body">
                         <#if article.channelName?? && (article.channelName?length > 0)>
-                        <span class="news-tag">${article.channelName}</span>
+                        <span class="news-tag">${article.channelName?xhtml}</span>
                         </#if>
-                        <h5 class="news-title">${(article.title)!}</h5>
-                        <p class="news-summary">${(article.summary)!'点击查看详情'}</p>
+                        <h5 class="news-title">${(article.title)!''?xhtml}</h5>
+                        <p class="news-summary">${(article.summary)!''?xhtml}</p>
                         <div class="news-meta">
                             <span><i class="bi bi-clock me-1"></i><#if article.createTime??>${article.createTime?string('yyyy-MM-dd')}</#if></span>
                             <span class="ms-auto"><i class="bi bi-eye me-1"></i>${(article.viewCount)!0}</span>

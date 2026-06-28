@@ -10,26 +10,26 @@
     </div>
     <div class="card-body">
         <form id="menuForm" class="cms-form">
-            <input type="hidden" name="menuId" value="${(menu.menuId)!!}">
+            <input type="hidden" name="menuId" value="${(menu.menuId)!!?html}">
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">菜单名称 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="menuName" value="${(menu.menuName)!!}" placeholder="请输入菜单名称" required>
+                    <input type="text" class="form-control" name="menuName" value="${(menu.menuName)!!?html}" placeholder="请输入菜单名称" required>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">菜单URL</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="url" value="${(menu.url)!!}" placeholder="请输入菜单URL">
+                    <input type="text" class="form-control" name="url" value="${(menu.url)!!?html}" placeholder="请输入菜单URL">
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">图标</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="icon" value="${(menu.icon)!!}" placeholder="Bootstrap Icons类名，如 bi-house">
+                    <input type="text" class="form-control" name="icon" value="${(menu.icon)!!?html}" placeholder="Bootstrap Icons类名，如 bi-house">
                 </div>
             </div>
 
@@ -45,7 +45,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">排序</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control" name="sort" value="${(menu.sort)!'0'}" placeholder="排序值">
+                    <input type="number" class="form-control" name="sort" value="${(menu.sort)!'0'?html}" placeholder="排序值">
                 </div>
             </div>
 
@@ -55,9 +55,9 @@
                     <#if roleList??>
                         <#list roleList as role>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="roleIds" id="role_${role.roleId}" value="${role.roleId}"
+                            <input class="form-check-input" type="checkbox" name="roleIds" id="role_${role.roleId?html}" value="${role.roleId?html}"
                                 <#if menu?? && menu.roleIds??><#list menu.roleIds?split(',') as rid><#if rid == role.roleId?string>checked</#if></#list></#if>>
-                            <label class="form-check-label" for="role_${role.roleId}">${role.roleName!''}</label>
+                            <label class="form-check-label" for="role_${role.roleId?html}">${role.roleName!''?html}</label>
                         </div>
                         </#list>
                     </#if>
@@ -83,7 +83,8 @@ $(function() {
             var html = '<option value="0">顶级菜单</option>';
             res.data.forEach(function(m) {
                 var selected = m.menuId == '${(menu.parentId)!"0"}' ? ' selected' : '';
-                html += '<option value="' + m.menuId + '"' + selected + '>' + m.menuName + '</option>';
+                // XSS 防护：menuName 来自数据库
+                html += '<option value="' + CmsUtil.escapeHtml(m.menuId) + '"' + selected + '>' + CmsUtil.escapeHtml(m.menuName) + '</option>';
             });
             $('#parentId').html(html);
         }

@@ -9,7 +9,7 @@
         <h6 class="mb-0"><i class="bi bi-inbox me-2"></i>表单提交管理</h6>
     </div>
     <div class="card-body">
-        <input type="hidden" id="formId" value="${(formId)!!}">
+        <input type="hidden" id="formId" value="${(formId)!!?html}">
         <div class="table-responsive">
             <table class="cms-table">
                 <thead>
@@ -47,9 +47,10 @@ $(function() {
             }},
             { field: 'createTime' },
             { field: 'submitId', render: function(val, row) {
-                return '<a href="${request.contextPath}/formSubmitValue/display?formId='+row.formId+'&submitId='+val+'" class="btn btn-outline-info btn-sm me-1"><i class="bi bi-eye"></i>查看</a>' +
-                       '<button class="btn btn-outline-success btn-sm me-1 btn-audit" data-id="'+val+'" data-status="1"><i class="bi bi-check-lg"></i>通过</button>' +
-                       '<button class="btn btn-outline-danger btn-sm btn-audit" data-id="'+val+'" data-status="2"><i class="bi bi-x-lg"></i>拒绝</button>';
+                // XSS 防护：formId/submitId 是数字，拼接安全但仍走 escapeAttr
+                return '<a href="${request.contextPath}/formSubmitValue/display?formId='+CmsUtil.escapeAttr(row.formId)+'&submitId='+CmsUtil.escapeAttr(val)+'" class="btn btn-outline-info btn-sm me-1"><i class="bi bi-eye"></i>查看</a>' +
+                       '<button class="btn btn-outline-success btn-sm me-1 btn-audit" data-id="'+CmsUtil.escapeAttr(val)+'" data-status="1"><i class="bi bi-check-lg"></i>通过</button>' +
+                       '<button class="btn btn-outline-danger btn-sm btn-audit" data-id="'+CmsUtil.escapeAttr(val)+'" data-status="2"><i class="bi bi-x-lg"></i>拒绝</button>';
             }}
         ]
     });
