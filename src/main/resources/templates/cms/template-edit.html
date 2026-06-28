@@ -22,9 +22,9 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">模板类型</label>
                 <div class="col-sm-10">
-                    <select class="form-select" name="templateType">
-                        <option value="page" <#if (template.templateType)?? && template.templateType == 'page'>selected</#if>>页面模板</option>
-                        <option value="email" <#if (template.templateType)?? && template.templateType == 'email'>selected</#if>>邮件模板</option>
+                    <select class="form-select" name="page">
+                        <option value="page" <#if (template.page)?? && template.page == 'page'>selected</#if>>页面模板</option>
+                        <option value="email" <#if (template.page)?? && template.page == 'email'>selected</#if>>邮件模板</option>
                     </select>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">模板内容</label>
                 <div class="col-sm-10">
-                    <textarea class="form-control" name="templateContent" rows="15" placeholder="请输入模板内容（HTML/FreeMarker）">${(template.templateContent)!!?html}</textarea>
+                    <textarea class="form-control" name="templateValue" rows="15" placeholder="请输入模板内容（HTML/FreeMarker）">${(template.templateValue)!!?html}</textarea>
                 </div>
             </div>
 
