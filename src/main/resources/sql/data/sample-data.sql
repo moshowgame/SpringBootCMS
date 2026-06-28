@@ -1,59 +1,82 @@
 -- ============================================================
+-- ⚠️  警告：执行此 SQL 文件将先清空以下所有数据表！
+-- ⚠️  请确认已备份数据后再执行！
+-- ============================================================
+-- 清空的表包括：
+--   menu, channel, article, tag, article_tag,
+--   template, activity, form, form_item
+-- ============================================================
 -- SpringBootCMS 示例数据 - 广东省数字政务协会风格
 -- ============================================================
 
 SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- 清空数据表
+-- ----------------------------
+TRUNCATE TABLE `menu`;
+TRUNCATE TABLE `article_tag`;
+TRUNCATE TABLE `article`;
+TRUNCATE TABLE `channel`;
+TRUNCATE TABLE `tag`;
+TRUNCATE TABLE `template`;
+TRUNCATE TABLE `activity`;
+TRUNCATE TABLE `form_item`;
+TRUNCATE TABLE `form`;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- ----------------------------
 -- 后台管理菜单数据
 -- ----------------------------
 INSERT INTO `menu` (`menu_id`, `title`, `href`, `icon`, `target`, `parent_menu_id`, `role_id`, `sort`, `deleted`, `create_time`, `update_time`) VALUES
 -- 顶级菜单 - 内容管理
-(1, '内容管理', '/admin/article/list', 'bi-file-text', '_self', 0, '1,9', 1, 0, NOW(), NOW()),
+(1, '内容管理', '/article/list', 'bi-file-text', '_self', 0, '1,9', 1, 0, NOW(), NOW()),
 -- 顶级菜单 - 栏目管理
-(2, '栏目管理', '/admin/channel/list', 'bi-grid', '_self', 0, '1,9', 2, 0, NOW(), NOW()),
+(2, '栏目管理', '/channel/list', 'bi-grid', '_self', 0, '1,9', 2, 0, NOW(), NOW()),
 -- 顶级菜单 - 用户管理
-(3, '用户管理', '/admin/user/list', 'bi-people', '_self', 0, '1,9', 3, 0, NOW(), NOW()),
+(3, '用户管理', '/user/list', 'bi-people', '_self', 0, '1,9', 3, 0, NOW(), NOW()),
 -- 顶级菜单 - 活动管理
-(4, '活动管理', '/admin/activity/list', 'bi-calendar', '_self', 0, '1,9', 4, 0, NOW(), NOW()),
+(4, '活动管理', '/activity/list', 'bi-calendar', '_self', 0, '1,9', 4, 0, NOW(), NOW()),
 -- 顶级菜单 - 表单管理
-(5, '表单管理', '/admin/form/list', 'bi-list-checks', '_self', 0, '1,9', 5, 0, NOW(), NOW()),
+(5, '表单管理', '/form/list', 'bi-list-checks', '_self', 0, '1,9', 5, 0, NOW(), NOW()),
 -- 顶级菜单 - 媒体管理
-(6, '媒体管理', '/admin/media/list', 'bi-image', '_self', 0, '1,9', 6, 0, NOW(), NOW()),
+(6, '媒体管理', '/media/list', 'bi-image', '_self', 0, '1,9', 6, 0, NOW(), NOW()),
 -- 顶级菜单 - 系统设置
-(7, '系统设置', '/admin/menu/list', 'bi-gear', '_self', 0, '1,9', 7, 0, NOW(), NOW()),
+(7, '系统设置', '/menu/list', 'bi-gear', '_self', 0, '1,9', 7, 0, NOW(), NOW()),
 
 -- 内容管理子菜单
-(8, '文章列表', '/admin/article/list', 'bi-file-text', '_self', 1, '1,9', 1, 0, NOW(), NOW()),
-(9, '添加文章', '/admin/article/edit?id=0', 'bi-plus-circle', '_self', 1, '1,9', 2, 0, NOW(), NOW()),
-(10, '标签管理', '/admin/tag/list', 'bi-tags', '_self', 1, '1,9', 3, 0, NOW(), NOW()),
+(8, '文章列表', '/article/list', 'bi-file-text', '_self', 1, '1,9', 1, 0, NOW(), NOW()),
+(9, '添加文章', '/article/edit?id=0', 'bi-plus-circle', '_self', 1, '1,9', 2, 0, NOW(), NOW()),
+(10, '标签管理', '/tag/list', 'bi-tags', '_self', 1, '1,9', 3, 0, NOW(), NOW()),
 
 -- 栏目管理子菜单
-(11, '栏目列表', '/admin/channel/list', 'bi-grid', '_self', 2, '1,9', 1, 0, NOW(), NOW()),
-(12, '添加栏目', '/admin/channel/edit?id=0', 'bi-plus-circle', '_self', 2, '1,9', 2, 0, NOW(), NOW()),
+(11, '栏目列表', '/channel/list', 'bi-grid', '_self', 2, '1,9', 1, 0, NOW(), NOW()),
+(12, '添加栏目', '/channel/edit?id=0', 'bi-plus-circle', '_self', 2, '1,9', 2, 0, NOW(), NOW()),
 
 -- 用户管理子菜单
-(13, '用户列表', '/admin/user/list', 'bi-people', '_self', 3, '1,9', 1, 0, NOW(), NOW()),
-(14, '添加用户', '/admin/user/edit?id=0', 'bi-plus-circle', '_self', 3, '1,9', 2, 0, NOW(), NOW()),
+(13, '用户列表', '/user/list', 'bi-people', '_self', 3, '1,9', 1, 0, NOW(), NOW()),
+(14, '添加用户', '/user/edit?id=0', 'bi-plus-circle', '_self', 3, '1,9', 2, 0, NOW(), NOW()),
 
 -- 活动管理子菜单
-(15, '活动列表', '/admin/activity/list', 'bi-calendar', '_self', 4, '1,9', 1, 0, NOW(), NOW()),
-(16, '添加活动', '/admin/activity/edit?id=0', 'bi-plus-circle', '_self', 4, '1,9', 2, 0, NOW(), NOW()),
-(17, '活动报名', '/admin/activitySign/list', 'bi-list-checks', '_self', 4, '1,9', 3, 0, NOW(), NOW()),
+(15, '活动列表', '/activity/list', 'bi-calendar', '_self', 4, '1,9', 1, 0, NOW(), NOW()),
+(16, '添加活动', '/activity/edit?id=0', 'bi-plus-circle', '_self', 4, '1,9', 2, 0, NOW(), NOW()),
+(17, '活动报名', '/activitySign/list', 'bi-list-checks', '_self', 4, '1,9', 3, 0, NOW(), NOW()),
 
 -- 表单管理子菜单
-(18, '表单列表', '/admin/form/list', 'bi-list-checks', '_self', 5, '1,9', 1, 0, NOW(), NOW()),
-(19, '添加表单', '/admin/form/edit?id=0', 'bi-plus-circle', '_self', 5, '1,9', 2, 0, NOW(), NOW()),
-(20, '表单数据', '/admin/formSubmit/list', 'bi-database', '_self', 5, '1,9', 3, 0, NOW(), NOW()),
+(18, '表单列表', '/form/list', 'bi-list-checks', '_self', 5, '1,9', 1, 0, NOW(), NOW()),
+(19, '添加表单', '/form/edit?id=0', 'bi-plus-circle', '_self', 5, '1,9', 2, 0, NOW(), NOW()),
+(20, '表单数据', '/formSubmit/list', 'bi-database', '_self', 5, '1,9', 3, 0, NOW(), NOW()),
 
 -- 媒体管理子菜单
-(21, '媒体列表', '/admin/media/list', 'bi-image', '_self', 6, '1,9', 1, 0, NOW(), NOW()),
+(21, '媒体列表', '/media/list', 'bi-image', '_self', 6, '1,9', 1, 0, NOW(), NOW()),
 
 -- 系统设置子菜单
-(22, '菜单管理', '/admin/menu/list', 'bi-menu-button-wide', '_self', 7, '1,9', 1, 0, NOW(), NOW()),
-(23, '模板管理', '/admin/template/list', 'bi-layout', '_self', 7, '1,9', 2, 0, NOW(), NOW()),
-(24, '站点配置', '/admin/siteConfig/list', 'bi-globe', '_self', 7, '1,9', 3, 0, NOW(), NOW()),
-(25, '操作日志', '/admin/auditLog/list', 'bi-journal-text', '_self', 7, '1,9', 4, 0, NOW(), NOW());
+(22, '菜单管理', '/menu/list', 'bi-menu-button-wide', '_self', 7, '1,9', 1, 0, NOW(), NOW()),
+(23, '模板管理', '/template/list', 'bi-layout', '_self', 7, '1,9', 2, 0, NOW(), NOW()),
+(24, '站点配置', '/siteConfig/list', 'bi-globe', '_self', 7, '1,9', 3, 0, NOW(), NOW()),
+(25, '操作日志', '/auditLog/list', 'bi-journal-text', '_self', 7, '1,9', 4, 0, NOW(), NOW());
 
 -- ----------------------------
 -- 频道数据（协会主要栏目）
