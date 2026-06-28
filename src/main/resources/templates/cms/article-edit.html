@@ -33,7 +33,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">内容 <span class="text-danger">*</span></label>
                 <div class="col-sm-10">
-                    <textarea id="editorBody" name="content" class="d-none"><#if article?? && article.content??>${article.content?replace('@@@',request.contextPath+'/file/files/')}</#if></textarea>
+                    <textarea id="editorBody" name="content" class="d-none"><#if article?? && article.content??><#assign _content=article.content /><#-- 占位符 @@@ -> 绝对路径 --><#assign _content=_content?replace('@@@', request.contextPath+'/file/files/') /><#-- 相对路径 ../file/files/ -> 绝对路径 --><#assign _content=_content?replace('../file/files/', request.contextPath+'/file/files/') />${_content}</#if></textarea>
                     <div id="editorFallback" class="form-text text-muted d-none mt-1">
                         <i class="bi bi-info-circle"></i> 富文本编辑器加载失败，请检查网络连接。
                     </div>
@@ -259,8 +259,21 @@ $(function() {
             formData[item.name] = item.value;
         });
 
-        // 替换图片路径（正文内绝对地址转存占位符 @@@）
-        formData.content = (formData.content || '').split(ctxPath + '/file/files/').join('@@@');
+        // 替换图片路径为占位符 @@@（统一转存逻辑，适配多种路径格式）
+        // 保存时：/cms/file/files/xxx -> @@@
+        //        ../file/files/xxx -> @@@  (TinyMCE 有时会转相对路径)
+        //        http://host/cms/file/files/xxx -> @@@  (带域名的完整URL)
+        var content = formData.content || '';
+        var prefixes = [
+            ctxPath + '/file/files/',     // /cms/file/files/
+            '../file/files/',             // 相对路径
+            'file/files/',                // 缺失前导斜杠
+            location.origin + ctxPath + '/file/files/'  // 完整URL
+        ];
+        prefixes.forEach(function(prefix) {
+            content = content.split(prefix).join('@@@');
+        });
+        formData.content = content;
 
         // 标题/摘要/内容基础校验
         if (!formData.title) { CmsUtil.showToast('请输入文章标题', 'warning'); return; }
@@ -285,6 +298,7 @@ $(function() {
 
     // ==================== 网络图片转存本地 ====================
     $('#btnUploadNetImg').on('click', async function() {
+        var $btn = $(this);
         var editor = tinymce.get('editorBody');
         if (!editor) {
             CmsUtil.showToast('编辑器尚未初始化', 'warning');
@@ -292,15 +306,29 @@ $(function() {
         }
 
         var content = editor.getContent();
-        var imgRegex = /<img[^>]+src="(http[^"]*?)"/g;
-        var matches = [];
-        var match;
+        // 匹配 <img> 标签中的 src="http..." 或 data-mce-src="http..." 属性
+        // 改进：兼容单/双引号，处理 src 和 data-mce-src，过滤已转存的本地URL
+        var srcRegex = /<img\b[^>]*?\bsrc\s*=\s*["']([^"']+)["'][^>]*>/gi;
+        var dataMceRe = /<img\b[^>]*?\bdata-mce-src\s*=\s*["']([^"']+)["'][^>]*>/gi;
 
-        while ((match = imgRegex.exec(content)) !== null) {
-            var imgUrl = match[1];
-            if (imgUrl.indexOf(ctxPath) === -1) {
-                matches.push(imgUrl);
-            }
+        var matches = [];
+        var seen = {};
+        function collectUrl(url) {
+            if (!url || !/^https?:\/\//i.test(url)) return;
+            // 过滤已经是本地（已转存）的URL
+            if (url.indexOf(ctxPath) !== -1) return;
+            if (seen[url]) return;
+            seen[url] = true;
+            matches.push(url);
+        }
+
+        var match;
+        while ((match = srcRegex.exec(content)) !== null) {
+            collectUrl(match[1]);
+        }
+        // 提取 data-mce-src（备份 src）
+        while ((match = dataMceRe.exec(content)) !== null) {
+            collectUrl(match[1]);
         }
 
         if (matches.length === 0) {
@@ -308,7 +336,12 @@ $(function() {
             return;
         }
 
+        // 禁用按钮避免重复点击
+        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>转存中...');
         CmsUtil.showToast('正在转存 ' + matches.length + ' 张图片...', 'info');
+
+        var successCount = 0;
+        var failCount = 0;
 
         // 顺序处理（async/await 修复竞态问题）
         for (var i = 0; i < matches.length; i++) {
@@ -317,20 +350,47 @@ $(function() {
                 var res = await $.ajax({
                     url: ctxPath + '/file/saveNetworkImg',
                     type: 'POST',
+                    dataType: 'json',
                     data: { imgUrl: imgUrl }
                 });
 
-                if (res.data && res.data.src) {
+                if (res && res.code === 200 && res.data && res.data.src) {
+                    var newUrl = res.data.src;
                     var currentContent = editor.getContent();
-                    editor.setContent(currentContent.split(imgUrl).join(res.data.src));
+                    // 替换 src 属性的值
+                    currentContent = currentContent.replace(
+                        new RegExp('(<img\\b[^>]*?\\bsrc\\s*=\\s*["\'])' + escapeRegExp(imgUrl) + '(["\'])', 'gi'),
+                        '$1' + newUrl + '$2'
+                    );
+                    // 同步替换 data-mce-src（如果存在）
+                    currentContent = currentContent.replace(
+                        new RegExp('(<img\\b[^>]*?\\bdata-mce-src\\s*=\\s*["\'])' + escapeRegExp(imgUrl) + '(["\'])', 'gi'),
+                        '$1' + newUrl + '$2'
+                    );
+                    editor.setContent(currentContent);
+                    successCount++;
+                } else {
+                    failCount++;
+                    console.warn('转存失败:', imgUrl, res && res.msg);
                 }
             } catch (e) {
-                console.warn('转存失败: ' + imgUrl, e);
+                failCount++;
+                console.warn('转存失败:', imgUrl, e);
             }
         }
 
-        CmsUtil.showToast('转存完成', 'success');
+        // 恢复按钮（即使中途出错也要恢复）
+        $btn.prop('disabled', false).html('<i class="bi bi-cloud-download me-1"></i>网络图片转存本地');
+
+        var msg = '转存完成：成功 ' + successCount + ' 张';
+        if (failCount > 0) msg += '，失败 ' + failCount + ' 张';
+        CmsUtil.showToast(msg, successCount > 0 ? 'success' : 'danger');
     });
+
+    // 正则元字符转义（FreeMarker 中需转义美元符大括号）
+    function escapeRegExp(str) {
+        return String(str).replace(/[.*+?^\$\{\}()|[\]\\]/g, '\\$&');
+    }
 });
 </script>
 </body>

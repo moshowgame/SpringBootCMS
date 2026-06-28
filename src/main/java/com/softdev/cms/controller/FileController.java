@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -239,9 +240,19 @@ public class FileController {
 
             // 从 Content-Type 判断实际类型
             URLConnection connection = url.openConnection();
+            // 设置 User-Agent，避免被 CDN（如 shortpixel、cloudflare）拦截
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+            connection.setRequestProperty("Accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8");
+            connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
             connection.setConnectTimeout(5000);
-            connection.setReadTimeout(10000);
+            connection.setReadTimeout(15000);
+            // 处理 HTTP 重定向（如 shortpixel 类的代理服务会 301/302 重定向到真实地址）
+            if (connection instanceof HttpURLConnection) {
+                ((HttpURLConnection) connection).setInstanceFollowRedirects(true);
+            }
             String contentType = connection.getContentType();
+            int contentLength = connection.getContentLength();
+            log.info("下载网络图片: {} (Content-Type: {}, Length: {})", imgUrl, contentType, contentLength);
             String ext = "png"; // 默认
             if (contentType != null) {
                 if (contentType.contains("jpeg") || contentType.contains("jpg")) {

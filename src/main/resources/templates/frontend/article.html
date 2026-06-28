@@ -132,7 +132,24 @@ $(function() {
         var src = $(this).attr('src');
         if (src) {
             if (src.indexOf('@@@') === 0) {
+                // 占位符 @@@ 替换为绝对路径
                 $(this).attr('src', src.replace('@@@', ctxPath + '/file/files/'));
+            } else if (src.indexOf('../file/files/') === 0) {
+                // 相对路径 ../file/files/ -> /cms/file/files/
+                $(this).attr('src', ctxPath + src.substring(2));
+            } else if (src.indexOf('file/files/') === 0) {
+                // 仅 file/files/ 开头（缺前导斜杠） -> /cms/file/files/
+                $(this).attr('src', ctxPath + '/' + src);
+            } else if (src.indexOf('/file/files/') === 0) {
+                // 绝对路径（不含 ctxPath）-> /cms/file/files/
+                $(this).attr('src', ctxPath + src);
+            } else if (src.indexOf('http://') === 0 || src.indexOf('https://') === 0) {
+                // 网络图片：暂不处理（保留原 URL）
+            } else {
+                // 其他情况：尝试补全为 ctxPath 下的绝对路径
+                if (src.charAt(0) === '/') {
+                    $(this).attr('src', ctxPath + src);
+                }
             }
             $(this).addClass('img-fluid rounded');
         }
