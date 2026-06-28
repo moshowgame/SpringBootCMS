@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body class="p-3">
+
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-image me-2"></i>媒体管理</h6>
+        <button class="btn btn-cms-primary btn-sm" id="btnUpload">
+            <i class="bi bi-cloud-upload me-1"></i>上传文件
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="cms-search">
+            <select class="form-select form-select-sm" id="searchMediaType" style="max-width:140px;">
+                <option value="">全部类型</option>
+                <option value="image">图片</option>
+                <option value="video">视频</option>
+                <option value="audio">音频</option>
+                <option value="file">文件</option>
+            </select>
+            <input type="text" class="form-control form-control-sm" id="searchFileName" placeholder="文件名">
+            <button class="btn btn-cms-primary btn-sm" id="btnSearch"><i class="bi bi-search me-1"></i>搜索</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="cms-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>预览</th>
+                        <th>文件名</th>
+                        <th>类型</th>
+                        <th>大小</th>
+                        <th>上传者</th>
+                        <th>上传时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody"></tbody>
+            </table>
+        </div>
+        <div id="pagination"></div>
+    </div>
+</div>
+
+<input type="file" id="fileInput" style="display:none;">
+
+<@netCommon.commonScript />
+<script>
+$(function() {
+    function formatFileSize(bytes) {
+        if (!bytes) return '-';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+    }
+
+    var table = new CmsTable({
+        apiList: '${request.contextPath}/media/list',
+        apiDelete: '${request.contextPath}/media/delete',
+        tableBody: '#dataTableBody',
+        paginationEl: '#pagination',
+        limit: 20,
+        columns: [
+            { field: 'mediaId' },
+            { field: 'filePath', render: function(val, row) {
+                if (row.mediaType === 'image' && val) {
+                    return '<img src="' + val + '" style="width:50px;height:50px;object-fit:cover;border-radius:4px;">';
+                }
+                return '<i class="bi bi-file-earmark fs-4 text-secondary"></i>';
+            }},
+            { field: 'fileName', render: function(val) { return val || '-'; } },
+            { field: 'mediaType', render: function(val) {
+                var map = { image: '图片', video: '视频', audio: '音频', file: '文件' };
+                return '<span class="badge bg-info">' + (map[val] || val || '-') + '</span>';
+            }},
+            { field: 'fileSize', render: function(val) { return formatFileSize(val); } },
+            { field: 'uploadUserName', render: function(val) { return val || '-'; } },
+            { field: 'createTime', render: function(val) { return val || '-'; } },
+            { field: 'mediaId', render: function(val, row) {
+                var html = '';
+                if (row.filePath) {
+                    html += '<button class="btn btn-outline-secondary btn-sm btn-copy me-1" data-url="' + row.filePath + '"><i class="bi bi-clipboard"></i>复制</button>';
+                }
+                html += '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="' + val + '"><i class="bi bi-trash"></i>删除</button>';
+                return html;
+            }}
+        ]
+    });
+
+    table.load();
+
+    $('#btnSearch').on('click', function() {
+        var params = {};
+        var fileName = $('#searchFileName').val().trim();
+        var mediaType = $('#searchMediaType').val();
+        if (fileName) params.fileName = fileName;
+        if (mediaType) params.mediaType = mediaType;
+        table.search(params);
+    });
+
+    $('#btnUpload').on('click', function() {
+        $('#fileInput').click();
+    });
+
+    $('#fileInput').on('change', function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var formData = new FormData();
+        formData.append('file', file);
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/file/upload',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast('上传成功', 'success');
+                    table.load();
+                } else {
+                    CmsUtil.showToast(res.msg || '上传失败', 'danger');
+                }
+            },
+            error: function() {
+                CmsUtil.showToast('上传失败', 'danger');
+            }
+        });
+        $(this).val('');
+    });
+
+    $(document).on('click', '.btn-copy', function() {
+        var url = $(this).data('url');
+        var textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        CmsUtil.showToast('链接已复制', 'success');
+    });
+
+    $(document).on('click', '.btn-delete', function() {
+        table.delete($(this).data('id'), '媒体文件');
+    });
+});
+</script>
+</body>
+</html>

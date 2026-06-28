@@ -20,16 +20,27 @@ const CmsCsrf = {
 
 // 通用API请求封装（自动携带CSRF Token）
 const CmsApi = {
-    contextPath: '',
+    contextPath: (typeof window.CMS_CONTEXT_PATH === 'string') ? window.CMS_CONTEXT_PATH : '',
 
-    post: function(url, data, callback) {
+    _ajax: function(url, options) {
         const csrfToken = CmsCsrf.getToken();
-        $.ajax({
+        const ajaxOptions = {
             url: this.contextPath + url,
-            type: 'POST',
-            data: data,
             dataType: 'json',
             headers: csrfToken ? { 'X-XSRF-TOKEN': csrfToken } : {},
+            ...options
+        };
+        // POST/PUT/DELETE 需要 CSRF
+        if (['POST', 'PUT', 'DELETE', 'PATCH'].includes((ajaxOptions.type || 'GET').toUpperCase()) && csrfToken) {
+            ajaxOptions.headers['X-XSRF-TOKEN'] = csrfToken;
+        }
+        return $.ajax(ajaxOptions);
+    },
+
+    post: function(url, data, callback) {
+        return this._ajax(url, {
+            type: 'POST',
+            data: data,
             success: function(res) {
                 if (typeof callback === 'function') callback(res);
             },
@@ -40,14 +51,10 @@ const CmsApi = {
     },
 
     postJson: function(url, data, callback) {
-        const csrfToken = CmsCsrf.getToken();
-        $.ajax({
-            url: this.contextPath + url,
+        return this._ajax(url, {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
-            dataType: 'json',
-            headers: csrfToken ? { 'X-XSRF-TOKEN': csrfToken } : {},
             success: function(res) {
                 if (typeof callback === 'function') callback(res);
             },
@@ -58,10 +65,8 @@ const CmsApi = {
     },
 
     get: function(url, callback) {
-        $.ajax({
-            url: this.contextPath + url,
+        return this._ajax(url, {
             type: 'GET',
-            dataType: 'json',
             success: function(res) {
                 if (typeof callback === 'function') callback(res);
             },

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body class="p-3">
+
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-image me-2"></i><#if media??>编辑媒体<#else>媒体详情</#if></h6>
+    </div>
+    <div class="card-body">
+        <form id="mediaForm" class="cms-form">
+            <input type="hidden" name="mediaId" value="${(media.mediaId)!!}">
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">文件名</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="fileName" value="${(media.fileName)!!}" readonly>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">文件路径</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" value="${(media.filePath)!!}" readonly>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">标题</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="title" value="${(media.title)!!}" placeholder="请输入标题">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">替代文本</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="altText" value="${(media.altText)!!}" placeholder="图片替代文本（用于SEO）">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">文件类型</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" value="${(media.fileType)!!}" readonly>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-cms-primary"><i class="bi bi-check-lg me-1"></i>确认保存</button>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">返回</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<@netCommon.commonScript />
+<script>
+$(function() {
+    $('#mediaForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = {};
+        $(this).serializeArray().forEach(function(item) {
+            formData[item.name] = item.value;
+        });
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/media/save',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '保存成功', 'success');
+                    setTimeout(function() { history.back(); }, 800);
+                } else {
+                    CmsUtil.showToast(res.msg || '保存失败', 'danger');
+                }
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

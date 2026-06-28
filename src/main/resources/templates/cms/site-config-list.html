@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body class="p-3">
+
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-globe me-2"></i>站点配置</h6>
+        <button class="btn btn-cms-primary btn-sm" id="btnAdd">
+            <i class="bi bi-plus-lg me-1"></i>新增配置
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="cms-search">
+            <select class="form-select form-select-sm" id="searchGroup" style="max-width:160px;">
+                <option value="">全部分组</option>
+            </select>
+            <input type="text" class="form-control form-control-sm" id="searchKey" placeholder="配置键名">
+            <button class="btn btn-cms-primary btn-sm" id="btnSearch"><i class="bi bi-search me-1"></i>搜索</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="cms-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>配置键</th>
+                        <th>配置值</th>
+                        <th>分组</th>
+                        <th>描述</th>
+                        <th>排序</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody"></tbody>
+            </table>
+        </div>
+        <div id="pagination"></div>
+    </div>
+</div>
+
+<@netCommon.commonScript />
+<script>
+$(function() {
+    function loadList() {
+        $.post('${request.contextPath}/siteConfig/list', {}, function(res) {
+            if (res.code === 200 && res.data) {
+                var html = '';
+                res.data.forEach(function(item) {
+                    var val = item.configValue || '';
+                    if (val.length > 50) val = val.substring(0, 50) + '...';
+                    html += '<tr>' +
+                        '<td>' + item.configId + '</td>' +
+                        '<td><code>' + item.configKey + '</code></td>' +
+                        '<td>' + val + '</td>' +
+                        '<td><span class="badge bg-secondary">' + (item.configGroup || 'default') + '</span></td>' +
+                        '<td>' + (item.description || '-') + '</td>' +
+                        '<td>' + (item.sort || 0) + '</td>' +
+                        '<td>' +
+                            '<button class="btn btn-outline-primary btn-sm btn-edit me-1" data-id="' + item.configId + '"><i class="bi bi-pencil"></i>编辑</button>' +
+                            '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="' + item.configId + '"><i class="bi bi-trash"></i>删除</button>' +
+                        '</td>' +
+                    '</tr>';
+                });
+                $('#dataTableBody').html(html);
+
+                var groups = [];
+                res.data.forEach(function(item) {
+                    if (item.configGroup && groups.indexOf(item.configGroup) < 0) {
+                        groups.push(item.configGroup);
+                    }
+                });
+                var currentGroup = $('#searchGroup').val();
+                var groupHtml = '<option value="">全部分组</option>';
+                groups.forEach(function(g) {
+                    groupHtml += '<option value="' + g + '"' + (g === currentGroup ? ' selected' : '') + '>' + g + '</option>';
+                });
+                $('#searchGroup').html(groupHtml);
+            }
+        });
+    }
+
+    loadList();
+
+    $('#btnSearch').on('click', function() {
+        loadList();
+    });
+
+    $('#btnAdd').on('click', function() {
+        window.location.href = '${request.contextPath}/siteConfig/edit?id=0';
+    });
+
+    $(document).on('click', '.btn-edit', function() {
+        window.location.href = '${request.contextPath}/siteConfig/edit?id=' + $(this).data('id');
+    });
+
+    $(document).on('click', '.btn-delete', function() {
+        var id = $(this).data('id');
+        if (confirm('确定要删除该配置吗？')) {
+            $.post('${request.contextPath}/siteConfig/delete', {id: id}, function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '删除成功', 'success');
+                    loadList();
+                } else {
+                    CmsUtil.showToast(res.msg || '删除失败', 'danger');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

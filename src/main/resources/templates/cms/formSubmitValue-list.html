@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body class="p-3">
+
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-database me-2"></i>表单提交数据 <#if formId??>(表单ID: ${formId})</#if></h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="cms-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>提交ID</th>
+                        <th>表单项ID</th>
+                        <th>值</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    <tr><td colspan="5" class="text-center text-muted py-4">暂无数据</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="pagination"></div>
+    </div>
+</div>
+
+<@netCommon.commonScript />
+<script>
+$(function() {
+    var table = new CmsTable({
+        apiList: '${request.contextPath}/formSubmitValue/list',
+        apiDelete: '${request.contextPath}/formSubmitValue/delete',
+        tableBody: '#dataTableBody',
+        paginationEl: '#pagination',
+        limit: 20,
+        columns: [
+            { field: 'valueId' },
+            { field: 'submitId' },
+            { field: 'itemId' },
+            { field: 'value', render: function(val) { return val || '-'; } },
+            { field: 'valueId', render: function(val) {
+                return '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="' + val + '"><i class="bi bi-trash"></i>删除</button>';
+            }}
+        ]
+    });
+
+    table.load();
+
+    $(document).on('click', '.btn-delete', function() {
+        table.delete($(this).data('id'), '数据');
+    });
+});
+</script>
+</body>
+</html>

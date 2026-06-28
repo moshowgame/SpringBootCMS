@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body class="p-3">
+
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-tags me-2"></i>标签管理</h6>
+        <button class="btn btn-cms-primary btn-sm" id="btnAdd">
+            <i class="bi bi-plus-lg me-1"></i>新增标签
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="cms-search">
+            <select class="form-select form-select-sm" id="searchTagType" style="max-width:160px;">
+                <option value="">全部类型</option>
+                <option value="article">文章标签</option>
+            </select>
+            <input type="text" class="form-control form-control-sm" id="searchTagName" placeholder="标签名称">
+            <button class="btn btn-cms-primary btn-sm" id="btnSearch"><i class="bi bi-search me-1"></i>搜索</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="cms-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>标签名称</th>
+                        <th>标签类型</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody"></tbody>
+            </table>
+        </div>
+        <div id="pagination"></div>
+    </div>
+</div>
+
+<!-- 新增/编辑标签模态框 -->
+<div class="modal fade" id="tagModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tagModalTitle">新增标签</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tagForm">
+                    <input type="hidden" name="tagId" id="tagId">
+                    <div class="mb-3">
+                        <label class="form-label">标签名称 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="tagName" id="tagName" placeholder="请输入标签名称" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">标签类型</label>
+                        <select class="form-select" name="tagType" id="tagType">
+                            <option value="article">文章标签</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-cms-primary" id="btnSaveTag">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<@netCommon.commonScript />
+<script>
+$(function() {
+    var tagModal = new bootstrap.Modal('#tagModal');
+
+    function loadTags() {
+        var tagType = $('#searchTagType').val();
+        var params = {};
+        if (tagType) params.tagType = tagType;
+        $.post('${request.contextPath}/tag/list', params, function(res) {
+            if (res.code === 200 && res.data) {
+                var html = '';
+                res.data.forEach(function(tag) {
+                    html += '<tr>' +
+                        '<td>' + tag.tagId + '</td>' +
+                        '<td>' + tag.tagName + '</td>' +
+                        '<td>' + (tag.tagType || '-') + '</td>' +
+                        '<td>' + (tag.createTime || '-') + '</td>' +
+                        '<td>' +
+                            '<button class="btn btn-outline-primary btn-sm btn-edit me-1" data-id="' + tag.tagId + '" data-name="' + tag.tagName + '" data-type="' + (tag.tagType || 'article') + '"><i class="bi bi-pencil"></i>编辑</button>' +
+                            '<button class="btn btn-outline-danger btn-sm btn-delete" data-id="' + tag.tagId + '"><i class="bi bi-trash"></i>删除</button>' +
+                        '</td>' +
+                    '</tr>';
+                });
+                $('#dataTableBody').html(html);
+            }
+        });
+    }
+
+    loadTags();
+
+    $('#btnSearch').on('click', function() {
+        loadTags();
+    });
+
+    $('#btnAdd').on('click', function() {
+        $('#tagModalTitle').text('新增标签');
+        $('#tagId').val('');
+        $('#tagName').val('');
+        $('#tagType').val('article');
+        tagModal.show();
+    });
+
+    $(document).on('click', '.btn-edit', function() {
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+        var type = $(this).data('type');
+        $('#tagModalTitle').text('编辑标签');
+        $('#tagId').val(id);
+        $('#tagName').val(name);
+        $('#tagType').val(type);
+        tagModal.show();
+    });
+
+    $('#btnSaveTag').on('click', function() {
+        var tagName = $('#tagName').val().trim();
+        if (!tagName) {
+            CmsUtil.showToast('请输入标签名称', 'danger');
+            return;
+        }
+        var formData = {
+            tagId: $('#tagId').val(),
+            tagName: tagName,
+            tagType: $('#tagType').val()
+        };
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/tag/save',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '保存成功', 'success');
+                    tagModal.hide();
+                    loadTags();
+                } else {
+                    CmsUtil.showToast(res.msg || '保存失败', 'danger');
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-delete', function() {
+        var id = $(this).data('id');
+        if (confirm('确定要删除该标签吗？')) {
+            $.post('${request.contextPath}/tag/delete', {id: id}, function(res) {
+                if (res.code === 200) {
+                    CmsUtil.showToast(res.msg || '删除成功', 'success');
+                    loadTags();
+                } else {
+                    CmsUtil.showToast(res.msg || '删除失败', 'danger');
+                }
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

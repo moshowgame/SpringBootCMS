@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body class="p-3">
+
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>文件上传</h6>
+    </div>
+    <div class="card-body">
+        <div class="upload-area" id="uploadArea" style="border:2px dashed #dee2e6;border-radius:12px;padding:60px 20px;text-align:center;cursor:pointer;transition:all 0.3s;">
+            <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+            <p class="mt-3 mb-1 text-muted">点击或拖拽文件到此处上传</p>
+            <p class="small text-muted">支持 jpg、png、gif、pdf 等常见格式</p>
+            <input type="file" id="fileInput" style="display:none;" multiple>
+        </div>
+
+        <div id="uploadList" class="mt-4"></div>
+    </div>
+</div>
+
+<@netCommon.commonScript />
+<script>
+$(function() {
+    var $uploadArea = $('#uploadArea');
+    var $fileInput = $('#fileInput');
+    var $uploadList = $('#uploadList');
+
+    $uploadArea.on('click', function() {
+        $fileInput.click();
+    });
+
+    $uploadArea.on('dragover', function(e) {
+        e.preventDefault();
+        $uploadArea.css('border-color', 'var(--ft-primary)').css('background', '#f0f7ff');
+    });
+
+    $uploadArea.on('dragleave', function() {
+        $uploadArea.css('border-color', '#dee2e6').css('background', 'transparent');
+    });
+
+    $uploadArea.on('drop', function(e) {
+        e.preventDefault();
+        $uploadArea.css('border-color', '#dee2e6').css('background', 'transparent');
+        var files = e.originalEvent.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    $fileInput.on('change', function(e) {
+        handleFiles(e.target.files);
+        $(this).val('');
+    });
+
+    function handleFiles(files) {
+        for (var i = 0; i < files.length; i++) {
+            uploadFile(files[i]);
+        }
+    }
+
+    function uploadFile(file) {
+        var itemHtml = '<div class="upload-item d-flex align-items-center p-2 border rounded mb-2" data-name="' + file.name + '">' +
+            '<i class="bi bi-file-earmark me-2 text-primary"></i>' +
+            '<span class="flex-grow-1 text-truncate">' + file.name + '</span>' +
+            '<span class="upload-status text-muted small me-2">上传中...</span>' +
+            '</div>';
+        $uploadList.prepend(itemHtml);
+
+        var formData = new FormData();
+        formData.append('file', file);
+
+        $.ajax({
+            type: 'POST',
+            url: '${request.contextPath}/file/upload',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                var $item = $uploadList.find('[data-name="' + file.name + '"]');
+                if (res.code === 200) {
+                    $item.find('.upload-status').removeClass('text-muted').addClass('text-success').text('上传成功');
+                } else {
+                    $item.find('.upload-status').removeClass('text-muted').addClass('text-danger').text(res.msg || '上传失败');
+                }
+            },
+            error: function() {
+                var $item = $uploadList.find('[data-name="' + file.name + '"]');
+                $item.find('.upload-status').removeClass('text-muted').addClass('text-danger').text('上传失败');
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>

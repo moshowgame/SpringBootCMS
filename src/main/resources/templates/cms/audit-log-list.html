@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body class="p-3">
+
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-journal-text me-2"></i>操作日志</h6>
+    </div>
+    <div class="card-body">
+        <div class="cms-search">
+            <input type="text" class="form-control form-control-sm" id="searchUserName" placeholder="用户名" style="max-width:140px;">
+            <input type="text" class="form-control form-control-sm" id="searchModule" placeholder="模块" style="max-width:140px;">
+            <input type="text" class="form-control form-control-sm" id="searchAction" placeholder="操作" style="max-width:140px;">
+            <button class="btn btn-cms-primary btn-sm" id="btnSearch"><i class="bi bi-search me-1"></i>搜索</button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="cms-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户ID</th>
+                        <th>用户名</th>
+                        <th>模块</th>
+                        <th>操作</th>
+                        <th>IP地址</th>
+                        <th>操作时间</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody"></tbody>
+            </table>
+        </div>
+        <div id="pagination"></div>
+    </div>
+</div>
+
+<@netCommon.commonScript />
+<script>
+$(function() {
+    var table = new CmsTable({
+        apiList: '${request.contextPath}/auditLog/list',
+        tableBody: '#dataTableBody',
+        paginationEl: '#pagination',
+        limit: 20,
+        columns: [
+            { field: 'logId' },
+            { field: 'userId', render: function(val) { return val || '-'; } },
+            { field: 'userName', render: function(val) { return val || '-'; } },
+            { field: 'module', render: function(val) { return val || '-'; } },
+            { field: 'action', render: function(val) { return val || '-'; } },
+            { field: 'ipAddress', render: function(val) { return val || '-'; } },
+            { field: 'createTime', render: function(val) { return val || '-'; } }
+        ]
+    });
+
+    table.load();
+
+    $('#btnSearch').on('click', function() {
+        var params = {};
+        var userName = $('#searchUserName').val().trim();
+        var module = $('#searchModule').val().trim();
+        var action = $('#searchAction').val().trim();
+        if (userName) params.userName = userName;
+        if (module) params.module = module;
+        if (action) params.action = action;
+        table.search(params);
+    });
+});
+</script>
+</body>
+</html>

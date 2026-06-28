@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<#import "common/common-import.html" as netCommon>
+<@netCommon.commonImport />
+<body class="p-3">
+
+<div class="cms-card">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>表单数据看板</h6>
+    </div>
+    <div class="card-body" id="dashboardContent">
+        <p class="text-muted">加载中...</p>
+    </div>
+</div>
+
+<@netCommon.commonScript />
+<script>
+$(function() {
+    var dataStr = '${data!"[]"}';
+    try {
+        var dataList = JSON.parse(dataStr);
+        if (dataList && dataList.length > 0) {
+            var html = '<div class="row g-3">';
+            dataList.forEach(function(item) {
+                html += '<div class="col-md-4"><div class="cms-card p-3">' +
+                    '<h6 class="text-muted">' + (item.itemName || '-') + '</h6>' +
+                    '<p class="mb-0 fs-5 fw-bold">' + (item.itemValue || '-') + '</p></div></div>';
+            });
+            html += '</div>';
+            $('#dashboardContent').html(html);
+        } else {
+            $('#dashboardContent').html('<p class="text-muted">暂无数据</p>');
+        }
+    } catch(e) {
+        $('#dashboardContent').html('<p class="text-danger">数据加载失败</p>');
+    }
+});
+</script>
+</body>
+</html>

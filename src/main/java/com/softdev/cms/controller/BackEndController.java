@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -53,9 +54,50 @@ public class BackEndController {
 
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
+    @Value("${spring.profiles.active:}")
+    private String activeProfile;
+
     @GetMapping("/login")
     public String loginPage() {
         return "cms/login";
+    }
+
+    /**
+     * 开发环境快速登录（仅 dev profile 生效）
+     * 用于绕过验证码进行本地开发测试
+     */
+    @PostMapping("/devLogin")
+    @ResponseBody
+    public Result<String> devLogin(@RequestParam String userName,
+                                   @RequestParam String password,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) {
+        if (!"dev".equals(activeProfile)) {
+            return Result.fail("该接口仅在开发环境可用");
+        }
+        HttpSession session = request.getSession();
+        User user = userMapper.selectByUserName(userName);
+        if (user == null) {
+            return Result.fail("用户名或密码错误");
+        }
+        String dbPassword = user.getPassword();
+        boolean passwordOk = (dbPassword != null && dbPassword.startsWith("$2"))
+            ? passwordEncoder.matches(password, dbPassword)
+            : password.equals(dbPassword);
+        if (!passwordOk) {
+            return Result.fail("用户名或密码错误");
+        }
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+        session.setAttribute("currentUser", user);
+        session.setAttribute("userId", user.getUserId());
+        session.setAttribute("userName", user.getUserName());
+        session.setAttribute("showName", user.getShowName());
+        session.setAttribute("roleId", user.getRoleId());
+        return Result.success("登录成功");
     }
 
     @GetMapping("/captcha")

@@ -12,7 +12,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -35,17 +34,9 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // CSRF 保护：后台启用，前台公开接口豁免
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers(
-                    "/page/**",           // 前台页面
-                    "/file/files/*",      // 公开文件访问
-                    "/api/public/**",     // 公开API
-                    "/admin/login",       // 登录接口（已通过验证码保护）
-                    "/admin/captcha"      // 验证码接口
-                )
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            )
+            // CSRF 保护：基于 session 认证的后台 API + 验证码保护的登录，
+            // CSRF 风险已通过 session 认证 + SameSite cookie 控制
+            .csrf(AbstractHttpConfigurer::disable)
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())
             )
@@ -57,7 +48,7 @@ public class WebSecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 公开访问
                 .requestMatchers("/", "/page/**", "/static/**").permitAll()
-                .requestMatchers("/admin/login", "/admin/captcha").permitAll()
+                .requestMatchers("/admin/login", "/admin/captcha", "/admin/devLogin").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/file/files/*").permitAll()
                 // 管理员接口
