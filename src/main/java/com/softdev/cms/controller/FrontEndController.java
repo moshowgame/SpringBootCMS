@@ -6,6 +6,7 @@ import com.softdev.cms.entity.dto.FormSubmitValueDTO;
 import com.softdev.cms.entity.dto.QueryParamDTO;
 import com.softdev.cms.mapper.*;
 import com.softdev.cms.service.FrontEndService;
+import com.softdev.cms.util.AttackDetectionUtil;
 import com.softdev.cms.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -86,6 +87,21 @@ public class FrontEndController {
             log.info("article list query:{}", objectMapper.writeValueAsString(queryParamDTO));
         } catch (Exception e) {
             log.warn("serialize queryParamDTO failed", e);
+        }
+        // 攻击检测：searchParam/title/keyword 等用户输入字段
+        if (queryParamDTO != null) {
+            java.util.Map<String, String> checkParams = new java.util.LinkedHashMap<>();
+            if (queryParamDTO.getSearchParam() != null) {
+                checkParams.put("searchParam", queryParamDTO.getSearchParam());
+            }
+            if (queryParamDTO.getTitle() != null) {
+                checkParams.put("title", queryParamDTO.getTitle());
+            }
+            AttackDetectionUtil.AttackResult attack = AttackDetectionUtil.detect(checkParams);
+            if (attack.isDetected()) {
+                AttackDetectionUtil.logAttack(attack);
+                return Result.fail(attack.getType().getDescription() + " 攻击已拦截：输入包含 '" + attack.getMatchedKeyword() + "' 特征");
+            }
         }
         queryParamDTO.setPageLimit();
         List<Article> itemList = articleMapper.pageAll(queryParamDTO);

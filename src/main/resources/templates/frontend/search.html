@@ -69,14 +69,39 @@ function resetAndSearch() {
 
 function getArticleList() {
     $('#articleListDiv').html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="text-muted mt-2">加载中...</p></div>');
+    var kw = $('#searchParam').val();
+    // 客户端预检测攻击特征，给用户即时提示
+    var localCheck = localAttackCheck(kw);
+    if (localCheck.detected) {
+        $('#articleListDiv').html(
+            '<div class="alert alert-danger" role="alert">' +
+            '<i class="bi bi-shield-exclamation me-2"></i>' +
+            '<strong>输入已被拦截：</strong>检测到 <code>' + localCheck.typeDescription + '</code> 攻击特征 ' +
+            '（关键字：<code>' + localCheck.keyword + '</code>）' +
+            '<hr><p class="mb-0 small">请输入正常的搜索关键词。如持续出现此提示，请联系管理员。</p>' +
+            '</div>'
+        );
+        return;
+    }
     $.ajax({
         type: 'POST',
         url: ctxPath + '/page/article/list',
-        data: JSON.stringify({"searchParam": $("#searchParam").val(), "page": currentPage, "limit": limit}),
+        data: JSON.stringify({"searchParam": kw, "page": currentPage, "limit": limit}),
         dataType: 'json',
         contentType: 'application/json',
         success: function(res) {
             $('#articleListDiv').html('');
+            // 服务端拦截：返回的 msg 包含"攻击已拦截"
+            if (res.code !== 200 && res.msg && res.msg.indexOf('攻击已拦截') !== -1) {
+                $('#articleListDiv').html(
+                    '<div class="alert alert-danger" role="alert">' +
+                    '<i class="bi bi-shield-exclamation me-2"></i>' +
+                    '<strong>输入已被服务端拦截：</strong>' + res.msg +
+                    '<hr><p class="mb-0 small">您的输入包含可疑字符，已被系统安全策略拒绝。如确认输入无误，请联系管理员。</p>' +
+                    '</div>'
+                );
+                return;
+            }
             var data = res.data || [], count = res.count || 0;
             if (count > limit && init === 0) {
                 totalPages = Math.ceil(count / limit);
@@ -108,6 +133,32 @@ function getArticleList() {
             $('#articleListDiv').html('<div class="text-center py-5"><i class="bi bi-exclamation-triangle text-danger" style="font-size:3rem;"></i><p class="text-muted mt-3">加载失败，请稍后重试</p></div>');
         }
     });
+}
+
+/**
+ * 客户端轻量级攻击检测（与服务端 AttackDetectionUtil 对齐）
+ * <p>
+ * 注意：客户端检测<b>仅用于即时 UX 反馈</b>，真正的安全拦截必须依靠服务端校验。
+ * 攻击者可轻易禁用 JS 绕过客户端检测。
+ */
+var ATTACK_RULES = [
+    { type: 'SQL_INJECTION', typeDescription: 'SQL 注入', pattern: /(\bunion\b[\s\/*]+select\b|\bor\s+1\s*=\s*1|--|\/\*)/i, keyword: 'SQL 关键字' },
+    { type: 'XSS', typeDescription: 'XSS 跨站脚本', pattern: /(<\s*script\b|<\s*iframe\b|javascript\s*:|on(error|load|click)\s*=)/i, keyword: 'XSS 标签/事件' },
+    { type: 'SVG_INJECTION', typeDescription: 'SVG 注入', pattern: /(<\s*svg\b|<\s*use\b|xlink\s*:\s*href)/i, keyword: 'SVG 标签' },
+    { type: 'COMMAND_INJECTION', typeDescription: '命令注入', pattern: /[;`|&]/, keyword: '命令链式符号' },
+    { type: 'PATH_TRAVERSAL', typeDescription: '路径遍历', pattern: /(\.\.\/|\.\.\\)/, keyword: '../ 路径遍历' },
+    { type: 'SSRF', typeDescription: '服务端请求伪造', pattern: /(file|gopher|dict):\/\//i, keyword: '危险协议' }
+];
+
+function localAttackCheck(value) {
+    if (!value) return { detected: false };
+    for (var i = 0; i < ATTACK_RULES.length; i++) {
+        var rule = ATTACK_RULES[i];
+        if (rule.pattern.test(value)) {
+            return { detected: true, type: rule.type, typeDescription: rule.typeDescription, keyword: rule.keyword };
+        }
+    }
+    return { detected: false };
 }
 
 // 从URL读取keyword参数并填充搜索框，然后执行首次搜索
