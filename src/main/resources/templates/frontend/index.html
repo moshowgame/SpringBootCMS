@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <#import "common-import.html" as ft>
-<#-- 模板辅助函数：确保URL带有contextPath -->
 <#function absPath(path, defaultPath)>
     <#assign p = (path)!defaultPath>
     <#if p?has_content && p?starts_with('/')>
@@ -12,18 +11,19 @@
         <#return request.contextPath + defaultPath>
     </#if>
 </#function>
-<@ft.frontendHead title="${(templateMap.companyName)!'SpringBootCMS'}" keywords="${(templateMap.siteKeywords)!'CMS,SpringBoot,内容管理'}" description="${(templateMap.siteDescription)!'基于SpringBoot的内容管理系统'}" />
+<@ft.frontendHead title="${(templateMap.companyName)!'智慧云通信'}" keywords="${(templateMap.siteKeywords)!'云通信,短信服务,语音验证,企业服务'}" description="${(templateMap.siteDescription)!'专业的云通信服务提供商，为企业提供短信验证码、语音通知、国际短信等一站式通信解决方案'}" />
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "${(templateMap.companyName)!'SpringBootCMS'}",
+    "@type": "Organization",
+    "name": "${(templateMap.companyName)!'智慧云通信'}",
     "url": "${request.contextPath}/page/index",
-    "description": "${(templateMap.siteDescription)!'基于SpringBoot的内容管理系统'}",
-    "potentialAction": {
-        "@type": "SearchAction",
-        "target": "${request.contextPath}/page/search?keyword={search_term_string}",
-        "query-input": "required name=search_term_string"
+    "description": "${(templateMap.siteDescription)!'专业的云通信服务提供商'}",
+    "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "${(templateMap.phone)!'400-888-8888'}",
+        "email": "${(templateMap.email)!'contact@example.com'}",
+        "contactType": "customer support"
     }
 }
 </script>
@@ -33,122 +33,193 @@
 <!-- Hero Banner -->
 <section class="hero-banner">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <h1 class="mb-3">${(templateMap.bannerTitle)!'专业的内容管理解决方案'}</h1>
-                <p class="lead mb-4">${(templateMap.bannerDescription)!'基于 Spring Boot 3 + MyBatis 的现代化 CMS 系统，让您的网站建设更高效'}</p>
-                <div class="d-flex gap-3 flex-wrap">
-                    <a href="${absPath(templateMap.bannerUrl, '/page/channel/1')}" class="btn btn-light btn-lg px-4">${(templateMap.bannerButton)!'立即体验'} <i class="bi bi-arrow-right ms-1"></i></a>
-                    <a href="${request.contextPath}/admin/login" class="btn btn-outline-light btn-lg px-4">${(templateMap.adminButton)!'管理后台'}</a>
+        <div class="row align-items-center min-vh-70">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <span class="hero-tag">${(templateMap.heroTag)!'专业云通信服务'}</span>
+                    <h1 class="hero-title">${(templateMap.bannerTitle)!'通信能力创新，让通讯更简单'}</h1>
+                    <p class="hero-desc">${(templateMap.bannerDescription)!'为企业提供安全、高效、稳定的一站式云通信解决方案，助力业务创新发展'}</p>
+                    <div class="hero-actions">
+                        <a href="${absPath(templateMap.bannerUrl, '/page/channel/1')}" class="btn btn-primary btn-lg">${(templateMap.bannerButton)!'立即体验'} <i class="bi bi-arrow-right ms-1"></i></a>
+                        <a href="${request.contextPath}/page/form/search" class="btn btn-outline-light btn-lg">${(templateMap.contactButton)!'联系我们'}</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat-item">
+                            <span class="hero-stat-value" data-count="10000">0</span>
+                            <span class="hero-stat-label">企业用户</span>
+                        </div>
+                        <div class="hero-stat-divider"></div>
+                        <div class="hero-stat-item">
+                            <span class="hero-stat-value" data-count="99.99">0</span>
+                            <span class="hero-stat-label">服务可用性</span>
+                        </div>
+                        <div class="hero-stat-divider"></div>
+                        <div class="hero-stat-item">
+                            <span class="hero-stat-value" data-count="3">0</span>
+                            <span class="hero-stat-label">秒级送达</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="hero-visual">
+                    <div class="hero-card hero-card-1">
+                        <i class="bi bi-shield-check"></i>
+                        <span>安全可靠</span>
+                    </div>
+                    <div class="hero-card hero-card-2">
+                        <i class="bi bi-lightning"></i>
+                        <span>极速响应</span>
+                    </div>
+                    <div class="hero-card hero-card-3">
+                        <i class="bi bi-telephone"></i>
+                        <span>全球覆盖</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Stats Counter -->
-<section class="stats-section">
+<!-- Features -->
+<section class="features-section">
     <div class="container">
-        <div class="row g-4">
-            <div class="col-6 col-md-3">
-                <div class="stats-item">
-                    <span class="stats-number" data-count="100">0</span>
-                    <span class="stats-label"><i class="bi bi-building me-1"></i>企业用户</span>
+        <div class="row">
+            <div class="col-md-4 feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-shield-check"></i>
                 </div>
+                <h4>${(templateMap.feature1title)!'安全高效'}</h4>
+                <p>${(templateMap.feature1desc)!'多年技术积累，平台及软件全部自主研发，通过国家知识产权认定'}</p>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="stats-item">
-                    <span class="stats-number" data-count="1000">0</span>
-                    <span class="stats-label"><i class="bi bi-file-text me-1"></i>发布文章</span>
+            <div class="col-md-4 feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-lightning"></i>
                 </div>
+                <h4>${(templateMap.feature2title)!'高性能高并发'}</h4>
+                <p>${(templateMap.feature2desc)!'掌握高性能、高并发、大数据处理技术，电信级运维保障'}</p>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="stats-item">
-                    <span class="stats-number" data-count="50000">0</span>
-                    <span class="stats-label"><i class="bi bi-eye me-1"></i>累计访问</span>
+            <div class="col-md-4 feature-item">
+                <div class="feature-icon">
+                    <i class="bi bi-globe"></i>
                 </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stats-item">
-                    <span class="stats-number" data-count="99">0</span>
-                    <span class="stats-label"><i class="bi bi-shield-check me-1"></i>% 可用性</span>
-                </div>
+                <h4>${(templateMap.feature3title)!'全球覆盖'}</h4>
+                <p>${(templateMap.feature3desc)!'三网合一专属通道，支持国际短信，覆盖全球主要地区'}</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Services -->
-<section class="section-padding">
+<section class="services-section">
     <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title">${(templateMap.serviceTitle)!'核心功能'}</h2>
-            <p class="section-subtitle">${(templateMap.serviceDescription)!'提供完整的文章管理、栏目管理、活动管理、表单管理等功能'}</p>
+        <div class="section-header text-center">
+            <span class="section-tag">${(templateMap.serviceTag)!'核心服务'}</span>
+            <h2 class="section-title">${(templateMap.serviceTitle)!'我们的服务'}</h2>
+            <p class="section-subtitle">${(templateMap.serviceDescription)!'全方位满足企业通信需求'}</p>
         </div>
         <div class="row g-4">
             <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <div class="service-icon"><i class="bi bi-journal-text"></i></div>
-                    <h5>${(templateMap.service1title)!'文章管理'}</h5>
-                    <p>${(templateMap.service1description)!'富文本编辑、Markdown支持、SEO优化、专题管理'}</p>
-                    <a href="${absPath(templateMap.service1url, '/page/channel/1')}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <div class="service-icon">
+                        <i class="bi bi-chat-right-text"></i>
+                    </div>
+                    <h5>${(templateMap.service1title)!'短信通知'}</h5>
+                    <p>${(templateMap.service1description)!'3秒可达，三网合一专属通道，99%到达率，支持大容量高并发'}</p>
+                    <ul class="service-features">
+                        <li><i class="bi bi-check-circle"></i> 验证码短信</li>
+                        <li><i class="bi bi-check-circle"></i> 短信通知</li>
+                        <li><i class="bi bi-check-circle"></i> 营销短信</li>
+                    </ul>
+                    <a href="${absPath(templateMap.service1url, '/page/channel/1')}" class="btn btn-primary btn-sm">了解详情 <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <div class="service-icon"><i class="bi bi-diagram-3"></i></div>
-                    <h5>${(templateMap.service2title)!'栏目管理'}</h5>
-                    <p>${(templateMap.service2description)!'多级栏目、权限控制、模板配置、灵活排序'}</p>
-                    <a href="${absPath(templateMap.service2url, '/page/channel/2')}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <div class="service-icon">
+                        <i class="bi bi-phone"></i>
+                    </div>
+                    <h5>${(templateMap.service2title)!'语音验证'}</h5>
+                    <p>${(templateMap.service2description)!'灵活支持业务场景，语音验证难窃取，安全有保障'}</p>
+                    <ul class="service-features">
+                        <li><i class="bi bi-check-circle"></i> 语音验证码</li>
+                        <li><i class="bi bi-check-circle"></i> 语音通知</li>
+                        <li><i class="bi bi-check-circle"></i> 国际语音</li>
+                    </ul>
+                    <a href="${absPath(templateMap.service2url, '/page/channel/2')}" class="btn btn-primary btn-sm">了解详情 <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <div class="service-icon"><i class="bi bi-calendar-check"></i></div>
-                    <h5>${(templateMap.service3title)!'活动管理'}</h5>
-                    <p>${(templateMap.service3description)!'活动发布、在线签到、签到统计、导出报表'}</p>
-                    <a href="${absPath(templateMap.service3url, '/page/activity/search')}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <div class="service-icon">
+                        <i class="bi bi-globe"></i>
+                    </div>
+                    <h5>${(templateMap.service3title)!'国际短信'}</h5>
+                    <p>${(templateMap.service3description)!'全球主要国家和地区覆盖，支持多语种，专业本地化服务'}</p>
+                    <ul class="service-features">
+                        <li><i class="bi bi-check-circle"></i> 全球覆盖</li>
+                        <li><i class="bi bi-check-circle"></i> 多语种支持</li>
+                        <li><i class="bi bi-check-circle"></i> 本地化服务</li>
+                    </ul>
+                    <a href="${absPath(templateMap.service3url, '/page/channel/3')}" class="btn btn-primary btn-sm">了解详情 <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <div class="service-icon"><i class="bi bi-ui-checks"></i></div>
-                    <h5>${(templateMap.service4title)!'表单管理'}</h5>
-                    <p>${(templateMap.service4description)!'自定义表单、表单设计、数据收集、在线审批'}</p>
-                    <a href="${absPath(templateMap.service4url, '/page/form/search')}" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <div class="service-icon">
+                        <i class="bi bi-image"></i>
+                    </div>
+                    <h5>${(templateMap.service4title)!'彩信营销'}</h5>
+                    <p>${(templateMap.service4description)!'图文并茂，提升营销效果，支持大容量多媒体内容'}</p>
+                    <ul class="service-features">
+                        <li><i class="bi bi-check-circle"></i> 图文彩信</li>
+                        <li><i class="bi bi-check-circle"></i> 视频彩信</li>
+                        <li><i class="bi bi-check-circle"></i> 互动彩信</li>
+                    </ul>
+                    <a href="${absPath(templateMap.service4url, '/page/channel/4')}" class="btn btn-primary btn-sm">了解详情 <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <div class="service-icon"><i class="bi bi-shield-lock"></i></div>
-                    <h5>${(templateMap.service5title)!'安全可靠'}</h5>
-                    <p>${(templateMap.service5description)!'Spring Security、BCrypt加密、CSRF防护、XSS过滤'}</p>
-                    <a href="${request.contextPath}/page/article/1" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <div class="service-icon">
+                        <i class="bi bi-gift"></i>
+                    </div>
+                    <h5>${(templateMap.service5title)!'数字营销'}</h5>
+                    <p>${(templateMap.service5description)!'手机话费充值、流量充值，数字奖励营销解决方案'}</p>
+                    <ul class="service-features">
+                        <li><i class="bi bi-check-circle"></i> 话费充值</li>
+                        <li><i class="bi bi-check-circle"></i> 流量充值</li>
+                        <li><i class="bi bi-check-circle"></i> 数字奖励</li>
+                    </ul>
+                    <a href="${request.contextPath}/page/article/1" class="btn btn-primary btn-sm">了解详情 <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="service-card">
-                    <div class="service-icon"><i class="bi bi-lightning"></i></div>
-                    <h5>${(templateMap.service6title)!'高性能'}</h5>
-                    <p>${(templateMap.service6description)!'Caffeine缓存、懒加载、CDN加速、数据库优化'}</p>
-                    <a href="${request.contextPath}/page/article/1" class="btn btn-outline-primary btn-sm">${(templateMap.readMore)!'了解更多'} <i class="bi bi-arrow-right ms-1"></i></a>
+                    <div class="service-icon">
+                        <i class="bi bi-file-bar-graph"></i>
+                    </div>
+                    <h5>${(templateMap.service6title)!'数据分析'}</h5>
+                    <p>${(templateMap.service6description)!'实时监控、数据统计、报表分析，助力业务决策'}</p>
+                    <ul class="service-features">
+                        <li><i class="bi bi-check-circle"></i> 实时监控</li>
+                        <li><i class="bi bi-check-circle"></i> 数据统计</li>
+                        <li><i class="bi bi-check-circle"></i> 报表分析</li>
+                    </ul>
+                    <a href="${request.contextPath}/page/article/1" class="btn btn-primary btn-sm">了解详情 <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Latest News（CMS 动态内容） -->
-<section class="section-padding section-bg">
+<!-- Latest News -->
+<section class="news-section">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h2 class="section-title mb-1">${(templateMap.newsTitle)!'最新资讯'}</h2>
-                <p class="section-subtitle mb-0">${(templateMap.newsDescription)!'了解最新的动态与文章'}</p>
-            </div>
-            <a href="${request.contextPath}/page/search" class="btn btn-outline-primary btn-sm d-none d-md-inline-block">
-                查看全部 <i class="bi bi-arrow-right ms-1"></i>
-            </a>
+        <div class="section-header">
+            <span class="section-tag">${(templateMap.newsTag)!'最新动态'}</span>
+            <h2 class="section-title">${(templateMap.newsTitle)!'新闻中心'}</h2>
+            <p class="section-subtitle">${(templateMap.newsDescription)!'了解最新行业资讯和公司动态'}</p>
         </div>
         <#if latestArticles?? && (latestArticles?size > 0)>
         <div class="row g-4">
@@ -159,7 +230,7 @@
                         <#if article.coverImage?? && (article.coverImage?length > 0)>
                             <img src="${article.coverImage}" alt="${article.title}" loading="lazy">
                         <#else>
-                            <div class="news-cover-placeholder"><i class="bi bi-image"></i></div>
+                            <div class="news-cover-placeholder"><i class="bi bi-newspaper"></i></div>
                         </#if>
                     </div>
                     <div class="news-body">
@@ -167,10 +238,9 @@
                         <span class="news-tag">${article.channelName}</span>
                         </#if>
                         <h5 class="news-title">${(article.title)!}</h5>
-                        <p class="news-summary text-muted">${(article.summary)!'点击查看详情'}</p>
+                        <p class="news-summary">${(article.summary)!'点击查看详情'}</p>
                         <div class="news-meta">
-                            <span><i class="bi bi-person me-1"></i>${(article.createUserName)!'系统'}</span>
-                            <span><i class="bi bi-clock ms-2 me-1"></i><#if article.createTime??>${article.createTime?string('yyyy-MM-dd')}</#if></span>
+                            <span><i class="bi bi-clock me-1"></i><#if article.createTime??>${article.createTime?string('yyyy-MM-dd')}</#if></span>
                             <span class="ms-auto"><i class="bi bi-eye me-1"></i>${(article.viewCount)!0}</span>
                         </div>
                     </div>
@@ -178,24 +248,106 @@
             </div>
             </#list>
         </div>
+        <div class="text-center mt-5">
+            <a href="${request.contextPath}/page/search" class="btn btn-outline-primary">查看更多新闻 <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
         <#else>
-        <div class="text-center py-5">
-            <i class="bi bi-inbox text-muted" style="font-size:3rem;"></i>
-            <p class="text-muted mt-3">暂无文章，请先在后台发布内容。</p>
-            <a href="${request.contextPath}/admin/login" class="btn btn-primary mt-2">进入后台发布</a>
+        <div class="text-center py-8">
+            <i class="bi bi-newspaper text-muted" style="font-size:4rem;"></i>
+            <p class="text-muted mt-4">暂无新闻资讯，请先在后台发布内容</p>
         </div>
         </#if>
     </div>
 </section>
 
-<!-- Solution -->
-<section class="section-padding">
-    <div class="container text-center">
-        <h2 class="section-title">${(templateMap.solutionTitle)!'一站式内容管理平台'}</h2>
-        <p class="section-subtitle mx-auto" style="max-width:600px;">${(templateMap.solutionDescription)!'从文章发布到数据收集，从模板配置到用户管理，满足您的所有需求'}</p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap mt-4">
-            <a href="${request.contextPath}/page/search" class="btn btn-primary btn-lg px-4">浏览文章 <i class="bi bi-arrow-right ms-1"></i></a>
-            <a href="${request.contextPath}/admin/login" class="btn btn-outline-primary btn-lg px-4">免费试用</a>
+<!-- Partners -->
+<section class="partners-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">${(templateMap.partnerTag)!'合作伙伴'}</span>
+            <h2 class="section-title">${(templateMap.partnerTitle)!'信赖之选'}</h2>
+            <p class="section-subtitle">${(templateMap.partnerDesc)!'服务超过10000家企业客户'}</p>
+        </div>
+        <div class="partners-grid">
+            <div class="partner-item">
+                <i class="bi bi-building"></i>
+                <span>知名企业</span>
+            </div>
+            <div class="partner-item">
+                <i class="bi bi-bank"></i>
+                <span>金融机构</span>
+            </div>
+            <div class="partner-item">
+                <i class="bi bi-shop"></i>
+                <span>电商平台</span>
+            </div>
+            <div class="partner-item">
+                <i class="bi bi-hospital"></i>
+                <span>医疗机构</span>
+            </div>
+            <div class="partner-item">
+                <i class="bi bi-school"></i>
+                <span>教育机构</span>
+            </div>
+            <div class="partner-item">
+                <i class="bi bi-flag"></i>
+                <span>政府部门</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA -->
+<section class="contact-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h2>${(templateMap.contactTitle)!'立即开始您的云通信之旅'}</h2>
+                <p class="lead">${(templateMap.contactDesc)!'专业团队为您提供一对一服务，快速接入，即刻体验'}</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="bi bi-phone"></i>
+                        <div>
+                            <span class="contact-label">服务热线</span>
+                            <span class="contact-value">${(templateMap.phone)!'400-888-8888'}</span>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-envelope"></i>
+                        <div>
+                            <span class="contact-label">商务邮箱</span>
+                            <span class="contact-value">${(templateMap.email)!'contact@example.com'}</span>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-clock"></i>
+                        <div>
+                            <span class="contact-label">服务时间</span>
+                            <span class="contact-value">${(templateMap.workTime)!'7x24小时'}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="contact-form">
+                    <h4>快速咨询</h4>
+                    <form action="${request.contextPath}/page/form/search" method="get">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="您的姓名" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="tel" class="form-control" placeholder="联系电话" name="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" placeholder="电子邮箱" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" rows="3" placeholder="您的需求" name="message"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">提交咨询</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -203,38 +355,50 @@
 <@ft.frontendFooter />
 <@ft.frontendScript />
 <script>
-// 数字动画效果
 function animateCounters() {
-    const counters = document.querySelectorAll('.stats-number[data-count]');
+    const counters = document.querySelectorAll('[data-count]');
     counters.forEach(counter => {
-        const target = parseInt(counter.dataset.count);
-        const duration = 2000;
+        const target = parseFloat(counter.dataset.count);
+        const duration = 2500;
+        const isDecimal = target < 100;
         const step = target / (duration / 16);
         let current = 0;
         const timer = setInterval(() => {
             current += step;
             if (current >= target) {
-                counter.textContent = target.toLocaleString() + (counter.dataset.count >= 100 ? '+' : '');
+                counter.textContent = isDecimal ? target.toFixed(2) : Math.floor(target).toLocaleString();
                 clearInterval(timer);
             } else {
-                counter.textContent = Math.floor(current).toLocaleString();
+                counter.textContent = isDecimal ? current.toFixed(2) : Math.floor(current).toLocaleString();
             }
         }, 16);
     });
 }
 
-// 滚动到视口时触发动画
-const statsObserver = new IntersectionObserver((entries) => {
+const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             animateCounters();
-            statsObserver.disconnect();
+            observer.disconnect();
         }
     });
-}, { threshold: 0.5 });
+}, { threshold: 0.3 });
 
-const statsSection = document.querySelector('.stats-section');
-if (statsSection) statsObserver.observe(statsSection);
+const heroStats = document.querySelector('.hero-stats');
+if (heroStats) observer.observe(heroStats);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.service-card, .news-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
 </script>
 </body>
 </html>
